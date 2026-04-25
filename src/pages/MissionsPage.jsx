@@ -1,0 +1,367 @@
+import React, { useEffect, useState, useCallback } from "react";
+import { useLang } from "../context/LanguageContext";
+import StatCard from "../components/dashboard/StatCard";
+import api from "../utils/api";
+import CRUDModal from "../components/common/CRUDModal";
+import DataTable from "../components/common/DataTable";
+import Pagination from "../components/common/Pagination";
+import FilterBar from "../components/common/FilterBar";
+import StatusBadge from "../components/common/StatusBadge";
+import { toast } from "react-toastify";
+import ConfirmModal from "../components/common/ConfirmModal";
+
+export default function MissionsPage() {
+  const { t } = useLang();
+  const [missions, setMissions] = useState([]);
+  const [meta, setMeta] = useState(null);
+  const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingMission, setEditingMission] = useState(null);
+  const [modalLoading, setModalLoading] = useState(false);
+
+  const [queryParams, setQueryParams] = useState({
+    page: 1,
+    limit: 10,
+    status: "all",
+    search: "",
+    sortBy: "date",
+    sort: "descending"
+  });
+
+  const [selectedMission, setSelectedMission] = useState(null);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [confirmModal, setConfirmModal] = useState({ isOpen: false, title: "", message: "", onConfirm: null });
+  const [confirmLoading, setConfirmLoading] = useState(false);
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const q = { ...queryParams };
+      if (q.status === "all") delete q.status;
+      const queryString = new URLSearchParams(q).toString();
+      
+      const [missionsRes, statsRes] = await Promise.all([
+        api.get(`/local-missions/get-all-local-missions?${queryString}`),
+        api.get("/admin/stats/missions"),
+      ]);
+      
+      if (missionsRes.data.status === "ok") {
+        setMissions(missionsRes.data.data || []);
+        setMeta(missionsRes.data.meta);
+      }
+      if (statsRes.data.status === "ok") {
+        setStats(statsRes.data.data);
+      }
+    } catch (err) {
+      console.error("Failed to fetch missions", err);
+    } finally {
+      setLoading(false);
+    }
+  }, [queryParams]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const handleOpenAdd = () => {
+    setEditingMission(null);
+    setIsModalOpen(true);
+  };
+
+  const handleOpenEdit = (mission) => {
+    setEditingMission(mission);
+    setIsModalOpen(true);
+  };
+
+  const handleOpenView = async (id) => {
+    try {
+      const res = await api.get(`/local-missions/get-single-local-mission/${id}`);
+      if (res.data.status === "ok") {
+        setSelectedMission(res.data.data);
+        setIsViewModalOpen(true);
+      }
+    } catch (err) {
+      console.error("Failed to load details", err);
+    }
+  };
+
+  const handleSubmit = async (formData) => {
+    setModalLoading(true);
+    try {
+      const data = new FormData();
+      Object.keys(formData).forEach(key => {
+        if (formData[key] !== undefined) {
+          data.append(key, formData[key]);
+        }
+      });
+
+      if (editingMission) {
+        await api.patch(`/local-missions/update-local-mission/${editingMission._id}`, data, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+      } else {
+        await api.post("/local-missions/create-local-mission", data, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+      }
+      setIsModalOpen(false);
+      toast.success(editingMission ? "Mission updated successfully" : "Mission created successfully");
+      fetchData();
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Operation failed.");
+    } finally {
+      setModalLoading(false);
+    }
+  };
+
+  const handleDelete = (id) => {
+    setConfirmModal({
+      isOpen: true,
+      title: "Delete Mission",
+      message: "Are you sure you want to delete this mission?",
+      onConfirm: async () => {
+        setConfirmLoading(true);
+        try {
+          await api.delete(`/local-missions/delete-local-mission/${id}`);
+          toast.success("Mission deleted successfully");
+          fetchData();
+        } catch (err) {
+          toast.error(err.response?.data?.message || "Delete failed.");
+        } finally {
+          setConfirmLoading(false);
+          setConfirmModal(prev => ({ ...prev, isOpen: false }));
+        }
+      }
+    });
+  };
+
+  const missionFields = [
+    { name: "title", label: "Title", required: true },
+    { name: "description", label: "Description", type: "textarea", required: true },
+    { name: "address", label: "Address", required: true },
+    { name: "points", label: "Points Reward", type: "number", required: true },
+    { name: "duration", label: "Duration (e.g. 2h)", required: true },
+    { name: "image", label: "Mission Image", type: "file" },
+  ];
+
+  const columns = [
+    {
+      header: "MISSION",
+      cell: (m) => (
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-lg bg-[#f5f0e8] flex items-center justify-center text-xl overflow-hidden shrink-0 border border-[#e8ddd0]">
+            {m.photo?.secure_url ? (
+              <img src={m.photo.secure_url} alt={m.title} className="w-full h-full object-cover" />
+            ) : (
+              "🎯"
+            )}
+          </div>
+          <div className="flex flex-col">
+            <span className="font-bold text-[#3a2a1a] truncate max-w-[150px]">{m.title || "N/A"}</span>
+            <span className="text-[10px] text-[#9a8a7a] truncate max-w-[150px]">{m.address || t.noAddress}</span>
+          </div>
+        </div>
+      )
+    },
+    { 
+      header: "PARTENAIRE", 
+      cell: (m) => (
+        <div className="flex items-center gap-2">
+          <div className="w-6 h-6 rounded-full bg-[#8B6914] text-white flex items-center justify-center text-[10px] font-bold overflow-hidden shrink-0">
+            {(m.partner?.company?.[0] || m.partner?.firstName?.[0] || 'P').toUpperCase()}
+          </div>
+          <span className="text-xs text-[#3a2a1a] font-medium truncate max-w-[100px]">
+            {m.partner?.company || m.partner?.firstName || 'N/A'}
+          </span>
+        </div>
+      )
+    },
+    { 
+      header: "DATE", 
+      cell: (m) => new Date(m.createdAt).toLocaleDateString()
+    },
+    { 
+      header: "POINTS", 
+      cell: (m) => <span className="font-bold text-orange-600">+{m.points} pts</span>
+    },
+    { 
+      header: "PARTICIPANTS", 
+      align: "center",
+      cell: (m) => <span className="font-bold">{m.participantsCount || 0}</span>
+    },
+    {
+      header: t.statusLabel || "STATUT",
+      cell: (m) => <StatusBadge status={m.status} />
+    },
+    {
+      header: "ACTIONS",
+      align: "right",
+      cell: (m) => (
+        <div className="flex gap-1 justify-end">
+          <button 
+            onClick={() => handleOpenView(m._id)}
+            className="bg-blue-100 text-blue-600 text-[10px] font-bold px-3 py-1 rounded hover:bg-blue-200 transition-colors"
+          >
+            {t.viewBtn}
+          </button>
+          <button 
+            onClick={() => handleOpenEdit(m)}
+            className="bg-orange-100 text-orange-600 text-[10px] font-bold px-3 py-1 rounded hover:bg-orange-200 transition-colors"
+          >
+            {t.editBtn}
+          </button>
+          <button 
+            onClick={() => handleDelete(m._id)}
+            className="bg-red-100 text-red-600 text-[10px] font-bold px-3 py-1 rounded hover:bg-red-200 transition-colors"
+          >
+            {t.cancelBtn}
+          </button>
+        </div>
+      )
+    }
+  ];
+
+  return (
+    <div className="p-5 flex flex-col gap-4">
+      {/* Header with Stats */}
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-xl">🎯</span>
+            <div>
+              <h2 className="text-xl font-bold text-[#3a2a1a]">{t.missionsTitle}</h2>
+              <p className="text-[11px] text-[#9a8a7a]">{t.missionsSub}</p>
+            </div>
+          </div>
+          <button 
+            onClick={handleOpenAdd}
+            className="bg-[#8B6914] text-white text-[11px] font-bold px-4 py-2 rounded-lg hover:bg-[#6a5010] transition-colors flex items-center gap-2"
+          >
+            <span>+</span> {t.createMission}
+          </button>
+        </div>
+
+        <div className="grid grid-cols-4 gap-3">
+          <StatCard loading={loading} label={t.inProgressLabel} value={{ text: stats?.inProgress?.toLocaleString() || "0", color: "text-[#3a2a1a]" }} />
+          <StatCard loading={loading} label={"To Come"} value={{ text: stats?.toCome?.toLocaleString() || "0", color: "text-[#3a2a1a]" }} />
+          <StatCard loading={loading} label={t.finishedLabel} value={{ text: stats?.finished?.toLocaleString() || "0", color: "text-[#3a2a1a]" }} />
+          <StatCard loading={loading} label={t.pointsAttributed} value={{ text: stats?.pointsAttributed?.toLocaleString() || "0", color: "text-orange-500" }} />
+        </div>
+      </div>
+
+      {/* Table Card */}
+      <div className="bg-white rounded-xl border border-[#e8ddd0] overflow-hidden flex flex-col">
+        <FilterBar 
+          onSearch={(val) => setQueryParams(p => p.search === val ? p : { ...p, search: val, page: 1 })}
+          onFilterChange={(name, val) => setQueryParams(p => p[name] === val ? p : { ...p, [name]: val, page: 1 })}
+          onSortChange={(sortBy, sort) => setQueryParams(p => p.sortBy === sortBy && p.sort === sort ? p : { ...p, sortBy, sort, page: 1 })}
+          filters={[
+            {
+              name: "status",
+              label: t.allStatuses || "All statuses",
+              options: [
+                { label: "Active", value: "active" },
+                { label: "Inactive", value: "inactive" }
+              ]
+            }
+          ]}
+          sortOptions={[
+            { label: t.dateDesc || "Date (Newest)", value: "date:descending" },
+            { label: t.dateAsc || "Date (Oldest)", value: "date:ascending" },
+            { label: t.titleAsc || "Title (A-Z)", value: "title:ascending" },
+            { label: t.titleDesc || "Title (Z-A)", value: "title:descending" }
+          ]}
+        />
+
+        <DataTable 
+          columns={columns}
+          data={missions}
+          loading={loading}
+          emptyMessage={t.noMissionsFound || "No missions found."}
+        />
+
+        <Pagination 
+          meta={meta}
+          onPageChange={(page) => setQueryParams(p => ({ ...p, page }))}
+        />
+      </div>
+
+      <CRUDModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title={editingMission ? "Edit Mission" : "Create New Mission"}
+        fields={missionFields}
+        initialData={editingMission}
+        onSubmit={handleSubmit}
+        loading={modalLoading}
+      />
+
+      {isViewModalOpen && selectedMission && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto custom-scrollbar shadow-2xl animate-in fade-in zoom-in duration-200">
+            <div className="p-5 border-b border-[#f0e8d8] flex justify-between items-center sticky top-0 bg-white z-10">
+              <h2 className="text-xl font-bold text-[#3a2a1a] flex items-center gap-2">
+                <span>🎯</span> Détails: {selectedMission.title}
+              </h2>
+              <button onClick={() => setIsViewModalOpen(false)} className="text-[#9a8a7a] hover:text-[#3a2a1a] transition-colors p-1">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            </div>
+
+            <div className="p-6 flex flex-col gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="flex flex-col gap-4">
+                  <h3 className="font-bold text-[#3a2a1a] border-b pb-2">Informations Générales</h3>
+                  <div className="grid grid-cols-2 gap-y-2 text-sm">
+                    <span className="text-[#9a8a7a]">Titre:</span><span className="font-medium text-[#3a2a1a]">{selectedMission.title}</span>
+                    <span className="text-[#9a8a7a]">{t.statusLabel || "Status"}:</span>
+                    <span className="font-bold uppercase text-[10px] bg-green-100 text-green-600 px-2 py-0.5 rounded-full w-fit">{selectedMission.status}</span>
+                    <span className="text-[#9a8a7a]">Adresse:</span><span className="font-medium text-[#3a2a1a] truncate" title={selectedMission.address}>{selectedMission.address}</span>
+                    <span className="text-[#9a8a7a]">Durée:</span><span className="font-medium text-[#3a2a1a]">{selectedMission.duration || "N/A"}</span>
+                    <span className="text-[#9a8a7a]">Points:</span><span className="font-bold text-orange-600">+{selectedMission.points} pts</span>
+                    <span className="text-[#9a8a7a]">Date:</span><span className="font-medium text-[#3a2a1a]">{new Date(selectedMission.createdAt).toLocaleDateString()}</span>
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-4">
+                  <h3 className="font-bold text-[#3a2a1a] border-b pb-2">Partenaire</h3>
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-10 h-10 rounded-full bg-[#8B6914] text-white flex items-center justify-center font-bold overflow-hidden border border-[#e8ddd0]">
+                      {(selectedMission.partner?.company?.[0] || selectedMission.partner?.firstName?.[0] || 'P').toUpperCase()}
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="font-bold text-sm text-[#3a2a1a]">{selectedMission.partner?.company || selectedMission.partner?.firstName}</span>
+                      <span className="text-xs text-[#9a8a7a]">{selectedMission.partner?.email}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-2 bg-[#f5f0e8] p-4 rounded-xl">
+                <h3 className="font-bold text-[#3a2a1a] text-sm">Description</h3>
+                <p className="text-sm text-[#5a4a3a] leading-relaxed whitespace-pre-wrap">{selectedMission.description || t.noDescription}</p>
+              </div>
+
+              {selectedMission.photo?.secure_url && (
+                <div className="flex flex-col gap-3">
+                  <h3 className="font-bold text-[#3a2a1a] border-b pb-2">Photo de la mission</h3>
+                  <img src={selectedMission.photo.secure_url} alt="Mission" className="w-full max-h-64 object-cover rounded-lg border border-[#e8ddd0] shadow-sm" />
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        onClose={() => !confirmLoading && setConfirmModal(prev => ({ ...prev, isOpen: false }))}
+        onConfirm={confirmModal.onConfirm}
+        loading={confirmLoading}
+      />
+    </div>
+  );
+}

@@ -1,0 +1,78 @@
+import React, { useState, useEffect } from 'react';
+import { useLang } from '../../context/LanguageContext';
+
+const FilterBar = ({ 
+  onSearch, 
+  onFilterChange, 
+  onSortChange, 
+  filters = [], 
+  sortOptions = [],
+  placeholder
+}) => {
+  const { t } = useLang();
+  const [searchTerm, setSearchTerm] = useState("");
+
+  // Debounced search
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      onSearch(searchTerm);
+    }, 500);
+
+    return () => clearTimeout(delayDebounceFn);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchTerm]);
+
+  return (
+    <div className="p-4 border-b border-[#e8ddd0] flex flex-wrap items-center justify-between gap-4 bg-white">
+      <div className="flex flex-wrap items-center gap-3">
+        {/* Search Input */}
+        <div className="relative">
+          <input 
+            type="text" 
+            placeholder={placeholder || t.searchPlaceholder || "Search..."} 
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="bg-[#fcfaf7] border border-[#e8ddd0] rounded-lg pl-9 pr-4 py-2 text-xs text-[#3a2a1a] outline-none focus:border-[#8B6914] focus:ring-2 focus:ring-[#8B6914]/10 transition-all w-64" 
+          />
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm opacity-40">🔍</span>
+        </div>
+
+        {/* Dynamic Filters */}
+        {filters.map((filter) => (
+          <select 
+            key={filter.name}
+            onChange={(e) => onFilterChange(filter.name, e.target.value)}
+            className="bg-[#fcfaf7] border border-[#e8ddd0] rounded-lg px-3 py-2 text-xs text-[#3a2a1a] outline-none focus:border-[#8B6914] transition-all cursor-pointer min-w-[140px]"
+          >
+            <option value="all">{filter.label}</option>
+            {filter.options.map((opt) => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
+          </select>
+        ))}
+      </div>
+
+      <div className="flex items-center gap-3">
+        {/* Sorting */}
+        {sortOptions.length > 0 && (
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-bold text-[#9a8a7a] uppercase tracking-wider">{t.sortBy || "Sort by:"}</span>
+            <select 
+              onChange={(e) => {
+                const [sortBy, sort] = e.target.value.split(':');
+                onSortChange(sortBy, sort);
+              }}
+              className="bg-[#fcfaf7] border border-[#e8ddd0] rounded-lg px-3 py-2 text-xs text-[#3a2a1a] outline-none focus:border-[#8B6914] transition-all cursor-pointer"
+            >
+              {sortOptions.map((opt) => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default FilterBar;
