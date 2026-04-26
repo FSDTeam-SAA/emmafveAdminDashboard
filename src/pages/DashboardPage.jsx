@@ -84,29 +84,29 @@ export default function DashboardPage() {
   ];
 
   return (
-    <div className="px-6 py-4 flex flex-col gap-4">
+    <div className="px-4 md:px-6 py-4 flex flex-col gap-4">
       {/* Stats Row 1 */}
-      <div className="grid grid-cols-4 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         {statsRow1.map((s) => (
           <StatCard key={s.label} {...s} />
         ))}
       </div>
 
       {/* Stats Row 2 */}
-      <div className="grid grid-cols-4 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         {statsRow2.map((s) => (
           <StatCard key={s.label} {...s} />
         ))}
       </div>
 
       {/* Map + Activity */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
         <MapCard data={stats?.reports?.map} total={stats?.reports?.pending} />
         <ActivityCard data={stats?.activity} />
       </div>
 
       {/* Chart + Crowdfunding */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
         <ReportTypesCard data={stats?.reports?.breakdown} total={stats?.reports?.total} />
         <CrowdfundingCard initialData={stats?.crowdfunding} />
       </div>

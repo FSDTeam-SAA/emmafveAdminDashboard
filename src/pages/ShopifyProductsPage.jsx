@@ -128,7 +128,7 @@ export default function ShopifyProductsPage() {
   );
 
   return (
-    <div className="px-6 py-4 flex flex-col gap-4">
+    <div className="px-4 md:px-6 py-4 flex flex-col gap-4">
       <div className="bg-white rounded-2xl border border-[#e8ddd0] overflow-hidden flex flex-col shadow-sm">
         <FilterBar
           onSearch={(val) => setQuery(p => ({ ...p, search: val }))}

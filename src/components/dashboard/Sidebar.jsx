@@ -2,8 +2,28 @@ import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useLang } from "../../context/LanguageContext";
 import api from "../../utils/api";
+import { 
+  LayoutDashboard, 
+  Flag, 
+  Users, 
+  Handshake, 
+  Phone, 
+  Map, 
+  MapPin, 
+  ShoppingBag, 
+  FileText, 
+  Coins, 
+  Package, 
+  Gift, 
+  Rocket, 
+  BarChart, 
+  Bell, 
+  Settings, 
+  LogOut,
+  X
+} from "lucide-react";
 
-const Sidebar = React.memo(() => {
+const Sidebar = React.memo(({ isOpen, setIsOpen }) => {
   const { t } = useLang();
   const location = useLocation();
   const [stats, setStats] = React.useState(null);
@@ -54,37 +74,37 @@ const Sidebar = React.memo(() => {
     {
       label: t.principal,
       items: [
-        { icon: "🏠", key: "overview", path: "/dashboard", badge: null },
-        { icon: "🚩", key: "reports", path: "/reports", badge: stats?.reports?.total > 0 ? stats.reports.total : null, badgeColor: "bg-red-600" },
-        { icon: "👥", key: "users", path: "/users", badge: null },
-        { icon: "🤝", key: "partners", path: "/partners", badge: stats?.partners?.pending > 0 ? stats.partners.pending : null, badgeColor: "bg-orange-500" },
-        { icon: "📞", key: "contacts", path: "/contacts", badge: null },
+        { icon: LayoutDashboard, key: "overview", path: "/dashboard", badge: null },
+        { icon: Flag, key: "reports", path: "/reports", badge: stats?.reports?.total > 0 ? stats.reports.total : null, badgeColor: "bg-red-600" },
+        { icon: Users, key: "users", path: "/users", badge: null },
+        { icon: Handshake, key: "partners", path: "/partners", badge: stats?.partners?.pending > 0 ? stats.partners.pending : null, badgeColor: "bg-orange-500" },
+        { icon: Phone, key: "contacts", path: "/contacts", badge: null },
       ],
     },
     {
       label: t.community,
       items: [
-        { icon: "🗺️", key: "localMissions", path: "/missions", badge: null },
-        { icon: "⭐", key: "collectionPoints", path: "/collection-points", badge: null },
+        { icon: Map, key: "localMissions", path: "/missions", badge: null },
+        { icon: MapPin, key: "collectionPoints", path: "/collection-points", badge: null },
       ],
     },
     {
       label: t.economy,
       items: [
-        { icon: "\uD83D\uDED2", key: "shopifyProducts", path: "/shopify-products", badge: null },
-        { icon: "\uD83D\uDCDD", key: "validation-donations", path: "/validation-donations", badge: stats?.donationProofs?.pending > 0 ? stats.donationProofs.pending : null, badgeColor: "bg-orange-500" },
-        { icon: "\u2B50", key: "pointsSystem", path: "/points", badge: null },
-        { icon: "\uD83D\uDECD", key: "physicalItems", path: "/items", badge: null },
-        { icon: "\uD83C\uDF81", key: "donations", path: "/donations", badge: null },
-        { icon: "\uD83D\uDE80", key: "crowdfunding", path: "/crowdfunding", badge: null },
+        { icon: ShoppingBag, key: "shopifyProducts", path: "/shopify-products", badge: null },
+        { icon: FileText, key: "validation-donations", path: "/validation-donations", badge: stats?.donationProofs?.pending > 0 ? stats.donationProofs.pending : null, badgeColor: "bg-orange-500" },
+        { icon: Coins, key: "pointsSystem", path: "/points", badge: null },
+        { icon: Package, key: "physicalItems", path: "/items", badge: null },
+        { icon: Gift, key: "donations", path: "/donations", badge: null },
+        { icon: Rocket, key: "crowdfunding", path: "/crowdfunding", badge: null },
       ],
     },
     {
       label: t.config,
       items: [
-        { icon: "📊", key: "analytics", path: "/analytics", badge: null },
-        { icon: "🔔", key: "notifications", path: "/notifications", badge: null },
-        { icon: "⚙️", key: "settings", path: "/settings", badge: null },
+        { icon: BarChart, key: "analytics", path: "/analytics", badge: null },
+        { icon: Bell, key: "notifications", path: "/notifications", badge: null },
+        { icon: Settings, key: "settings", path: "/settings", badge: null },
       ],
     },
   ];
@@ -92,13 +112,24 @@ const Sidebar = React.memo(() => {
   const sections = navSections(t, stats);
 
   return (
-    <aside className="fixed top-0 left-0 h-screen w-52 bg-[#3a2a1a] flex flex-col overflow-y-auto z-50">
+    <aside className={`fixed top-0 left-0 h-screen w-52 bg-[#3a2a1a] flex flex-col overflow-y-auto z-[9999] transform transition-transform duration-300 md:translate-x-0 ${isOpen ? "translate-x-0" : "-translate-x-full"}`}>
       {/* Logo */}
-      <div className="bg-[#2a1a0a] px-3 h-[73px] flex items-center gap-2 shrink-0">
-        <span className="text-white font-bold text-base tracking-widest">HESTEKA</span>
-        <span className="bg-red-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
-          {t.admin}
-        </span>
+      <div className="bg-[#2a1a0a] px-3 h-[73px] flex items-center justify-between shrink-0">
+        <div className="flex items-center gap-2">
+          <span className="text-white font-bold text-base tracking-widest">HESTEKA</span>
+          <span className="bg-red-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
+            {t.admin}
+          </span>
+        </div>
+        
+        {/* Close Button for Mobile */}
+        <button 
+          onClick={() => setIsOpen(false)}
+          className="md:hidden text-[#c8b898] hover:text-white p-1 transition-colors"
+          aria-label="Close Sidebar"
+        >
+          <X className="w-6 h-6" />
+        </button>
       </div>
 
       {/* User */}
@@ -128,10 +159,11 @@ const Sidebar = React.memo(() => {
             <Link
               to={item.path}
               key={item.key}
+              onClick={() => setIsOpen && setIsOpen(false)}
               className={`w-full flex items-center gap-2 px-3 py-1.5 text-[12px] text-[#c8b898] hover:bg-[#5a4a3a] hover:text-white transition-colors ${location.pathname === item.path ? "bg-[#8B6914] text-white" : ""
                 }`}
             >
-              <span className="text-sm w-4 text-center">{item.icon}</span>
+              <item.icon className="w-4 h-4 shrink-0" />
               <span className="flex-1 text-left">{t[item.key]}</span>
               {item.badge && (
                 <span
@@ -150,9 +182,7 @@ const Sidebar = React.memo(() => {
           onClick={handleLogout}
           className="w-full flex items-center justify-center gap-2 px-3 py-2 text-[12px] text-[#c8b898] border border-[#5a4a3a] rounded hover:bg-[#5a4a3a] hover:text-white transition-colors"
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-          </svg>
+          <LogOut className="w-4 h-4" />
           {t.logout}
         </button>
       </div>

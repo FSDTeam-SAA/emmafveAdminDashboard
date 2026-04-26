@@ -31,9 +31,9 @@ export default function SettingsPage() {
   ];
 
   return (
-    <div className="px-6 py-4 flex flex-col gap-4">
+    <div className="px-4 md:px-6 py-4 flex flex-col gap-4">
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Admin Team Card */}
         <div className="bg-white rounded-xl border border-[#e8ddd0] p-6 flex flex-col gap-5">
            <h3 className="font-bold text-[#3a2a1a] text-sm flex items-center gap-2">

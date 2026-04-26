@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLang } from "../context/LanguageContext";
 import { toast } from "react-toastify";
+import { requestForToken } from "../firebase";
 
 export default function AdminLoginPage() {
   const navigate = useNavigate();
@@ -41,6 +42,32 @@ export default function AdminLoginPage() {
         localStorage.setItem("adminUser", JSON.stringify(userData));
         localStorage.setItem("adminAccessToken", userData.accessToken);
         localStorage.setItem("adminRefreshToken", userData.refreshToken);
+
+        try {
+          const fcmToken = await requestForToken();
+          if (fcmToken) {
+            console.log("[FCM] Saving token to backend...");
+            const fcmRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/user/update-fcm-token`, {
+              method: "PATCH",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${userData.accessToken}`,
+              },
+              body: JSON.stringify({ fcmToken }),
+            });
+            const fcmData = await fcmRes.json();
+            if (fcmRes.ok) {
+              console.log("[FCM] Token saved successfully:", fcmData);
+            } else {
+              console.error("[FCM] Backend rejected token save:", fcmData);
+            }
+          } else {
+            console.warn("[FCM] No token generated — skipping backend save.");
+          }
+        } catch (fcmErr) {
+          console.error("[FCM] Failed to update FCM token:", fcmErr);
+        }
+
         toast.success(`${t.welcomeBack || "Welcome back"}, ${userData.firstName}!`);
         navigate("/dashboard", { replace: true });
       } else {
@@ -54,27 +81,27 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f5f0e8] flex items-center justify-center p-4">
-      {/* Phone-style card */}
-      <div className="w-full max-w-sm bg-white rounded-3xl overflow-hidden shadow-2xl">
+    <div className="min-h-screen bg-[#f5f0e8] flex items-center justify-center p-4 md:p-8">
+      {/* Responsive Card */}
+      <div className="w-full max-w-sm md:max-w-4xl bg-white rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row">
 
         {/* Hero / Logo Section */}
-        <div className="relative h-52 overflow-hidden flex flex-col items-center justify-center gap-3">
+        <div className="relative h-52 md:h-auto md:min-h-[500px] md:w-1/2 overflow-hidden flex flex-col items-center justify-center">
           {/* Cat hero bg subtle pattern */}
           <div className="absolute inset-0 opacity-90">
             <img src="/images/cat_hero.jpg" alt="" className="w-full h-full object-cover object-center" />
           </div>
-          <div className="absolute inset-0 bg-gradient-to-b from-[#2a1a0a]/60 to-[#2a1a0a]/80" />
+          <div className="absolute inset-0 bg-gradient-to-b md:bg-gradient-to-br from-[#2a1a0a]/60 to-[#2a1a0a]/80" />
           {/* Actual HESTEKA logo */}
           <img
             src="/images/Logo.png"
             alt="HESTEKA"
-            className="relative z-10 h-25 object-contain drop-shadow-xl"
+            className="relative z-10 h-24 md:h-32 object-contain drop-shadow-2xl transition-transform hover:scale-105 duration-300"
           />
         </div>
 
         {/* Form Section */}
-        <div className="px-7 py-7">
+        <div className="px-7 py-8 md:p-12 md:w-1/2 flex flex-col justify-center">
           <h2 className="text-3xl font-bold text-[#c0501a] text-center mb-6" style={{ fontFamily: "serif" }}>
             {t.loginTitle}
           </h2>

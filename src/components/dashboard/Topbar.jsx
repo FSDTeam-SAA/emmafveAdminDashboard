@@ -6,8 +6,9 @@ import { socket } from "../../context/SocketContect";
 import api from "../../utils/api";
 import ProfileModal from "./ProfileModal";
 import { toast } from "react-toastify";
+import { Bell, Menu } from "lucide-react";
 
-const Topbar = React.memo(() => {
+const Topbar = React.memo(({ onToggleSidebar }) => {
   const { lang, setLang, t } = useLang();
   const location = useLocation();
   const { fetchWithCache } = useApiCache();
@@ -169,10 +170,19 @@ const Topbar = React.memo(() => {
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-white border-b border-[#e8ddd0] px-6 h-[73px] flex items-center justify-between shrink-0">
-      <div>
-        <h1 className="text-xl font-bold text-[#3a2a1a]">{page.title}</h1>
-        <p className="text-[11px] text-[#9a8a7a] mt-0.5">{page.sub}</p>
+    <header className="sticky top-0 z-[9997] bg-white border-b border-[#e8ddd0] px-4 md:px-6 h-[73px] flex items-center justify-between shrink-0">
+      <div className="flex items-center gap-3">
+        <button 
+          onClick={onToggleSidebar}
+          className="md:hidden text-[#3a2a1a] p-1.5 -ml-1 hover:bg-[#f5f0e8] rounded-lg transition-colors"
+          aria-label="Toggle Sidebar"
+        >
+          <Menu className="w-6 h-6" />
+        </button>
+        <div>
+          <h1 className="text-lg md:text-xl font-bold text-[#3a2a1a] truncate max-w-[150px] sm:max-w-none">{page.title}</h1>
+          <p className="text-[10px] md:text-[11px] text-[#9a8a7a] mt-0.5 hidden sm:block">{page.sub}</p>
+        </div>
       </div>
 
       <div className="flex items-center gap-3">
@@ -198,7 +208,7 @@ const Topbar = React.memo(() => {
             onClick={() => setShowNotifs(!showNotifs)}
             className="relative text-[#3a2a1a] text-lg hover:opacity-80 transition-opacity p-1"
           >
-            🔔
+            <Bell className="w-5 h-5" />
             {unreadCount > 0 && (
               <span className="absolute top-0 right-0 w-4 h-4 bg-red-600 rounded-full flex items-center justify-center text-[9px] font-bold text-white shadow-sm border border-white">
                 {unreadCount > 9 ? "9+" : unreadCount}

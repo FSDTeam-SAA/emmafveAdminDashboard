@@ -177,7 +177,7 @@ export default function ValidationDonationsPage() {
   ];
 
   return (
-    <div className="px-6 py-4 flex flex-col gap-4 relative">
+    <div className="px-4 md:px-6 py-4 flex flex-col gap-4 relative">
       {/* Background loading overlay for the whole page if no data yet */}
       {loading && pending.length === 0 && (
         <div className="absolute inset-0 bg-white/50 backdrop-blur-sm z-50 flex items-center justify-center">
@@ -200,7 +200,7 @@ export default function ValidationDonationsPage() {
       </div> */}
 
       {/* Stats Bar */}
-      <div className="grid grid-cols-4 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <StatCard loading={loading} label={t.pendingValidationDon} value={{ text: stats?.pendingCount?.toString() || "0", color: "text-orange-500" }} sub={t.toValidate} subType="wait" />
         <StatCard loading={loading} label={t.validatedThisMonth} value={{ text: stats?.validatedThisMonth?.toString() || "0", color: "text-green-600" }} sub={`${(stats?.validatedGrowth || 0) >= 0 ? "+" : ""}${stats?.validatedGrowth || 0}% ${t.vsLastMonth}`} subType={(stats?.validatedGrowth || 0) >= 0 ? "up" : "down"} />
         <StatCard loading={loading} label={t.refused} value={{ text: stats?.refusedThisMonth?.toString() || "0", color: "text-red-600" }} sub={`${(stats?.refusedGrowth || 0) >= 0 ? "+" : ""}${stats?.refusedGrowth || 0}% ${t.vsLastMonth}`} subType={(stats?.refusedGrowth || 0) >= 0 ? "up" : "down"} />

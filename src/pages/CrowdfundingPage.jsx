@@ -1,25 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLang } from "../context/LanguageContext";
 import api from "../utils/api";
-
-const DonorRow = React.memo(({ donor, t }) => (
-  <tr className="border-b border-[#f0e8d8] last:border-0 hover:bg-[#fcfaf7] transition-colors text-xs">
-    <td className="py-4 px-4 font-bold text-[#3a2a1a]">{donor.user}</td>
-    <td className="py-4 px-4 font-bold text-[#3a2a1a]">{donor.amount}€</td>
-    <td className="py-4 px-4 text-[#3a2a1a]">{donor.counterpart}</td>
-    <td className="py-4 px-4 text-[#9a8a7a]">{donor.date}</td>
-    <td className="py-4 px-4">
-      <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full uppercase ${donor.status === "Confirmed" || donor.status === "Confirm\u00E9" ? "bg-green-100 text-green-600" : "bg-orange-100 text-orange-600"}`}>
-        {donor.status}
-      </span>
-    </td>
-    <td className="py-4 px-4">
-      <div className="flex justify-end">
-        <button className="bg-blue-100 text-blue-600 text-[10px] font-bold px-3 py-1 rounded-xl hover:bg-blue-200 transition-colors">{t.detailsBtn}</button>
-      </div>
-    </td>
-  </tr>
-));
+import DataTable from "../components/common/DataTable";
 
 export default function CrowdfundingPage() {
   const { t, lang } = useLang();
@@ -48,17 +30,47 @@ export default function CrowdfundingPage() {
     { user: "thomas@email.fr", amount: "100", counterpart: "Pack Fondateur", date: "13/04/26", status: lang === "fr" ? "En attente" : "Pending" },
   ];
 
+  const columns = [
+    {
+      header: t.donator,
+      cell: (d) => <div className="font-bold text-[#3a2a1a]">{d.user}</div>
+    },
+    {
+      header: t.amount,
+      cell: (d) => <div className="font-bold text-[#3a2a1a]">{d.amount}€</div>
+    },
+    { header: t.counterpart, accessor: "counterpart" },
+    { header: t.dateLabel || "DATE", accessor: "date" },
+    {
+      header: t.statusLabel || "STATUS",
+      cell: (d) => (
+        <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full uppercase ${d.status === "Confirmed" || d.status === "Confirm\u00E9" ? "bg-green-100 text-green-600" : "bg-orange-100 text-orange-600"}`}>
+          {d.status}
+        </span>
+      )
+    },
+    {
+      header: t.actionsLabel || "ACTIONS",
+      align: "right",
+      cell: () => (
+        <div className="flex justify-end">
+          <button className="bg-blue-100 text-blue-600 text-[10px] font-bold px-3 py-1 rounded-xl hover:bg-blue-200 transition-colors">{t.detailsBtn}</button>
+        </div>
+      )
+    }
+  ];
+
   return (
-    <div className="px-6 py-4 flex flex-col gap-4">
+    <div className="px-4 md:px-6 py-4 flex flex-col gap-4">
       {/* Main Campaign Card */}
       <div className="bg-white rounded-xl border border-[#e8ddd0] p-6 flex flex-col gap-6">
         <div className="flex flex-col gap-2">
-          <div className="flex items-end gap-3">
-            <span className="text-5xl font-bold text-[#3a2a1a]">{stats?.totalCollected?.toLocaleString() || 0}€</span>
-            <span className="text-xl text-[#9a8a7a] mb-1.5">{t.of || "sur"} {stats?.goalAmount?.toLocaleString() || 0}€ {t.goal || "goal"}</span>
+          <div className="flex flex-wrap items-end gap-2 md:gap-3">
+            <span className="text-3xl md:text-5xl font-bold text-[#3a2a1a]">{stats?.totalCollected?.toLocaleString() || 0}€</span>
+            <span className="text-base md:text-xl text-[#9a8a7a] mb-1 md:mb-1.5">{t.of || "sur"} {stats?.goalAmount?.toLocaleString() || 0}€ {t.goal || "goal"}</span>
           </div>
           {/* Progress Bar */}
-          <div className="w-full h-8 bg-[#f5f0e8] rounded-full overflow-hidden relative border border-[#e8ddd0]">
+          <div className="w-full h-6 md:h-8 bg-[#f5f0e8] rounded-full overflow-hidden relative border border-[#e8ddd0]">
             <div
               className="h-full bg-[#8B6914] transition-all duration-1000 flex items-center justify-end px-3"
               style={{ width: `${stats?.percentage || 0}%` }}
@@ -68,7 +80,7 @@ export default function CrowdfundingPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {[
             { label: t.donors, value: stats?.donorsCount || "0", color: "bg-blue-500" },
             { label: t.averageBasket, value: "33,9€", color: "bg-green-500" },
@@ -90,29 +102,19 @@ export default function CrowdfundingPage() {
       </div>
 
       {/* Donors List Table */}
-      <div className="bg-white rounded-xl border border-[#e8ddd0] overflow-hidden">
-        <div className="p-4 border-b border-[#e8ddd0]">
+      <div className="bg-white rounded-xl border border-[#e8ddd0] overflow-hidden shadow-sm">
+        <div className="p-4 border-b border-[#e8ddd0] bg-[#fcfaf7]">
           <h3 className="font-bold text-[#3a2a1a] text-xs flex items-center gap-2">
             <span>📜</span> {t.donorsList}
           </h3>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead>
-              <tr className="bg-[#fcfaf7] border-b border-[#e8ddd0]">
-                <th className="py-3 px-4 text-[10px] font-bold text-[#9a8a7a] tracking-widest">{t.donator}</th>
-                <th className="py-3 px-4 text-[10px] font-bold text-[#9a8a7a] tracking-widest">{t.amount}</th>
-                <th className="py-3 px-4 text-[10px] font-bold text-[#9a8a7a] tracking-widest">{t.counterpart}</th>
-                <th className="py-3 px-4 text-[10px] font-bold text-[#9a8a7a] tracking-widest">{t.dateLabel || "DATE"}</th>
-                <th className="py-3 px-4 text-[10px] font-bold text-[#9a8a7a] tracking-widest">{t.statusLabel || "STATUS"}</th>
-                <th className="py-3 px-4 text-[10px] font-bold text-[#9a8a7a] tracking-widest text-right">{t.actionsLabel || "ACTIONS"}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {donors.map((d, i) => <DonorRow key={i} donor={d} t={t} />)}
-            </tbody>
-          </table>
-        </div>
+        
+        <DataTable 
+          columns={columns}
+          data={donors}
+          loading={loading}
+          emptyMessage={t.noDataFound}
+        />
       </div>
       {/* Action */}
       <div className="flex justify-start">

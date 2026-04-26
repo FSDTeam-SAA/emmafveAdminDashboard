@@ -223,9 +223,9 @@ export default function MissionsPage() {
   ];
 
   return (
-    <div className="px-6 py-4 flex flex-col gap-4">
+    <div className="px-4 md:px-6 py-4 flex flex-col gap-4">
       {/* Stats */}
-      <div className="grid grid-cols-4 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <StatCard loading={loading} label={t.inProgressLabel} value={{ text: stats?.inProgress?.toLocaleString() || "0", color: "text-[#3a2a1a]" }} color="bg-orange-500" />
         <StatCard loading={loading} label={t.toComeLabel || "To Come"} value={{ text: stats?.toCome?.toLocaleString() || "0", color: "text-[#3a2a1a]" }} color="bg-blue-500" />
         <StatCard loading={loading} label={t.finishedLabel} value={{ text: stats?.finished?.toLocaleString() || "0", color: "text-[#3a2a1a]" }} color="bg-green-500" />

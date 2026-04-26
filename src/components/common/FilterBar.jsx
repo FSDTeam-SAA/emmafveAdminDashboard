@@ -25,11 +25,10 @@ const FilterBar = ({
   }, [searchTerm]);
 
   return (
-    <div className={`p-3 flex flex-wrap items-center justify-between gap-4 transition-all ${
-      related 
-        ? "bg-white border-b border-[#e8ddd0]" 
+    <div className={`p-3 flex flex-wrap items-center justify-between gap-4 transition-all ${related
+        ? "bg-white border-b border-[#e8ddd0]"
         : "bg-white rounded-2xl border border-[#e8ddd0] shadow-sm"
-    }`}>
+      }`}>
       <div className="flex flex-wrap items-center gap-3">
         {/* Search Input */}
         <div className="relative">

@@ -275,7 +275,7 @@ export default function PartnersPage() {
   ];
 
   return (
-    <div className="px-6 py-4 flex flex-col gap-4">
+    <div className="px-4 md:px-6 py-4 flex flex-col gap-4">
       {/* Header */}
       {/* <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">

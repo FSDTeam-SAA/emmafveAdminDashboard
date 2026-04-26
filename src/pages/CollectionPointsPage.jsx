@@ -12,6 +12,7 @@ import ConfirmModal from "../components/common/ConfirmModal";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { Store, ClipboardList, Plus, MapPin, X } from "lucide-react";
 
 // Fix default Leaflet marker icons
 delete L.Icon.Default.prototype._getIconUrl;
@@ -178,7 +179,7 @@ const CollectionPointsPage = React.memo(() => {
       cell: (p) => (
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded bg-[#8B6914] flex items-center justify-center text-white text-xs font-bold shrink-0">
-            🛒
+            <Store className="w-4 h-4" />
           </div>
           <div className="flex flex-col">
             <span className="font-bold text-[#3a2a1a]">{p.title}</span>
@@ -233,11 +234,11 @@ const CollectionPointsPage = React.memo(() => {
   ];
 
   return (
-    <div className="px-6 py-4 flex flex-col gap-4">
+    <div className="px-4 md:px-6 py-4 flex flex-col gap-4 overflow-x-hidden">
 
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Real Leaflet Map */}
-        <div className="xl:col-span-5 bg-white rounded-xl border border-[#e8ddd0] overflow-hidden relative h-[450px] shadow-sm">
+        <div className="lg:col-span-5 bg-white rounded-xl border border-[#e8ddd0] overflow-hidden relative min-h-[450px] lg:h-auto shadow-sm">
           <MapContainer
             center={[46.2276, 2.2137]}
             zoom={5}
@@ -271,23 +272,23 @@ const CollectionPointsPage = React.memo(() => {
 
           {/* Loading overlay — shown while allPoints not yet ready */}
           {loading && allPoints.length === 0 && (
-            <div className="absolute inset-0 z-[400] flex items-center justify-center bg-white/60 backdrop-blur-sm">
+            <div className="absolute inset-0 z-20 flex items-center justify-center bg-white/60 backdrop-blur-sm">
               <div className="w-8 h-8 border-4 border-[#8B6914] border-t-transparent rounded-full animate-spin"></div>
             </div>
           )}
 
-          <div className="absolute bottom-4 left-4 z-[400] bg-white/95 backdrop-blur shadow-lg px-4 py-2 rounded-xl text-[10px] font-extrabold text-[#3a2a1a] border border-[#e8ddd0] flex items-center gap-2">
+          <div className="absolute bottom-4 left-4 z-10 bg-white/95 backdrop-blur shadow-lg px-4 py-2 rounded-xl text-[10px] font-extrabold text-[#3a2a1a] border border-[#e8ddd0] flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
             {meta?.total || 0} {t.activePointsLabel || "active collection points"}
           </div>
         </div>
 
         {/* List View */}
-        <div className="xl:col-span-7 flex flex-col">
+        <div className="lg:col-span-7 flex flex-col">
           <div className="bg-white rounded-xl border border-[#e8ddd0] overflow-hidden flex flex-col shadow-sm">
             <div className="p-4 border-b border-[#e8ddd0] bg-[#fcfaf7] flex items-center justify-between">
               <h3 className="font-bold text-[#3a2a1a] text-xs flex items-center gap-2">
-                <span>📜</span> {t.pointsList}
+                <ClipboardList className="w-4 h-4 text-[#8B6914]" /> {t.pointsList}
               </h3>
               <span className="text-[10px] font-bold text-[#9a8a7a]">{meta?.total || 0} Total</span>
             </div>
@@ -318,7 +319,7 @@ const CollectionPointsPage = React.memo(() => {
                   onClick={handleOpenAdd}
                   className="bg-[#8B6914] text-white text-[11px] font-bold px-4 py-2 rounded-xl hover:bg-[#6a5010] transition-colors flex items-center gap-2"
                 >
-                  <span>+</span> {t.addPoint}
+                  <Plus className="w-4 h-4" /> {t.addPoint}
                 </button>
               }
             />
@@ -355,10 +356,10 @@ const CollectionPointsPage = React.memo(() => {
           <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto custom-scrollbar shadow-2xl animate-in fade-in zoom-in duration-200">
             <div className="p-5 border-b border-[#f0e8d8] flex justify-between items-center sticky top-0 bg-white z-10">
               <h2 className="text-xl font-bold text-[#3a2a1a] flex items-center gap-2">
-                <span>🛒</span> {t.viewBtn || "View"}: {selectedPoint.title}
+                <Store className="w-5 h-5 text-[#8B6914]" /> {t.viewBtn || "View"}: {selectedPoint.title}
               </h2>
               <button onClick={() => setIsViewModalOpen(false)} className="text-[#9a8a7a] hover:text-[#3a2a1a] transition-colors p-1">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                <X className="w-6 h-6" />
               </button>
             </div>
 
@@ -404,7 +405,7 @@ const CollectionPointsPage = React.memo(() => {
               {selectedPoint.location && selectedPoint.location.coordinates && (
                 <div className="flex flex-col gap-3">
                   <h3 className="font-bold text-[#3a2a1a] border-b pb-2">{t.localisationLabel || "Localization"}</h3>
-                  <p className="text-sm text-[#5a4a3a] mb-2">📍 {selectedPoint.location.address || selectedPoint.address}</p>
+                  <p className="text-sm text-[#5a4a3a] mb-2 flex items-center gap-2"><MapPin className="w-4 h-4 text-[#8B6914]" /> {selectedPoint.location.address || selectedPoint.address}</p>
                   <div className="w-full h-64 bg-gray-200 rounded-xl overflow-hidden border border-[#e8ddd0]">
                     <iframe
                       width="100%"

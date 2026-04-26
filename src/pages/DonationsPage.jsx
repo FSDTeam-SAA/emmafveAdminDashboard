@@ -5,6 +5,7 @@ import api from "../utils/api";
 import Pagination from "../components/common/Pagination";
 import FilterBar from "../components/common/FilterBar";
 import { toast } from "react-toastify";
+import { FileText, X, Mail, Printer, CreditCard, Package, Wallet, Download } from "lucide-react";
 
 const ReceiptModal = ({ donation, isOpen, onClose, t, isFiscal }) => {
   const [emailLoading, setEmailLoading] = useState(false);
@@ -37,9 +38,9 @@ const ReceiptModal = ({ donation, isOpen, onClose, t, isFiscal }) => {
         {/* Modal Header - Hidden on print */}
         <div className="bg-[#fcfaf7] px-6 py-4 border-b border-[#e8ddd0] flex justify-between items-center print:hidden">
           <h3 className="font-bold text-[#3a2a1a] flex items-center gap-2 uppercase tracking-tight text-sm">
-            <span>{isFiscal ? "📜" : "🧾"}</span> {isFiscal ? t.fiscalReceipt : t.receiptBtn}
+            <FileText className="w-4 h-4 text-[#8B6914]" /> {isFiscal ? t.fiscalReceipt : t.receiptBtn}
           </h3>
-          <button onClick={onClose} className="text-[#9a8a7a] hover:text-[#3a2a1a] transition-colors">✕</button>
+          <button onClick={onClose} className="text-[#9a8a7a] hover:text-[#3a2a1a] transition-colors"><X className="w-5 h-5" /></button>
         </div>
 
         {/* Receipt Content */}
@@ -126,13 +127,13 @@ const ReceiptModal = ({ donation, isOpen, onClose, t, isFiscal }) => {
             disabled={emailLoading}
             className="flex-1 bg-blue-600 text-white text-xs font-bold py-3 rounded-xl hover:bg-blue-700 transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-600/20 disabled:opacity-50"
           >
-            {emailLoading ? t.sendingLabel || "SENDING..." : <><span>📧</span> {t.emailReceipt || "EMAIL"}</>}
+            {emailLoading ? t.sendingLabel || "SENDING..." : <><Mail className="w-4 h-4" /> {t.emailReceipt || "EMAIL"}</>}
           </button>
           <button
             onClick={handlePrint}
             className="flex-1 bg-[#3a2a1a] text-white text-xs font-bold py-3 rounded-xl hover:bg-[#2a1a0a] transition-all flex items-center justify-center gap-2 shadow-lg shadow-[#3a2a1a]/20"
           >
-            <span>🖨️</span> {t.printBtn || "PRINT"}
+            <Printer className="w-4 h-4" /> {t.printBtn || "PRINT"}
           </button>
         </div>
       </div>
@@ -170,9 +171,9 @@ const DonationDetailModal = ({ donation, isOpen, onClose, t }) => {
       <div className="bg-white rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden border border-[#e8ddd0]">
         <div className="bg-[#fcfaf7] px-6 py-4 border-b border-[#e8ddd0] flex justify-between items-center">
           <h3 className="font-bold text-[#3a2a1a] flex items-center gap-2">
-            <span>🧾</span> {t.donationDetailTitle || "DONATION DETAILS"}
+            <FileText className="w-5 h-5 text-[#8B6914]" /> {t.donationDetailTitle || "DONATION DETAILS"}
           </h3>
-          <button onClick={onClose} className="text-[#9a8a7a] hover:text-[#3a2a1a] transition-colors">✕</button>
+          <button onClick={onClose} className="text-[#9a8a7a] hover:text-[#3a2a1a] transition-colors"><X className="w-5 h-5" /></button>
         </div>
 
         <div className="p-6 flex flex-col gap-6 max-h-[80vh] overflow-y-auto">
@@ -241,68 +242,6 @@ const DonationDetailModal = ({ donation, isOpen, onClose, t }) => {
     </div>
   );
 };
-
-const DonationRow = React.memo(({ donation, t, onViewDetails, onReceipt }) => {
-  const statusColors = {
-    "Trait\u00E9": "bg-green-100 text-green-600",
-    "Processed": "bg-green-100 text-green-600",
-    "En attente": "bg-orange-100 text-orange-600",
-    "Pending": "bg-orange-100 text-orange-600",
-    "completed": "bg-green-100 text-green-600",
-    "pending": "bg-orange-100 text-orange-600",
-    "cancelled": "bg-gray-100 text-gray-600",
-    "failed": "bg-red-100 text-red-600"
-  };
-
-  const methodIcons = {
-    stripe: "💳",
-    paypal: "🅿️",
-    collection_point: "📦"
-  };
-
-  return (
-    <tr className="border-b border-[#f0e8d8] last:border-0 hover:bg-[#fcfaf7] transition-colors text-xs">
-      <td className="py-4 px-4 font-bold text-[#3a2a1a]">{donation.user}</td>
-      <td className="py-4 px-4 font-bold text-[#3a2a1a]">{donation.amount}€</td>
-      <td className="py-4 px-4 text-[#3a2a1a]">{donation.association}</td>
-      <td className="py-4 px-4 text-[#3a2a1a] font-medium flex items-center gap-1.5 uppercase text-[10px]">
-        <span>{methodIcons[donation.method] || "💰"}</span>
-        {donation.method?.replace('_', ' ')}
-      </td>
-      <td className="py-4 px-4 text-[#9a8a7a]">{donation.date}</td>
-      <td className="py-4 px-4">
-        <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full uppercase ${statusColors[donation.status]}`}>
-          {donation.status}
-        </span>
-      </td>
-      <td className="py-4 px-4">
-        <div className="flex gap-2 justify-end">
-          <button
-            onClick={() => onViewDetails(donation.id)}
-            className="w-20 bg-[#fcfaf7] text-[#3a2a1a] text-[10px] font-bold py-1 rounded border border-[#e8ddd0] hover:bg-[#f0e8d8] transition-colors"
-          >
-            {t.detailsBtn || "Details"}
-          </button>
-          {donation.status.toLowerCase().includes("pending") || donation.status.toLowerCase().includes("attente") ? (
-            <button
-              onClick={() => onReceipt(donation.id, false)}
-              className="w-28 bg-blue-100 text-blue-600 text-[10px] font-bold py-1 rounded hover:bg-blue-200 transition-colors text-center"
-            >
-              {t.receiptBtn}
-            </button>
-          ) : (
-            <button
-              onClick={() => onReceipt(donation.id, true)}
-              className="w-28 bg-blue-50 text-blue-600 text-[10px] font-bold py-1 rounded border border-blue-100 hover:bg-blue-100 transition-colors text-center"
-            >
-              {t.fiscalReceipt}
-            </button>
-          )}
-        </div>
-      </td>
-    </tr>
-  );
-});
 
 export default function DonationsPage() {
   const { t, lang } = useLang();
@@ -373,18 +312,91 @@ export default function DonationsPage() {
     { label: t.averageBasket, value: { text: `${Math.round(stats?.averageBasket || 0)}€`, color: "text-[#3a2a1a]" }, color: "bg-purple-500" },
   ];
 
+  const columns = [
+    {
+      header: t.donator,
+      cell: (d) => (
+        <div className="font-bold text-[#3a2a1a]">{d.donorName || "Anonyme"}</div>
+      )
+    },
+    {
+      header: t.amount,
+      cell: (d) => <div className="font-bold text-[#3a2a1a]">{d.amount}€</div>
+    },
+    { header: t.association, accessor: "association" },
+    {
+      header: t.paymentMethodLabel || "METHOD",
+      cell: (d) => (
+        <div className="font-medium flex items-center gap-1.5 uppercase text-[10px] text-[#3a2a1a]">
+          <span>{d.method === 'stripe' ? <CreditCard className="w-3.5 h-3.5" /> : d.method === 'collection_point' ? <Package className="w-3.5 h-3.5" /> : <Wallet className="w-3.5 h-3.5" />}</span>
+          {d.method?.replace('_', ' ')}
+        </div>
+      )
+    },
+    {
+      header: t.dateLabel || "DATE",
+      cell: (d) => new Date(d.createdAt).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US')
+    },
+    {
+      header: t.statusLabel || "STATUS",
+      cell: (d) => {
+        const status = d.status || d.payment?.status || "completed";
+        const colors = {
+          "completed": "bg-green-100 text-green-600",
+          "pending": "bg-orange-100 text-orange-600",
+          "cancelled": "bg-gray-100 text-gray-600",
+          "failed": "bg-red-100 text-red-600"
+        };
+        return (
+          <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full uppercase ${colors[status.toLowerCase()] || 'bg-gray-100 text-gray-600'}`}>
+            {status}
+          </span>
+        );
+      }
+    },
+    {
+      header: t.actionsLabel || "ACTIONS",
+      align: "right",
+      cell: (d) => (
+        <div className="flex gap-2 justify-end">
+          <button
+            onClick={() => fetchSingleDonation(d._id, 'details')}
+            className="md:w-20 bg-[#fcfaf7] text-[#3a2a1a] text-[10px] font-bold px-3 py-1.5 rounded border border-[#e8ddd0] hover:bg-[#f0e8d8] transition-colors"
+          >
+            {t.detailsBtn || "Details"}
+          </button>
+          {(d.status?.toLowerCase().includes("pending") || (d.payment?.status?.toLowerCase().includes("pending"))) ? (
+            <button
+              onClick={() => fetchSingleDonation(d._id, 'receipt')}
+              className="md:w-28 bg-blue-100 text-blue-600 text-[10px] font-bold px-3 py-1.5 rounded hover:bg-blue-200 transition-colors text-center"
+            >
+              {t.receiptBtn}
+            </button>
+          ) : (
+            <button
+              onClick={() => fetchSingleDonation(d._id, 'fiscal')}
+              className="md:w-28 bg-blue-50 text-blue-600 text-[10px] font-bold px-3 py-1.5 rounded border border-blue-100 hover:bg-blue-100 transition-colors text-center"
+            >
+              {t.fiscalReceipt}
+            </button>
+          )}
+        </div>
+      )
+    }
+  ];
+
   return (
-    <div className="px-6 py-4 flex flex-col gap-4">
+    <div className="px-4 md:px-6 py-4 flex flex-col gap-4">
 
       {/* Stats Bar */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         {statCards.map((s, i) => (
           <StatCard key={i} loading={loading} {...s} />
         ))}
       </div>
 
       {/* Transactions Table */}
-      <div className="bg-white rounded-xl border border-[#e8ddd0] overflow-hidden shadow-sm">
+      <div className="bg-white rounded-xl border border-[#e8ddd0] overflow-hidden shadow-sm flex flex-col">
         <FilterBar
           onSearch={(val) => setQueryParams(p => ({ ...p, search: val, page: 1 }))}
           onFilterChange={(name, val) => setQueryParams(p => ({ ...p, [name]: val, page: 1 }))}
@@ -403,54 +415,24 @@ export default function DonationsPage() {
           sortOptions={[]}
           actionButton={
             <button className="bg-[#3a2a1a] text-white text-[11px] font-bold px-4 py-2 rounded-xl hover:bg-[#2a1a0a] transition-colors flex items-center gap-2">
-              <span>📤</span> {t.exportBtn}
+              <Download className="w-4 h-4" /> {t.exportBtn}
             </button>
           }
         />
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead>
-              <tr className="bg-[#fcfaf7] border-b border-[#e8ddd0]">
-                <th className="py-3 px-4 text-[10px] font-bold text-[#9a8a7a] tracking-widest">{t.donator}</th>
-                <th className="py-3 px-4 text-[10px] font-bold text-[#9a8a7a] tracking-widest">{t.amount}</th>
-                <th className="py-3 px-4 text-[10px] font-bold text-[#9a8a7a] tracking-widest">{t.association}</th>
-                <th className="py-3 px-4 text-[10px] font-bold text-[#9a8a7a] tracking-widest">{t.paymentMethodLabel || "METHOD"}</th>
-                <th className="py-3 px-4 text-[10px] font-bold text-[#9a8a7a] tracking-widest">{t.dateLabel || "DATE"}</th>
-                <th className="py-3 px-4 text-[10px] font-bold text-[#9a8a7a] tracking-widest">{t.statusLabel || "STATUS"}</th>
-                <th className="py-3 px-4 text-[10px] font-bold text-[#9a8a7a] tracking-widest text-right">{t.actionsLabel || "ACTIONS"}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {donations.map((d, i) => (
-                <DonationRow
-                  key={d._id || i}
-                  donation={{
-                    id: d._id,
-                    user: d.donorName || "Anonyme",
-                    amount: d.amount,
-                    association: d.association || "HESTEKA",
-                    method: d.method,
-                    date: new Date(d.createdAt).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US'),
-                    status: d.status || d.payment?.status || "completed"
-                  }}
-                  t={t}
-                  onViewDetails={(id) => fetchSingleDonation(id, 'details')}
-                  onReceipt={(id, fiscal) => fetchSingleDonation(id, fiscal ? 'fiscal' : 'receipt')}
-                />
-              ))}
-              {!loading && donations.length === 0 && (
-                <tr><td colSpan={6} className="text-center py-20 text-[#9a8a7a] italic">{t.noDataFound}</td></tr>
-              )}
-              {loading && (
-                <tr><td colSpan={6} className="text-center py-20 text-[#9a8a7a]">{t.loadingLabel}</td></tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-        <Pagination
-          meta={meta}
-          onPageChange={(page) => setQueryParams(p => ({ ...p, page }))}
+        
+        <DataTable 
+          columns={columns}
+          data={donations}
+          loading={loading}
+          emptyMessage={t.noDataFound}
         />
+
+        <div className="bg-[#fcfaf7]">
+          <Pagination
+            meta={meta}
+            onPageChange={(page) => setQueryParams(p => ({ ...p, page }))}
+          />
+        </div>
       </div>
 
       <DonationDetailModal

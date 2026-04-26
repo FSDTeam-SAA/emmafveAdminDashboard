@@ -291,7 +291,7 @@ export default function PhysicalItemsPage() {
   ];
 
   return (
-    <div className="px-6 py-4 flex flex-col gap-4">
+    <div className="px-4 md:px-6 py-4 flex flex-col gap-4">
       {/* Catalog Table */}
       <div className="bg-white rounded-xl border border-[#e8ddd0] overflow-hidden flex flex-col shadow-sm">
         <FilterBar
@@ -328,7 +328,7 @@ export default function PhysicalItemsPage() {
         />
 
         <div className="p-4 flex flex-col gap-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
             {loadingItems && !timedOut ? (
               Array(6).fill(0).map((_, i) => <ItemSkeleton key={i} />)
             ) : items.length > 0 ? (

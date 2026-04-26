@@ -278,10 +278,10 @@ export default function ReportsPage() {
   ];
 
   return (
-    <div className="px-6 py-4 flex flex-col gap-4">
+    <div className="px-4 md:px-6 py-4 flex flex-col gap-4">
       {/* Stats */}
       <div className="flex flex-col gap-3">
-        <div className="grid grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <StatCard loading={loading} label={t.totalActive} value={{ text: stats?.total?.toLocaleString() || "0", color: "text-[#3a2a1a]" }} color="bg-purple-500" />
           <StatCard loading={loading} label={t.resolvedLabel} value={{ text: stats?.resolved?.toLocaleString() || "0", color: "text-[#3a2a1a]" }} color="bg-green-500" />
           <StatCard loading={loading} label={t.pendingLabel} value={{ text: stats?.pending?.toLocaleString() || "0", color: "text-orange-500" }} color="bg-orange-500" />
