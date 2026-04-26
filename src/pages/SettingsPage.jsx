@@ -31,7 +31,7 @@ export default function SettingsPage() {
   ];
 
   return (
-    <div className="px-6 py-4 flex flex-col gap-6">
+    <div className="px-6 py-4 flex flex-col gap-4">
 
       <div className="grid grid-cols-3 gap-4">
         {/* Admin Team Card */}
@@ -64,7 +64,7 @@ export default function SettingsPage() {
                    </span>
                 </div>
               ))}
-              <button className="bg-[#f5f0e8] text-[#8B6914] text-[11px] font-bold py-3 rounded-lg border border-dashed border-[#8B6914] hover:bg-[#e8d5b0] transition-colors">
+              <button className="bg-[#f5f0e8] text-[#8B6914] text-[11px] font-bold py-3 rounded-xl border border-dashed border-[#8B6914] hover:bg-[#e8d5b0] transition-colors">
                  + {t.inviteAdmin}
               </button>
            </div>
@@ -127,9 +127,9 @@ export default function SettingsPage() {
       </div>
 
       <div className="flex">
-         <button className="bg-[#8B6914] text-white text-[12px] font-bold px-6 py-2.5 rounded-lg hover:bg-[#6a5010] transition-colors flex items-center gap-2">
-            <span>💾</span> {t.saveChanges}
-         </button>
+          <button className="bg-[#8B6914] text-white text-[12px] font-bold px-6 py-2.5 rounded-xl hover:bg-[#6a5010] transition-colors flex items-center gap-2">
+             <span>💾</span> {t.saveChanges}
+          </button>
       </div>
 
       <ProfileModal

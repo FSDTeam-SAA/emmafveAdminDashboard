@@ -243,12 +243,12 @@ export default function UsersPage() {
         <StatCard loading={loading} label={t.newThisMonth} value={{ text: (stats?.newThisMonth || 0).toLocaleString(), color: "text-blue-600" }} />
       </div>
 
-      {/* Table Card */}
-      <div className="bg-white rounded-xl border border-[#e8ddd0] overflow-hidden flex flex-col">
+      <div className="bg-white rounded-xl border border-[#e8ddd0] overflow-hidden flex flex-col shadow-sm">
         <FilterBar 
           onSearch={(val) => setQueryParams(p => p.search === val ? p : { ...p, search: val, page: 1 })}
           onFilterChange={(name, val) => setQueryParams(p => p[name] === val ? p : { ...p, [name]: val, page: 1 })}
           onSortChange={(sortBy, sort) => setQueryParams(p => p.sortBy === sortBy && p.sort === sort ? p : { ...p, sortBy, sort, page: 1 })}
+          related={true}
           filters={[
             { name: "role", label: t.allRoles || "All roles", options: [
                 { label: "User", value: "user" },
@@ -273,28 +273,28 @@ export default function UsersPage() {
             <div className="flex gap-2">
               <button 
                 onClick={() => { setEditingUser(null); setIsModalOpen(true); }}
-                className="bg-[#8B6914] text-white text-[11px] font-bold px-4 py-2 rounded-lg hover:bg-[#6a5010] transition-colors flex items-center gap-2"
+                className="bg-[#8B6914] text-white text-[11px] font-bold px-4 py-2 rounded-xl hover:bg-[#6a5010] transition-colors flex items-center gap-2"
               >
                 <span>+</span> {t.addUser || "Add User"}
-              </button>
-              <button className="bg-[#3a2a1a] text-white text-[11px] font-bold px-4 py-2 rounded-lg hover:bg-[#2a1a0a] transition-colors flex items-center gap-2">
-                <span>📤</span> {t.exportBtn}
               </button>
             </div>
           }
         />
+        <div className="overflow-x-auto">
+          <DataTable 
+            columns={columns}
+            data={users}
+            loading={loading}
+            emptyMessage={t.noUsersFound || "No users found matching your criteria."}
+          />
+        </div>
 
-        <DataTable 
-          columns={columns}
-          data={users}
-          loading={loading}
-          emptyMessage={t.noUsersFound || "No users found matching your criteria."}
-        />
-
-        <Pagination 
-          meta={meta}
-          onPageChange={(page) => setQueryParams(p => ({ ...p, page }))}
-        />
+        <div className="bg-[#fcfaf7]">
+          <Pagination 
+            meta={meta}
+            onPageChange={(page) => setQueryParams(p => ({ ...p, page }))}
+          />
+        </div>
       </div>
 
       <CRUDModal

@@ -115,23 +115,7 @@ export default function PointsPage() {
   };
 
   return (
-    <div className="px-6 py-4 flex flex-col gap-6 max-w-7xl mx-auto">
-
-      {/* Save button */}
-      <div className="flex justify-end">
-        <button 
-          onClick={handleUpdateConfig}
-          disabled={saving || loading}
-          className="bg-[#3a2a1a] text-white text-[11px] font-black px-6 py-2.5 rounded-xl hover:bg-[#2a1a0a] transition-all flex items-center gap-2 disabled:opacity-50 active:scale-95"
-        >
-          {saving ? (
-            <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-          ) : (
-            <span>💾</span>
-          )}
-          {t.saveBtn || "Save"}
-        </button>
-      </div>
+    <div className="px-6 py-4 flex flex-col gap-4 max-w-7xl mx-auto">
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -233,6 +217,21 @@ export default function PointsPage() {
              </button>
           </div>
         </div>
+      </div>
+       {/* Save button */}
+      <div className="flex justify-center">
+        <button 
+          onClick={handleUpdateConfig}
+          disabled={saving || loading}
+          className="bg-[#3a2a1a] text-white text-[11px] font-black px-6 py-2.5 rounded-xl hover:bg-[#2a1a0a] transition-all flex items-center gap-2 disabled:opacity-50 active:scale-95"
+        >
+          {saving ? (
+            <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+          ) : (
+            <span>💾</span>
+          )}
+          {t.saveBtn || "Save"}
+        </button>
       </div>
     </div>
   );

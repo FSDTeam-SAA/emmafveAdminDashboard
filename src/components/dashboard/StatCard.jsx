@@ -15,30 +15,40 @@ const StatCard = React.memo(({ label, value, sub, subType = "up", loading = fals
     neutral: "▶",
   };
 
+  const containerClasses = "bg-white rounded-xl p-3 px-4 border border-[#e8ddd0] flex flex-col justify-between h-[85px] w-full transition-all hover:shadow-md";
+
   if (loading || value.text === "...") {
     return (
-      <div className="bg-white rounded-xl p-4 border border-[#e8ddd0] animate-pulse">
-        <div className="h-2 bg-gray-100 rounded w-1/2 mb-3"></div>
-        <div className="h-8 bg-gray-100 rounded w-3/4"></div>
-        <div className="h-2 bg-gray-50 rounded w-1/3 mt-4"></div>
+      <div className={`${containerClasses} animate-pulse`}>
+        <div>
+          <div className="h-2 bg-gray-100 rounded w-1/2 mb-1.5"></div>
+          <div className="h-6 bg-gray-100 rounded w-3/4"></div>
+        </div>
+        <div className="h-2 bg-gray-50 rounded w-1/3"></div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-xl p-4 border border-[#e8ddd0] hover:shadow-md transition-shadow">
-      <p className="text-[9px] font-bold tracking-widest text-[#9a8a7a] uppercase mb-2">
-        {label}
-      </p>
-      <p className={`text-3xl font-bold leading-none ${value.color}`}>
-        {value.text}
-      </p>
-      {sub && (
-        <p className={`text-[10px] mt-2 flex items-center gap-1 ${subColors[subType]}`}>
-          <span>{subIcons[subType]}</span>
-          {sub}
+    <div className={containerClasses}>
+      <div>
+        <p className="text-[10px] font-black tracking-widest text-[#9a8a7a] uppercase mb-0.5">
+          {label}
         </p>
-      )}
+        <p className={`text-2xl font-black leading-none ${value.color}`}>
+          {value.text}
+        </p>
+      </div>
+      <div className="mt-auto">
+        {sub ? (
+          <p className={`text-[10px] flex items-center gap-1 ${subColors[subType]}`}>
+            <span>{subIcons[subType]}</span>
+            {sub}
+          </p>
+        ) : (
+          <p className="text-[10px] invisible leading-none">&nbsp;</p>
+        )}
+      </div>
     </div>
   );
 });

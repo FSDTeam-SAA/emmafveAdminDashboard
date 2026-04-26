@@ -24,13 +24,13 @@ const PartnerCard = React.memo(({ partner, isPending, onApprove, onReject, onVie
         <>
           <button
             onClick={() => onApprove(partner._id)}
-            className="bg-green-100 text-green-600 text-[10px] font-bold px-3 py-1.5 rounded hover:bg-green-200 transition-colors"
+            className="bg-green-100 text-green-600 text-[10px] font-bold px-3 py-1.5 rounded-xl hover:bg-green-200 transition-colors"
           >
             {t.validateBtn}
           </button>
           <button
             onClick={() => onReject(partner._id)}
-            className="bg-red-100 text-red-600 text-[10px] font-bold px-3 py-1.5 rounded hover:bg-red-200 transition-colors"
+            className="bg-red-100 text-red-600 text-[10px] font-bold px-3 py-1.5 rounded-xl hover:bg-red-200 transition-colors"
           >
             {t.rejectBtn || "Reject"}
           </button>
@@ -39,13 +39,13 @@ const PartnerCard = React.memo(({ partner, isPending, onApprove, onReject, onVie
         <>
           <button
             onClick={() => onView(partner._id)}
-            className="bg-blue-100 text-blue-600 text-[10px] font-bold px-3 py-1.5 rounded hover:bg-blue-200 transition-colors"
+            className="bg-blue-100 text-blue-600 text-[10px] font-bold px-3 py-1.5 rounded-xl hover:bg-blue-200 transition-colors"
           >
             {t.viewBtn}
           </button>
           <button
             onClick={() => onEdit(partner._id)}
-            className="bg-orange-100 text-orange-600 text-[10px] font-bold px-3 py-1.5 rounded hover:bg-orange-200 transition-colors"
+            className="bg-orange-100 text-orange-600 text-[10px] font-bold px-3 py-1.5 rounded-xl hover:bg-orange-200 transition-colors"
           >
             {t.editBtn}
           </button>
@@ -274,7 +274,7 @@ export default function PartnersPage() {
   ];
 
   return (
-    <div className="p-5 flex flex-col gap-6">
+    <div className="px-6 py-4 flex flex-col gap-4">
       {/* Header */}
       {/* <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -321,9 +321,8 @@ export default function PartnersPage() {
             )}
           </div>
         </div>
-
         {/* Active Partners with Advanced Table */}
-        <div className="lg:col-span-2 flex flex-col gap-4">
+        <div className="lg:col-span-2 flex flex-col">
           <div className="bg-white rounded-xl border border-[#e8ddd0] overflow-hidden flex flex-col">
             <div className="p-4 border-b border-[#e8ddd0] bg-[#fcfaf7] flex items-center justify-between">
               <h3 className="font-bold text-[#3a2a1a] text-xs flex items-center gap-2">
@@ -334,21 +333,14 @@ export default function PartnersPage() {
                   ? (t.allPartners || "All Partners")
                   : (t[queryParams.status] ? `${t[queryParams.status]} ${t.partnersTitle}` : t.activePartners)}
               </h3>
-
-              <button
-                onClick={() => setIsAddModalOpen(true)}
-                className="bg-[#8B6914] text-white text-[11px] font-bold px-4 py-2 rounded-lg hover:bg-[#6a5010] transition-colors flex items-center gap-2"
-              >
-                <span>+</span> {t.addPartner}
-              </button>
             </div>
-
 
             <FilterBar
               onSearch={(val) => setQueryParams(p => p.search === val ? p : { ...p, search: val, page: 1 })}
               onFilterChange={(name, val) => setQueryParams(p => p[name] === val ? p : { ...p, [name]: val, page: 1 })}
               onSortChange={(sortBy, sort) => setQueryParams(p => p.sortBy === sortBy && p.sort === sort ? p : { ...p, sortBy, sort, page: 1 })}
               placeholder={t.searchPartnerPlaceholder || "Search for a partner..."}
+              related={true}
               filters={[
                 {
                   name: "status",
@@ -369,6 +361,14 @@ export default function PartnersPage() {
                 { label: t.nameAsc || "Name (A-Z)", value: "name:ascending" },
                 { label: t.companyAsc || "Company (A-Z)", value: "company:ascending" }
               ]}
+              actionButton={
+                <button
+                  onClick={() => setIsAddModalOpen(true)}
+                  className="bg-[#8B6914] text-white text-[11px] font-bold px-4 py-2 rounded-xl hover:bg-[#6a5010] transition-colors flex items-center gap-2"
+                >
+                  <span>+</span> {t.addPartner}
+                </button>
+              }
             />
 
             <DataTable
@@ -400,13 +400,13 @@ export default function PartnersPage() {
                     <div className="flex gap-1 justify-end">
                       <button
                         onClick={() => openDetailsModal(p._id)}
-                        className="bg-blue-100 text-blue-600 text-[10px] font-bold px-3 py-1 rounded hover:bg-blue-200 transition-colors"
+                        className="bg-blue-100 text-blue-600 text-[10px] font-bold px-3 py-1 rounded-xl hover:bg-blue-200 transition-colors"
                       >
                         {t.viewBtn}
                       </button>
                       <button
                         onClick={() => openEditModal(p._id)}
-                        className="bg-orange-100 text-orange-600 text-[10px] font-bold px-3 py-1 rounded hover:bg-orange-200 transition-colors"
+                        className="bg-orange-100 text-orange-600 text-[10px] font-bold px-3 py-1 rounded-xl hover:bg-orange-200 transition-colors"
                       >
                         {t.editBtn}
                       </button>

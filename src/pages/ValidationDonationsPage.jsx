@@ -38,19 +38,19 @@ const PendingDonation = React.memo(({ item, onAction, onEnlarge, t }) => (
     <div className="flex gap-2">
        <button 
          onClick={() => item.photo?.secure_url && onEnlarge(item.photo.secure_url)}
-         className="flex-1 bg-white border border-[#e8ddd0] text-[#3a2a1a] text-[10px] font-bold py-2 rounded-lg hover:bg-[#f5f0e8] transition-colors flex items-center justify-center gap-2"
+         className="flex-1 bg-white border border-[#e8ddd0] text-[#3a2a1a] text-[10px] font-bold py-2 rounded-xl hover:bg-[#f5f0e8] transition-colors flex items-center justify-center gap-2"
        >
           <span>🔍</span> {t.enlargePhoto || "Enlarge photo"}
        </button>
        <button 
          onClick={() => onAction(item._id, 'validate')}
-         className="flex-1 bg-green-100 text-green-600 text-[10px] font-bold py-2 rounded-lg hover:bg-green-200 transition-colors"
+         className="flex-1 bg-green-100 text-green-600 text-[10px] font-bold py-2 rounded-xl hover:bg-green-200 transition-colors"
        >
           {t.validatePts}
        </button>
        <button 
          onClick={() => onAction(item._id, 'reject')}
-         className="flex-1 bg-red-50 text-red-600 text-[10px] font-bold py-2 rounded-lg hover:bg-red-100 transition-colors"
+         className="flex-1 bg-red-50 text-red-600 text-[10px] font-bold py-2 rounded-xl hover:bg-red-100 transition-colors"
        >
           {t.refuseBtn}
        </button>
@@ -177,7 +177,7 @@ export default function ValidationDonationsPage() {
   ];
 
   return (
-    <div className="p-5 flex flex-col gap-6 relative">
+    <div className="px-6 py-4 flex flex-col gap-4 relative">
       {/* Background loading overlay for the whole page if no data yet */}
       {loading && pending.length === 0 && (
         <div className="absolute inset-0 bg-white/50 backdrop-blur-sm z-50 flex items-center justify-center">
@@ -200,7 +200,7 @@ export default function ValidationDonationsPage() {
       </div> */}
 
       {/* Stats Bar */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-4 gap-3">
         <StatCard loading={loading} label={t.pendingValidationDon} value={{ text: stats?.pendingCount?.toString() || "0", color: "text-orange-500" }} sub={t.toValidate} subType="wait" />
         <StatCard loading={loading} label={t.validatedThisMonth} value={{ text: stats?.validatedThisMonth?.toString() || "0", color: "text-green-600" }} sub={`${(stats?.validatedGrowth || 0) >= 0 ? "+" : ""}${stats?.validatedGrowth || 0}% ${t.vsLastMonth}`} subType={(stats?.validatedGrowth || 0) >= 0 ? "up" : "down"} />
         <StatCard loading={loading} label={t.refused} value={{ text: stats?.refusedThisMonth?.toString() || "0", color: "text-red-600" }} sub={`${(stats?.refusedGrowth || 0) >= 0 ? "+" : ""}${stats?.refusedGrowth || 0}% ${t.vsLastMonth}`} subType={(stats?.refusedGrowth || 0) >= 0 ? "up" : "down"} />

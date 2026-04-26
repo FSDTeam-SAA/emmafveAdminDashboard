@@ -2,15 +2,21 @@ import React from "react";
 import { useLang } from "../context/LanguageContext";
 
 const AnalyticsCard = React.memo(({ label, value, sub, color }) => (
-  <div className={`bg-white rounded-xl p-4 border border-[#e8ddd0] flex flex-col gap-1 relative overflow-hidden`}>
+  <div className={`bg-white rounded-xl p-4 border border-[#e8ddd0] flex flex-col justify-between h-[110px] relative overflow-hidden transition-all hover:shadow-md`}>
     <div className={`absolute left-0 top-0 w-1 h-full ${color}`}></div>
-    <span className="text-[9px] font-bold text-[#9a8a7a] tracking-widest uppercase">{label}</span>
-    <span className="text-2xl font-bold text-[#3a2a1a]">{value}</span>
-    {sub && (
-      <span className={`text-[10px] font-bold ${sub.startsWith('+') ? 'text-green-600' : 'text-red-600'}`}>
-        {sub.startsWith('+') ? '\u25B2' : '\u25BC'} {sub}
-      </span>
-    )}
+    <div>
+      <p className="text-[9px] font-bold text-[#9a8a7a] tracking-widest uppercase mb-1">{label}</p>
+      <p className="text-2xl font-bold text-[#3a2a1a]">{value}</p>
+    </div>
+    <div className="mt-auto">
+      {sub ? (
+        <p className={`text-[10px] font-bold ${sub.startsWith('+') ? 'text-green-600' : 'text-red-600'}`}>
+          {sub.startsWith('+') ? '\u25B2' : '\u25BC'} {sub}
+        </p>
+      ) : (
+        <p className="text-[10px] invisible">&nbsp;</p>
+      )}
+    </div>
   </div>
 ));
 
@@ -44,7 +50,7 @@ export default function AnalyticsPage() {
   ];
 
   return (
-    <div className="px-6 py-4 flex flex-col gap-6">
+    <div className="px-6 py-4 flex flex-col gap-4">
 
       {/* Stats Bar */}
       <div className="grid grid-cols-4 gap-4">

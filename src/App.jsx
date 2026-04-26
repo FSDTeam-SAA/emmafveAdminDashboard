@@ -4,27 +4,30 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import { LanguageProvider } from "./context/LanguageContext";
+import { ApiCacheProvider } from "./context/ApiCacheContext";
 import DashboardLayout from "./layouts/DashboardLayout";
 import ProtectedRoute from "./components/common/ProtectedRoute";
 
-// Pages
-import AdminLoginPage from "./pages/AdminLoginPage";
-import DashboardPage from "./pages/DashboardPage";
-import ReportsPage from "./pages/ReportsPage";
-import UsersPage from "./pages/UsersPage";
-import PartnersPage from "./pages/PartnersPage";
-import MissionsPage from "./pages/MissionsPage";
-import CollectionPointsPage from "./pages/CollectionPointsPage";
-import PointsPage from "./pages/PointsPage";
-import PhysicalItemsPage from "./pages/PhysicalItemsPage";
-import DonationsPage from "./pages/DonationsPage";
-import CrowdfundingPage from "./pages/CrowdfundingPage";
-import AnalyticsPage from "./pages/AnalyticsPage";
-import NotificationsPage from "./pages/NotificationsPage";
-import SettingsPage from "./pages/SettingsPage";
-import ValidationDonationsPage from "./pages/ValidationDonationsPage";
-import ShopifyProductsPage from "./pages/ShopifyProductsPage";
-import ContactsPage from "./pages/ContactsPage";
+import { Suspense, lazy } from "react";
+
+// Lazy Loaded Pages
+const AdminLoginPage = lazy(() => import("./pages/AdminLoginPage"));
+const DashboardPage = lazy(() => import("./pages/DashboardPage"));
+const ReportsPage = lazy(() => import("./pages/ReportsPage"));
+const UsersPage = lazy(() => import("./pages/UsersPage"));
+const PartnersPage = lazy(() => import("./pages/PartnersPage"));
+const MissionsPage = lazy(() => import("./pages/MissionsPage"));
+const CollectionPointsPage = lazy(() => import("./pages/CollectionPointsPage"));
+const PointsPage = lazy(() => import("./pages/PointsPage"));
+const PhysicalItemsPage = lazy(() => import("./pages/PhysicalItemsPage"));
+const DonationsPage = lazy(() => import("./pages/DonationsPage"));
+const CrowdfundingPage = lazy(() => import("./pages/CrowdfundingPage"));
+const AnalyticsPage = lazy(() => import("./pages/AnalyticsPage"));
+const NotificationsPage = lazy(() => import("./pages/NotificationsPage"));
+const SettingsPage = lazy(() => import("./pages/SettingsPage"));
+const ValidationDonationsPage = lazy(() => import("./pages/ValidationDonationsPage"));
+const ShopifyProductsPage = lazy(() => import("./pages/ShopifyProductsPage"));
+const ContactsPage = lazy(() => import("./pages/ContactsPage"));
 
 // Helper: is admin logged in?
 const isAdmin = () => {
@@ -40,59 +43,70 @@ const isAdmin = () => {
 const App = () => {
   return (
     <LanguageProvider>
-      <ToastContainer position="top-right" autoClose={3000} theme="colored" />
-      <Routes>
-        {/* Root → dashboard if logged in, else login */}
-        <Route
-          path="/"
-          element={<Navigate to={isAdmin() ? "/dashboard" : "/login"} replace />}
-        />
+      <ApiCacheProvider>
+        <ToastContainer position="top-right" autoClose={3000} theme="colored" />
+      <Suspense fallback={
+        <div className="flex h-screen w-screen items-center justify-center bg-[#fcfaf7]">
+          <div className="flex flex-col items-center gap-4">
+             <div className="w-12 h-12 border-4 border-[#8B6914] border-t-transparent rounded-full animate-spin"></div>
+             <p className="text-[#8B6914] font-bold tracking-widest uppercase text-xs animate-pulse">Loading Application...</p>
+          </div>
+        </div>
+      }>
+        <Routes>
+          {/* Root → dashboard if logged in, else login */}
+          <Route
+            path="/"
+            element={<Navigate to={isAdmin() ? "/dashboard" : "/login"} replace />}
+          />
 
-        {/* Public Login */}
-        <Route
-          path="/login"
-          element={
-            isAdmin() ? (
-              <Navigate to="/dashboard" replace />
-            ) : (
-              <AdminLoginPage />
-            )
-          }
-        />
+          {/* Public Login */}
+          <Route
+            path="/login"
+            element={
+              isAdmin() ? (
+                <Navigate to="/dashboard" replace />
+              ) : (
+                <AdminLoginPage />
+              )
+            }
+          />
 
-        {/* Protected Dashboard Routes */}
-        <Route
-          path="/"
-          element={
-            <ProtectedRoute>
-              <DashboardLayout />
-            </ProtectedRoute>
-          }
-        >
-          <Route path="dashboard" element={<DashboardPage />} />
-          <Route path="reports" element={<ReportsPage />} />
-          <Route path="users" element={<UsersPage />} />
-          <Route path="partners" element={<PartnersPage />} />
-          <Route path="missions" element={<MissionsPage />} />
-          <Route path="collection-points" element={<CollectionPointsPage />} />
-          <Route path="points" element={<PointsPage />} />
-          <Route path="items" element={<PhysicalItemsPage />} />
-          <Route path="donations" element={<DonationsPage />} />
-          <Route path="validation-donations" element={<ValidationDonationsPage />} />
-          <Route path="shopify-products" element={<ShopifyProductsPage />} />
-          <Route path="contacts" element={<ContactsPage />} />
-          <Route path="crowdfunding" element={<CrowdfundingPage />} />
-          <Route path="analytics" element={<AnalyticsPage />} />
-          <Route path="notifications" element={<NotificationsPage />} />
-          <Route path="settings" element={<SettingsPage />} />
-        </Route>
+          {/* Protected Dashboard Routes */}
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <DashboardLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route path="dashboard" element={<DashboardPage />} />
+            <Route path="reports" element={<ReportsPage />} />
+            <Route path="users" element={<UsersPage />} />
+            <Route path="partners" element={<PartnersPage />} />
+            <Route path="missions" element={<MissionsPage />} />
+            <Route path="collection-points" element={<CollectionPointsPage />} />
+            <Route path="points" element={<PointsPage />} />
+            <Route path="items" element={<PhysicalItemsPage />} />
+            <Route path="donations" element={<DonationsPage />} />
+            <Route path="validation-donations" element={<ValidationDonationsPage />} />
+            <Route path="shopify-products" element={<ShopifyProductsPage />} />
+            <Route path="contacts" element={<ContactsPage />} />
+            <Route path="crowdfunding" element={<CrowdfundingPage />} />
+            <Route path="analytics" element={<AnalyticsPage />} />
+            <Route path="notifications" element={<NotificationsPage />} />
+            <Route path="settings" element={<SettingsPage />} />
+          </Route>
 
-        {/* Catch-all */}
-        <Route
-          path="*"
-          element={<Navigate to={isAdmin() ? "/dashboard" : "/login"} replace />}
-        />
-      </Routes>
+          {/* Catch-all */}
+          <Route
+            path="*"
+            element={<Navigate to={isAdmin() ? "/dashboard" : "/login"} replace />}
+          />
+        </Routes>
+      </Suspense>
+      </ApiCacheProvider>
     </LanguageProvider>
   );
 };

@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useLang } from "../context/LanguageContext";
 import StatCard from "../components/dashboard/StatCard";
 import api from "../utils/api";
@@ -272,28 +272,17 @@ export default function ContactsPage() {
   ];
 
   return (
-    <div className="px-6 py-6 flex flex-col gap-3">
-      {/* Stats Cards */}
-
-      {/* Table Card */}
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {[
-          { label: "ALL CONTACTS", value: stats.all, color: "text-[#3a2a1a]" },
-          { label: "ACTIVE", value: stats.active, color: "text-green-600" },
-          { label: "SHELTER", value: stats.shelter, color: "text-blue-600" },
-          { label: "VET", value: stats.vet, color: "text-orange-600" },
-        ].map((item, idx) => (
-          <div key={idx} className="bg-white p-5 rounded-2xl border border-[#e8ddd0] shadow-sm hover:shadow-md transition-shadow">
-            <p className="text-[10px] font-black text-[#9a8a7a] tracking-widest uppercase mb-1">{item.label}</p>
-            <p className={`text-3xl font-black ${item.color}`}>{item.value || 0}</p>
-          </div>
-        ))}
+    <div className="px-6 py-4 flex flex-col gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <StatCard loading={loading} label="ALL CONTACTS" value={{ text: (stats.all || 0).toLocaleString(), color: "text-[#3a2a1a]" }} />
+        <StatCard loading={loading} label="ACTIVE" value={{ text: (stats.active || 0).toLocaleString(), color: "text-green-600" }} />
+        <StatCard loading={loading} label="SHELTER" value={{ text: (stats.shelter || 0).toLocaleString(), color: "text-blue-600" }} />
+        <StatCard loading={loading} label="VET" value={{ text: (stats.vet || 0).toLocaleString(), color: "text-orange-600" }} />
       </div>
 
       <div className="bg-white rounded-2xl border border-[#e8ddd0] shadow-sm overflow-hidden flex flex-col">
-        <div className="bg-[#fcfaf7] border-b border-[#e8ddd0] p-4 flex flex-wrap items-center justify-between gap-4">
-          {/* Additional Filters: City, Country, Dates */}
+        {/* Primary Actions & Secondary Filters (Integrated) */}
+        <div className="bg-white border-b border-[#e8ddd0] p-3 flex flex-wrap items-center justify-between gap-4">
           <div className="flex flex-wrap items-center gap-3">
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-bold text-[#9a8a7a] uppercase">Location:</span>
@@ -302,14 +291,14 @@ export default function ContactsPage() {
                 placeholder="City..."
                 value={queryParams.city}
                 onChange={(e) => setQueryParams(p => ({ ...p, city: e.target.value, page: 1 }))}
-                className="bg-white border border-[#e8ddd0] rounded-lg px-3 py-1.5 text-[11px] text-[#3a2a1a] outline-none focus:border-[#8B6914] w-28 transition-all"
+                className="bg-[#fcfaf7] border border-[#e8ddd0] rounded-xl px-3 py-1.5 text-[11px] text-[#3a2a1a] outline-none focus:border-[#8B6914] w-28 transition-all"
               />
               <input
                 type="text"
                 placeholder="Country..."
                 value={queryParams.country}
                 onChange={(e) => setQueryParams(p => ({ ...p, country: e.target.value, page: 1 }))}
-                className="bg-white border border-[#e8ddd0] rounded-lg px-3 py-1.5 text-[11px] text-[#3a2a1a] outline-none focus:border-[#8B6914] w-28 transition-all"
+                className="bg-[#fcfaf7] border border-[#e8ddd0] rounded-xl px-3 py-1.5 text-[11px] text-[#3a2a1a] outline-none focus:border-[#8B6914] w-28 transition-all"
               />
             </div>
 
@@ -319,14 +308,14 @@ export default function ContactsPage() {
                 type="date"
                 value={queryParams.from}
                 onChange={(e) => setQueryParams(p => ({ ...p, from: e.target.value, page: 1 }))}
-                className="bg-white border border-[#e8ddd0] rounded-lg px-2 py-1 text-[11px] text-[#3a2a1a] outline-none focus:border-[#8B6914] transition-all"
+                className="bg-[#fcfaf7] border border-[#e8ddd0] rounded-xl px-2 py-1 text-[11px] text-[#3a2a1a] outline-none focus:border-[#8B6914] transition-all"
               />
               <span className="text-[#9a8a7a] text-[10px]">to</span>
               <input
                 type="date"
                 value={queryParams.to}
                 onChange={(e) => setQueryParams(p => ({ ...p, to: e.target.value, page: 1 }))}
-                className="bg-white border border-[#e8ddd0] rounded-lg px-2 py-1 text-[11px] text-[#3a2a1a] outline-none focus:border-[#8B6914] transition-all"
+                className="bg-[#fcfaf7] border border-[#e8ddd0] rounded-xl px-2 py-1 text-[11px] text-[#3a2a1a] outline-none focus:border-[#8B6914] transition-all"
               />
             </div>
           </div>
@@ -355,6 +344,7 @@ export default function ContactsPage() {
           onSearch={(val) => setQueryParams((p) => (p.search === val ? p : { ...p, search: val, page: 1 }))}
           onFilterChange={(name, val) => setQueryParams((p) => (p[name] === val ? p : { ...p, [name]: val, page: 1 }))}
           onSortChange={(sortBy, sort) => setQueryParams((p) => (p.sortBy === sortBy && p.sort === sort ? p : { ...p, sortBy, sort, page: 1 }))}
+          related={true}
           filters={[
             {
               name: "type",
@@ -391,7 +381,7 @@ export default function ContactsPage() {
           emptyMessage={t.noItemsFound}
         />
 
-        <div className="bg-[#fcfaf7] border-t border-[#e8ddd0]">
+        <div className="bg-[#fcfaf7]">
           <Pagination
             meta={meta}
             onPageChange={(page) => setQueryParams((p) => ({ ...p, page }))}

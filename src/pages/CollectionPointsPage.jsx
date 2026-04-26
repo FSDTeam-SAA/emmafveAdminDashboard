@@ -1,5 +1,6 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { useLang } from "../context/LanguageContext";
+import { useApiCache } from "../context/ApiCacheContext";
 import api from "../utils/api";
 import DataTable from "../components/common/DataTable";
 import Pagination from "../components/common/Pagination";
@@ -32,12 +33,19 @@ const FitBounds = ({ points }) => {
   return null;
 };
 
-export default function CollectionPointsPage() {
+const CollectionPointsPage = React.memo(() => {
   const { t } = useLang();
-  const [points, setPoints] = useState([]);
-  const [allPoints, setAllPoints] = useState([]); // All points for the map (no pagination)
-  const [meta, setMeta] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { fetchWithCache, invalidateCache, getCachedData } = useApiCache();
+
+  // Predict URL for initial cache hit
+  const initialQueryStr = new URLSearchParams({ page: 1, limit: 10, search: "", sortBy: "date", sort: "descending", type: "collection_point" }).toString();
+  const cachedList = getCachedData(`/partner-ads/get-all-partner-ads?${initialQueryStr}`);
+  const cachedMap = getCachedData("/partner-ads/get-all-partner-ads?type=collection_point&limit=500");
+
+  const [points, setPoints] = useState(cachedList?.data?.data || []);
+  const [allPoints, setAllPoints] = useState(cachedMap?.data?.data || []); // All points for the map (no pagination)
+  const [meta, setMeta] = useState(cachedList?.data?.meta || null);
+  const [loading, setLoading] = useState(!cachedList);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingPoint, setEditingPoint] = useState(null);
   const [modalLoading, setModalLoading] = useState(false);
@@ -60,10 +68,10 @@ export default function CollectionPointsPage() {
   // Fetch ALL points (no pagination) specifically for map pins
   const fetchAllForMap = useCallback(async () => {
     try {
-      const res = await api.get("/partner-ads/get-all-partner-ads?type=collection_point&limit=500");
+      const res = await fetchWithCache("/partner-ads/get-all-partner-ads?type=collection_point&limit=500");
       if (res.data.status === "ok") setAllPoints(res.data.data || []);
     } catch { /* silent */ }
-  }, []);
+  }, [fetchWithCache]);
 
   useEffect(() => { fetchAllForMap(); }, [fetchAllForMap]);
 
@@ -73,8 +81,8 @@ export default function CollectionPointsPage() {
       const q = { ...queryParams, type: "collection_point" };
       if (q.status === "all") delete q.status;
       const queryString = new URLSearchParams(q).toString();
-      
-      const res = await api.get(`/partner-ads/get-all-partner-ads?${queryString}`);
+
+      const res = await fetchWithCache(`/partner-ads/get-all-partner-ads?${queryString}`);
       if (res.data.status === "ok") {
         setPoints(res.data.data || []);
         setMeta(res.data.meta);
@@ -84,7 +92,7 @@ export default function CollectionPointsPage() {
     } finally {
       setLoading(false);
     }
-  }, [queryParams]);
+  }, [queryParams, fetchWithCache]);
 
   useEffect(() => {
     fetchData();
@@ -120,16 +128,20 @@ export default function CollectionPointsPage() {
         if (formData[key] !== undefined) data.append(key, formData[key]);
       });
 
-      if (editingPoint) {
-        await api.patch(`/partner-ads/update-partner-ad/${editingPoint._id}`, data);
-      } else {
-        // Backend expects specific create-collection-point route for partners
-        // If admin, we might need a general route or use the same one if admin has partner role
-        await api.post("/partner-ads/create-collection-point", data);
+      const isUpdate = !!editingPoint;
+      const endpoint = isUpdate
+        ? `/partner-ads/update-partner-ad/${editingPoint._id}`
+        : "/partner-ads/create-partner-ad";
+
+      const res = await api[isUpdate ? 'patch' : 'post'](endpoint, data);
+
+      if (res.data.status === "ok" || res.data.success) {
+        toast.success(`Collection point ${isUpdate ? 'updated' : 'created'} successfully`);
+        invalidateCache("/partner-ads/get-all-partner-ads");
+        fetchData();
+        fetchAllForMap();
+        setIsModalOpen(false);
       }
-      setIsModalOpen(false);
-      toast.success(editingPoint ? "Collection point updated" : "Collection point created");
-      fetchData();
     } catch (err) {
       toast.error(err.response?.data?.message || "Operation failed.");
     } finally {
@@ -147,7 +159,9 @@ export default function CollectionPointsPage() {
         try {
           await api.delete(`/partner-ads/delete-partner-ad/${id}`);
           toast.success("Collection point deleted successfully");
+          invalidateCache("/partner-ads/get-all-partner-ads");
           fetchData();
+          fetchAllForMap();
         } catch (err) {
           toast.error(err.response?.data?.message || "Delete failed.");
         } finally {
@@ -164,17 +178,17 @@ export default function CollectionPointsPage() {
       cell: (p) => (
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded bg-[#8B6914] flex items-center justify-center text-white text-xs font-bold shrink-0">
-             🛒
+            🛒
           </div>
           <div className="flex flex-col">
-             <span className="font-bold text-[#3a2a1a]">{p.title}</span>
-             <span className="text-[10px] text-[#9a8a7a] truncate max-w-[150px]">{p.address}</span>
+            <span className="font-bold text-[#3a2a1a]">{p.title}</span>
+            <span className="text-[10px] text-[#9a8a7a] truncate max-w-[150px]">{p.address}</span>
           </div>
         </div>
       )
     },
-    { 
-      header: t.partner || "Partner", 
+    {
+      header: t.partner || "Partner",
       cell: (p) => p.partner?.company || p.partner?.firstName || 'N/A'
     },
     {
@@ -186,19 +200,19 @@ export default function CollectionPointsPage() {
       align: "right",
       cell: (p) => (
         <div className="flex gap-1 justify-end">
-          <button 
+          <button
             onClick={() => handleOpenView(p._id)}
             className="bg-blue-100 text-blue-600 text-[10px] font-bold px-3 py-1 rounded hover:bg-blue-200 transition-colors"
           >
             {t.viewBtn || "View"}
           </button>
-          <button 
+          <button
             onClick={() => handleOpenEdit(p)}
             className="bg-orange-100 text-orange-600 text-[10px] font-bold px-3 py-1 rounded hover:bg-orange-200 transition-colors"
           >
             {t.editBtn}
           </button>
-          <button 
+          <button
             onClick={() => handleDelete(p._id)}
             className="bg-red-100 text-red-600 text-[10px] font-bold px-3 py-1 rounded hover:bg-red-200 transition-colors"
           >
@@ -219,11 +233,11 @@ export default function CollectionPointsPage() {
   ];
 
   return (
-    <div className="px-6 py-4 flex flex-col gap-6">
+    <div className="px-6 py-4 flex flex-col gap-4">
 
-      <div className="grid grid-cols-1 xl:grid-cols-5 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
         {/* Real Leaflet Map */}
-        <div className="xl:col-span-3 bg-white rounded-xl border border-[#e8ddd0] overflow-hidden relative h-[450px] shadow-sm">
+        <div className="xl:col-span-5 bg-white rounded-xl border border-[#e8ddd0] overflow-hidden relative h-[450px] shadow-sm">
           <MapContainer
             center={[46.2276, 2.2137]}
             zoom={5}
@@ -269,55 +283,60 @@ export default function CollectionPointsPage() {
         </div>
 
         {/* List View */}
-        <div className="xl:col-span-2 bg-white rounded-xl border border-[#e8ddd0] overflow-hidden flex flex-col shadow-sm">
-           <div className="p-4 border-b border-[#e8ddd0] bg-[#fcfaf7] flex items-center justify-between">
+        <div className="xl:col-span-7 flex flex-col">
+          <div className="bg-white rounded-xl border border-[#e8ddd0] overflow-hidden flex flex-col shadow-sm">
+            <div className="p-4 border-b border-[#e8ddd0] bg-[#fcfaf7] flex items-center justify-between">
               <h3 className="font-bold text-[#3a2a1a] text-xs flex items-center gap-2">
                 <span>📜</span> {t.pointsList}
               </h3>
               <span className="text-[10px] font-bold text-[#9a8a7a]">{meta?.total || 0} Total</span>
-           </div>
-           
-           <FilterBar 
-             onSearch={(val) => setQueryParams(p => p.search === val ? p : { ...p, search: val, page: 1 })}
-             onFilterChange={(name, val) => setQueryParams(p => p[name] === val ? p : { ...p, [name]: val, page: 1 })}
-             onSortChange={(sortBy, sort) => setQueryParams(p => p.sortBy === sortBy && p.sort === sort ? p : { ...p, sortBy, sort, page: 1 })}
-             filters={[
-               {
-                 name: "status",
-                 label: t.allStatuses || "All statuses",
-                 options: [
-                   { label: "Active", value: "active" },
-                   { label: "Inactive", value: "inactive" }
-                 ]
-               }
-             ]}
-             sortOptions={[
-               { label: t.dateDesc || "Date (Newest)", value: "date:descending" },
-               { label: t.dateAsc || "Date (Oldest)", value: "date:ascending" },
-               { label: t.nameAsc || "Name (A-Z)", value: "title:ascending" },
-               { label: t.nameDesc || "Name (Z-A)", value: "title:descending" }
-             ]}
-             actionButton={
-               <button 
-                 onClick={handleOpenAdd}
-                 className="bg-[#8B6914] text-white text-[11px] font-bold px-4 py-2 rounded-lg hover:bg-[#6a5010] transition-colors flex items-center gap-2"
-               >
-                 <span>+</span> {t.addPoint}
-               </button>
-             }
-           />
-           
-           <DataTable 
-             columns={columns}
-             data={points}
-             loading={loading}
-             skeletonCount={5}
-             emptyMessage="No collection points found."
-           />
+            </div>
 
-           <div className="p-4 mt-auto border-t border-[#e8ddd0]">
-             <Pagination meta={meta} onPageChange={(page) => setQueryParams(p => ({ ...p, page }))} />
-           </div>
+            <FilterBar
+              onSearch={(val) => setQueryParams(p => p.search === val ? p : { ...p, search: val, page: 1 })}
+              onFilterChange={(name, val) => setQueryParams(p => p[name] === val ? p : { ...p, [name]: val, page: 1 })}
+              onSortChange={(sortBy, sort) => setQueryParams(p => p.sortBy === sortBy && p.sort === sort ? p : { ...p, sortBy, sort, page: 1 })}
+              related={true}
+              filters={[
+                {
+                  name: "status",
+                  label: t.allStatuses || "All statuses",
+                  options: [
+                    { label: "Active", value: "active" },
+                    { label: "Inactive", value: "inactive" }
+                  ]
+                }
+              ]}
+              sortOptions={[
+                { label: t.dateDesc || "Date (Newest)", value: "date:descending" },
+                { label: t.dateAsc || "Date (Oldest)", value: "date:ascending" },
+                { label: t.nameAsc || "Name (A-Z)", value: "title:ascending" },
+                { label: t.nameDesc || "Name (Z-A)", value: "title:descending" }
+              ]}
+              actionButton={
+                <button
+                  onClick={handleOpenAdd}
+                  className="bg-[#8B6914] text-white text-[11px] font-bold px-4 py-2 rounded-xl hover:bg-[#6a5010] transition-colors flex items-center gap-2"
+                >
+                  <span>+</span> {t.addPoint}
+                </button>
+              }
+            />
+
+            <div className="overflow-x-auto">
+              <DataTable
+                columns={columns}
+                data={points}
+                loading={loading}
+                skeletonCount={5}
+                emptyMessage="No collection points found."
+              />
+            </div>
+
+            <div className="p-4 mt-auto">
+              <Pagination meta={meta} onPageChange={(page) => setQueryParams(p => ({ ...p, page }))} />
+            </div>
+          </div>
         </div>
       </div>
 
@@ -387,12 +406,12 @@ export default function CollectionPointsPage() {
                   <h3 className="font-bold text-[#3a2a1a] border-b pb-2">Localisation</h3>
                   <p className="text-sm text-[#5a4a3a] mb-2">📍 {selectedPoint.location.address || selectedPoint.address}</p>
                   <div className="w-full h-64 bg-gray-200 rounded-xl overflow-hidden border border-[#e8ddd0]">
-                    <iframe 
-                      width="100%" 
-                      height="100%" 
-                      style={{ border: 0 }} 
-                      loading="lazy" 
-                      allowFullScreen 
+                    <iframe
+                      width="100%"
+                      height="100%"
+                      style={{ border: 0 }}
+                      loading="lazy"
+                      allowFullScreen
                       src={`https://maps.google.com/maps?q=${selectedPoint.location.coordinates[1]},${selectedPoint.location.coordinates[0]}&hl=fr;z=14&output=embed`}
                     ></iframe>
                   </div>
@@ -413,4 +432,6 @@ export default function CollectionPointsPage() {
       />
     </div>
   );
-}
+});
+
+export default CollectionPointsPage;

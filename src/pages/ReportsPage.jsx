@@ -7,6 +7,7 @@ import Pagination from "../components/common/Pagination";
 import FilterBar from "../components/common/FilterBar";
 import { toast } from "react-toastify";
 import ConfirmModal from "../components/common/ConfirmModal";
+import CRUDModal from "../components/common/CRUDModal";
 
 export default function ReportsPage() {
   const { t } = useLang();
@@ -19,6 +20,8 @@ export default function ReportsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [confirmModal, setConfirmModal] = useState({ isOpen: false, title: "", message: "", onConfirm: null });
   const [confirmLoading, setConfirmLoading] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [modalLoading, setModalLoading] = useState(false);
 
   const [queryParams, setQueryParams] = useState({
     page: 1,
@@ -102,6 +105,62 @@ export default function ReportsPage() {
     if (tp?.includes("cat") || tp?.includes("chat")) return "🐈";
     return "🐾";
   };
+
+  const handleCreateReport = async (formData) => {
+    setModalLoading(true);
+    try {
+      const data = new FormData();
+      Object.keys(formData).forEach(key => {
+        if (formData[key] !== undefined) data.append(key, formData[key]);
+      });
+
+      const res = await api.post("/reports/create-report", data, {
+        headers: { "Content-Type": "multipart/form-data" }
+      });
+
+      if (res.data.status === "ok" || res.status === 201) {
+        toast.success("Report created successfully");
+        fetchData();
+        setIsAddModalOpen(false);
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to create report");
+    } finally {
+      setModalLoading(false);
+    }
+  };
+
+  const reportFields = [
+    { name: "animalName", label: "Animal Name", required: true },
+    { 
+      name: "species", 
+      label: "Species", 
+      type: "select", 
+      required: true,
+      options: [
+        { label: "Dog", value: "Dog" },
+        { label: "Cat", value: "Cat" },
+        { label: "Bird", value: "Bird" },
+        { label: "Other", value: "Other" }
+      ]
+    },
+    { name: "breed", label: "Breed" },
+    { 
+      name: "status", 
+      label: "Status", 
+      type: "select", 
+      required: true,
+      options: [
+        { label: "Lost", value: "lost" },
+        { label: "Found", value: "found" },
+        { label: "Rescued", value: "rescued" },
+        { label: "Sighted", value: "sighted" }
+      ]
+    },
+    { name: "address", label: "Location Address", required: true },
+    { name: "description", label: "Description", type: "textarea" },
+    { name: "image", label: "Animal Photo", type: "file" }
+  ];
 
   const columns = [
     {
@@ -236,6 +295,7 @@ export default function ReportsPage() {
           onSearch={(val) => setQueryParams(p => p.search === val ? p : { ...p, search: val, page: 1 })}
           onFilterChange={(name, val) => setQueryParams(p => p[name] === val ? p : { ...p, [name]: val, page: 1 })}
           onSortChange={(sortBy, sort) => setQueryParams(p => p.sortBy === sortBy && p.sort === sort ? p : { ...p, sortBy, sort, page: 1 })}
+          related={true}
           filters={[
             {
               name: "status",
@@ -243,18 +303,18 @@ export default function ReportsPage() {
               options: [
                 { label: "Lost", value: "lost" },
                 { label: "Found", value: "found" },
-                { label: "Rescued", value: "rescued" },
-                { label: "Sighted", value: "sighted" }
+                { label: "Sightings", value: "sighting" },
+                { label: "Resolved", value: "resolved" }
               ]
             },
             {
               name: "species",
               label: t.allSpecies || "All species",
               options: [
-                { label: "Chien", value: "Dog" },
-                { label: "Chat", value: "Cat" },
-                { label: "Oiseau", value: "Bird" },
-                { label: "Autre", value: "Other" }
+                { label: "Dog", value: "dog" },
+                { label: "Cat", value: "cat" },
+                { label: "Bird", value: "bird" },
+                { label: "Other", value: "other" }
               ]
             }
           ]}
@@ -265,23 +325,29 @@ export default function ReportsPage() {
             { label: t.nameDesc || "Name (Z-A)", value: "name:descending" }
           ]}
           actionButton={
-            <button className="bg-[#8B6914] text-white text-[11px] font-bold px-4 py-2 rounded-lg hover:bg-[#6a5010] transition-colors flex items-center gap-2">
+            <button 
+              onClick={() => setIsAddModalOpen(true)}
+              className="bg-[#8B6914] text-white text-[11px] font-bold px-4 py-2 rounded-xl hover:bg-[#6a5010] transition-colors flex items-center gap-2"
+            >
               <span>+</span> {t.createReport || "Create Report"}
             </button>
           }
         />
+        <div className="overflow-x-auto">
+          <DataTable
+            columns={columns}
+            data={reports}
+            loading={loading}
+            emptyMessage={t.noReportsFound || "No reports found."}
+          />
+        </div>
 
-        <DataTable
-          columns={columns}
-          data={reports}
-          loading={loading}
-          emptyMessage={t.noReportsFound || "No reports found."}
-        />
-
-        <Pagination
-          meta={meta}
-          onPageChange={(page) => setQueryParams(p => ({ ...p, page }))}
-        />
+        <div className="p-4">
+          <Pagination
+            meta={meta}
+            onPageChange={(page) => setQueryParams(p => ({ ...p, page }))}
+          />
+        </div>
       </div>
 
       {isModalOpen && selectedReport && (
@@ -299,107 +365,74 @@ export default function ReportsPage() {
             <div className="p-6 flex flex-col gap-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="flex flex-col gap-4">
-                  <h3 className="font-bold text-[#3a2a1a] border-b pb-2">Informations sur l'animal</h3>
-                  <div className="grid grid-cols-2 gap-y-2 text-sm">
-                    <span className="text-[#9a8a7a]">Titre:</span><span className="font-medium text-[#3a2a1a] truncate" title={selectedReport.title}>{selectedReport.title}</span>
-                    <span className="text-[#9a8a7a]">Nom:</span><span className="font-medium text-[#3a2a1a]">{selectedReport.animalName}</span>
-                    <span className="text-[#9a8a7a]">Espèce:</span><span className="font-medium text-[#3a2a1a]">{selectedReport.species}</span>
-                    <span className="text-[#9a8a7a]">Race:</span><span className="font-medium text-[#3a2a1a]">{selectedReport.breed}</span>
-                    <span className="text-[#9a8a7a]">Genre:</span><span className="font-medium text-[#3a2a1a]">{selectedReport.gender}</span>
-                    <span className="text-[#9a8a7a]">Âge:</span><span className="font-medium text-[#3a2a1a]">{selectedReport.age}</span>
-                    <span className="text-[#9a8a7a]">{t.statusLabel || "Status"}:</span>
-                    <span className="font-bold uppercase text-[10px] bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full w-fit">{selectedReport.status}</span>
-                    <span className="text-[#9a8a7a]">Puce:</span><span className="font-medium text-[#3a2a1a]">{selectedReport.hasMicrochip}</span>
-                    <span className="text-[#9a8a7a]">Collier:</span><span className="font-medium text-[#3a2a1a]">{selectedReport.hasCollarOrHarness}</span>
+                  <div className="w-full aspect-video rounded-xl bg-gray-100 overflow-hidden border border-[#e8ddd0]">
+                    {selectedReport.images?.[0]?.secure_url ? (
+                      <img src={selectedReport.images[0].secure_url} alt="Report" className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-6xl">{getEmoji(selectedReport.species)}</div>
+                    )}
                   </div>
                 </div>
 
                 <div className="flex flex-col gap-4">
-                  <h3 className="font-bold text-[#3a2a1a] border-b pb-2">Auteur & Contact</h3>
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="w-10 h-10 rounded-full bg-[#8B6914] text-white flex items-center justify-center font-bold overflow-hidden border border-[#e8ddd0]">
-                      {selectedReport.author?.profileImage?.secure_url ? (
-                        <img src={selectedReport.author.profileImage.secure_url} alt="author" className="w-full h-full object-cover" />
-                      ) : (
-                        (selectedReport.author?.firstName?.[0] || 'U').toUpperCase()
-                      )}
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="font-bold text-sm text-[#3a2a1a]">{selectedReport.author?.firstName} {selectedReport.author?.lastName}</span>
-                      <span className="text-xs text-[#9a8a7a]">{selectedReport.author?.email}</span>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-y-2 text-sm">
-                    <span className="text-[#9a8a7a]">Date:</span><span className="font-medium text-[#3a2a1a]">{new Date(selectedReport.eventDate).toLocaleDateString()}</span>
-                    <span className="text-[#9a8a7a]">Téléphone:</span><span className="font-medium text-[#3a2a1a]">{selectedReport.isPhoneVisible ? selectedReport.contactPhone || 'N/A' : 'Masqué'}</span>
-                    <span className="text-[#9a8a7a]">Email:</span><span className="font-medium text-[#3a2a1a]">{selectedReport.isEmailVisible ? selectedReport.contactEmail || selectedReport.author?.email : 'Masqué'}</span>
+                  <h3 className="font-bold text-[#3a2a1a] border-b pb-2 flex items-center gap-2">
+                    <span>📝</span> Infos Signalement
+                  </h3>
+                  <div className="grid grid-cols-2 gap-y-3 text-sm">
+                    <span className="text-[#9a8a7a]">Espèce:</span><span className="font-medium text-[#3a2a1a]">{selectedReport.species}</span>
+                    <span className="text-[#9a8a7a]">Race:</span><span className="font-medium text-[#3a2a1a]">{selectedReport.breed || "Inconnue"}</span>
+                    <span className="text-[#9a8a7a]">Nom Animal:</span><span className="font-medium text-[#3a2a1a]">{selectedReport.animalName || "N/A"}</span>
+                    <span className="text-[#9a8a7a]">Statut:</span>
+                    <span className="font-bold uppercase text-[10px] bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full w-fit">{selectedReport.status}</span>
+                    <span className="text-[#9a8a7a]">Date:</span><span className="font-medium text-[#3a2a1a]">{new Date(selectedReport.createdAt).toLocaleDateString()}</span>
                   </div>
                 </div>
+              </div>
+
+              <div className="flex flex-col gap-2 bg-[#fcfaf7] p-4 rounded-xl border border-[#e8ddd0]">
+                <h3 className="font-bold text-[#3a2a1a] text-sm flex items-center gap-2">
+                  <span>📍</span> Localisation
+                </h3>
+                <p className="text-sm text-[#5a4a3a] leading-relaxed">{selectedReport.location?.address || "Adresse non fournie"}</p>
               </div>
 
               <div className="flex flex-col gap-2 bg-[#f5f0e8] p-4 rounded-xl">
                 <h3 className="font-bold text-[#3a2a1a] text-sm">Description</h3>
-                <p className="text-sm text-[#5a4a3a] leading-relaxed whitespace-pre-wrap">{selectedReport.description || t.noDescription}</p>
+                <p className="text-sm text-[#5a4a3a] leading-relaxed whitespace-pre-wrap">{selectedReport.description || t.noDescription || "Aucune description fournie"}</p>
               </div>
 
-              {selectedReport.images && selectedReport.images.length > 0 && (
-                <div className="flex flex-col gap-3">
-                  <h3 className="font-bold text-[#3a2a1a] border-b pb-2">Photos</h3>
-                  <div className="flex gap-4 overflow-x-auto custom-scrollbar pb-2">
-                    {selectedReport.images.map((img, idx) => (
-                      <img key={idx} src={img.secure_url} alt="Animal" className="w-32 h-32 object-cover rounded-lg border border-[#e8ddd0] shadow-sm" />
-                    ))}
+              <div className="flex flex-col gap-4">
+                <h3 className="font-bold text-[#3a2a1a] border-b pb-2 flex items-center gap-2">
+                  <span>👤</span> Signalé par
+                </h3>
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-full bg-[#8B6914] text-white flex items-center justify-center text-lg font-bold overflow-hidden border-2 border-white shadow-sm">
+                    {selectedReport.author?.profileImage?.secure_url ? (
+                      <img src={selectedReport.author.profileImage.secure_url} alt="Profile" className="w-full h-full object-cover" />
+                    ) : (
+                      (selectedReport.author?.firstName?.[0] || 'U').toUpperCase()
+                    )}
                   </div>
-                </div>
-              )}
-
-              {selectedReport.location && selectedReport.location.coordinates && (
-                <div className="flex flex-col gap-3">
-                  <h3 className="font-bold text-[#3a2a1a] border-b pb-2">Localisation</h3>
-                  <p className="text-sm text-[#5a4a3a] mb-2">📍 {selectedReport.location.address}</p>
-                  <div className="w-full h-64 bg-gray-200 rounded-xl overflow-hidden border border-[#e8ddd0]">
-                    <iframe
-                      width="100%"
-                      height="100%"
-                      style={{ border: 0 }}
-                      loading="lazy"
-                      allowFullScreen
-                      src={`https://maps.google.com/maps?q=${selectedReport.location.coordinates[1]},${selectedReport.location.coordinates[0]}&hl=fr;z=14&output=embed`}
-                    ></iframe>
+                  <div className="flex flex-col">
+                    <span className="font-bold text-[#3a2a1a]">{selectedReport.author?.firstName} {selectedReport.author?.lastName}</span>
+                    <span className="text-xs text-[#9a8a7a]">{selectedReport.author?.email}</span>
                   </div>
-                </div>
-              )}
-
-              <div className="flex flex-col gap-3">
-                <h3 className="font-bold text-[#3a2a1a] border-b pb-2">Commentaires ({selectedReport.comments?.length || 0})</h3>
-                <div className="flex flex-col gap-3">
-                  {selectedReport.comments && selectedReport.comments.length > 0 ? selectedReport.comments.map((comment) => (
-                    <div key={comment._id} className="bg-[#fcfaf7] border border-[#e8ddd0] p-3 rounded-lg flex flex-col gap-2">
-                      <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-full bg-[#8B6914] text-white flex items-center justify-center font-bold text-[10px] overflow-hidden">
-                          {comment.author?.profileImage?.secure_url ? (
-                            <img src={comment.author.profileImage.secure_url} alt="comment author" className="w-full h-full object-cover" />
-                          ) : (
-                            (comment.author?.firstName?.[0] || 'U').toUpperCase()
-                          )}
-                        </div>
-                        <span className="font-bold text-xs text-[#3a2a1a]">{comment.author?.firstName} {comment.author?.lastName}</span>
-                        <span className="text-[10px] text-[#9a8a7a] ml-auto">{new Date(comment.createdAt).toLocaleString()}</span>
-                      </div>
-                      <p className="text-xs text-[#5a4a3a] pl-8">{comment.content}</p>
-                      {comment.image && (
-                        <img src={comment.image.secure_url} alt="comment attachment" className="w-20 h-20 object-cover rounded mt-2 ml-8" />
-                      )}
-                    </div>
-                  )) : (
-                    <p className="text-xs text-[#9a8a7a] italic">{t.noComments}</p>
-                  )}
                 </div>
               </div>
             </div>
           </div>
         </div>
       )}
+
+      <CRUDModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        title="Create New Report"
+        fields={reportFields}
+        onSubmit={handleCreateReport}
+        loading={modalLoading}
+      />
+
 
       <ConfirmModal
         isOpen={confirmModal.isOpen}

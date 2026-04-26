@@ -374,22 +374,12 @@ export default function DonationsPage() {
   ];
 
   return (
-    <div className="px-6 py-4 flex flex-col gap-6">
+    <div className="px-6 py-4 flex flex-col gap-4">
 
       {/* Stats Bar */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
         {statCards.map((s, i) => (
-          <div key={i} className="bg-white rounded-xl p-4 border border-[#e8ddd0] flex flex-col gap-1 shadow-sm hover:shadow-md transition-shadow">
-            <div className="flex items-center gap-2 mb-1">
-              <div className={`w-1 h-3 rounded-full ${s.value.color.replace('text-', 'bg-')}`}></div>
-              <span className="text-[9px] font-bold text-[#9a8a7a] uppercase tracking-widest">{s.label}</span>
-            </div>
-            {loading ? (
-              <div className="h-8 w-24 bg-gray-100 animate-pulse rounded"></div>
-            ) : (
-              <span className={`text-2xl font-bold ${s.value.color}`}>{s.value.text}</span>
-            )}
-          </div>
+          <StatCard key={i} loading={loading} {...s} />
         ))}
       </div>
 
@@ -399,6 +389,7 @@ export default function DonationsPage() {
           onSearch={(val) => setQueryParams(p => ({ ...p, search: val, page: 1 }))}
           onFilterChange={(name, val) => setQueryParams(p => ({ ...p, [name]: val, page: 1 }))}
           onSortChange={() => { }} // Not used yet
+          related={true}
           filters={[
             {
               name: "status", label: "ALL", options: [
@@ -411,7 +402,7 @@ export default function DonationsPage() {
           ]}
           sortOptions={[]}
           actionButton={
-            <button className="bg-[#3a2a1a] text-white text-[11px] font-bold px-4 py-2 rounded-lg hover:bg-[#2a1a0a] transition-colors flex items-center gap-2">
+            <button className="bg-[#3a2a1a] text-white text-[11px] font-bold px-4 py-2 rounded-xl hover:bg-[#2a1a0a] transition-colors flex items-center gap-2">
               <span>📤</span> {t.exportBtn}
             </button>
           }

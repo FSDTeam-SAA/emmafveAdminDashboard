@@ -33,19 +33,19 @@ export default function DashboardPage() {
     {
       label: t.usersLabel,
       value: { text: loading ? "..." : (stats?.users?.total || 0).toLocaleString(), color: "text-[#3a2a1a]" },
-      sub: stats?.users?.newThisWeek ? `+${stats.users.newThisWeek} ${t.thisWeek}` : t.thisWeek,
+      sub: stats?.users?.newThisWeek ? `+${stats.users.newThisWeek} ${t.thisWeek}` : `${(0).toLocaleString()} ${t.thisWeek}`,
       subType: "up",
     },
     {
       label: t.activeReports,
       value: { text: loading ? "..." : (stats?.reports?.total || 0).toLocaleString(), color: "text-orange-500" },
-      sub: stats?.reports?.pending ? `${stats.reports.pending} ${t.pending}` : t.pending,
+      sub: stats?.reports?.pending ? `${stats.reports.pending} ${t.pending}` : `${(0).toLocaleString()} ${t.pending}`,
       subType: "wait",
     },
     {
       label: t.resolved,
       value: { text: loading ? "..." : (stats?.reports?.resolved || 0).toLocaleString(), color: "text-green-600" },
-      sub: stats?.reports?.resolutionRate ? `${t.rate} ${stats.reports.resolutionRate}%` : t.rate,
+      sub: stats?.reports?.resolutionRate ? `${t.rate} ${stats.reports.resolutionRate}%` : `${(0).toLocaleString()} ${t.rate}`,
       subType: "up",
     },
     {
@@ -60,31 +60,31 @@ export default function DashboardPage() {
     {
       label: t.pointsDistributed,
       value: { text: loading ? "..." : (stats?.points?.totalEarnedThisMonth || 0).toLocaleString(), color: "text-red-600" },
-      sub: stats?.points?.pending ? `${stats.points.pending?.toLocaleString()} ${t.pendingPoints}` : t.pendingPoints,
+      sub: stats?.points?.pending ? `${stats.points.pending?.toLocaleString()} ${t.pendingPoints}` : `${(0).toLocaleString() +" in"} ${t.pendingPoints}`,
       subType: "wait",
     },
     {
       label: t.partnersLabel,
       value: { text: loading ? "..." : (stats?.partners?.total || 0).toLocaleString(), color: "text-[#3a2a1a]" },
-      sub: stats?.partners?.pending ? `${stats.partners.pending} ${t.inValidation}` : t.inValidation,
+      sub: stats?.partners?.pending ? `${stats.partners.pending} ${t.inValidation}` : `${(0).toLocaleString()} ${t.inValidation}`,
       subType: "wait",
     },
     {
       label: t.activeMissions,
       value: { text: loading ? "..." : (stats?.missions?.active || 0).toLocaleString(), color: "text-[#3a2a1a]" },
-      sub: stats?.missions?.inProgress ? `${stats.missions.inProgress} ${t.inProgress}` : t.inProgress,
+      sub: stats?.missions?.inProgress ? `${stats.missions.inProgress} ${t.inProgress}` : `${(0).toLocaleString()} ${t.inProgress}`,
       subType: "neutral",
     },
     {
       label: t.downloads,
       value: { text: loading ? "..." : (stats?.downloads?.total || 0).toLocaleString(), color: "text-orange-500" },
-      sub: stats?.downloads?.growth ? `+${stats.downloads.growth} ${t.thisMonth55}` : t.thisMonth55,
+      sub: stats?.downloads?.growth ? `+${stats.downloads.growth} ${t.thisMonth55}` : `${(0).toLocaleString()} ${t.thisMonth55}`,
       subType: "up",
     },
   ];
 
   return (
-    <div className="p-5 flex flex-col gap-3">
+    <div className="px-6 py-4 flex flex-col gap-4">
       {/* Stats Row 1 */}
       <div className="grid grid-cols-4 gap-3">
         {statsRow1.map((s) => (

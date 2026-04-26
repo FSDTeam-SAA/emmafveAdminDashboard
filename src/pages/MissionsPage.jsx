@@ -40,12 +40,12 @@ export default function MissionsPage() {
       const q = { ...queryParams };
       if (q.status === "all") delete q.status;
       const queryString = new URLSearchParams(q).toString();
-      
+
       const [missionsRes, statsRes] = await Promise.all([
         api.get(`/local-missions/get-all-local-missions?${queryString}`),
         api.get("/admin/stats/missions"),
       ]);
-      
+
       if (missionsRes.data.status === "ok") {
         setMissions(missionsRes.data.data || []);
         setMeta(missionsRes.data.meta);
@@ -164,8 +164,8 @@ export default function MissionsPage() {
         </div>
       )
     },
-    { 
-      header: "PARTENAIRE", 
+    {
+      header: "PARTENAIRE",
       cell: (m) => (
         <div className="flex items-center gap-2">
           <div className="w-6 h-6 rounded-full bg-[#8B6914] text-white flex items-center justify-center text-[10px] font-bold overflow-hidden shrink-0">
@@ -177,16 +177,16 @@ export default function MissionsPage() {
         </div>
       )
     },
-    { 
-      header: "DATE", 
+    {
+      header: "DATE",
       cell: (m) => new Date(m.createdAt).toLocaleDateString()
     },
-    { 
-      header: "POINTS", 
+    {
+      header: "POINTS",
       cell: (m) => <span className="font-bold text-orange-600">+{m.points} pts</span>
     },
-    { 
-      header: "PARTICIPANTS", 
+    {
+      header: "PARTICIPANTS",
       align: "center",
       cell: (m) => <span className="font-bold">{m.participantsCount || 0}</span>
     },
@@ -199,19 +199,19 @@ export default function MissionsPage() {
       align: "right",
       cell: (m) => (
         <div className="flex gap-1 justify-end">
-          <button 
+          <button
             onClick={() => handleOpenView(m._id)}
             className="bg-blue-100 text-blue-600 text-[10px] font-bold px-3 py-1 rounded hover:bg-blue-200 transition-colors"
           >
             {t.viewBtn}
           </button>
-          <button 
+          <button
             onClick={() => handleOpenEdit(m)}
             className="bg-orange-100 text-orange-600 text-[10px] font-bold px-3 py-1 rounded hover:bg-orange-200 transition-colors"
           >
             {t.editBtn}
           </button>
-          <button 
+          <button
             onClick={() => handleDelete(m._id)}
             className="bg-red-100 text-red-600 text-[10px] font-bold px-3 py-1 rounded hover:bg-red-200 transition-colors"
           >
@@ -232,12 +232,12 @@ export default function MissionsPage() {
         <StatCard loading={loading} label={t.pointsAttributed} value={{ text: stats?.pointsAttributed?.toLocaleString() || "0", color: "text-orange-500" }} />
       </div>
 
-      {/* Table Card */}
-      <div className="bg-white rounded-xl border border-[#e8ddd0] overflow-hidden flex flex-col">
-        <FilterBar 
+      <div className="bg-white rounded-xl border border-[#e8ddd0] overflow-hidden flex flex-col shadow-sm">
+        <FilterBar
           onSearch={(val) => setQueryParams(p => p.search === val ? p : { ...p, search: val, page: 1 })}
           onFilterChange={(name, val) => setQueryParams(p => p[name] === val ? p : { ...p, [name]: val, page: 1 })}
           onSortChange={(sortBy, sort) => setQueryParams(p => p.sortBy === sortBy && p.sort === sort ? p : { ...p, sortBy, sort, page: 1 })}
+          related={true}
           filters={[
             {
               name: "status",
@@ -251,30 +251,32 @@ export default function MissionsPage() {
           sortOptions={[
             { label: t.dateDesc || "Date (Newest)", value: "date:descending" },
             { label: t.dateAsc || "Date (Oldest)", value: "date:ascending" },
-            { label: t.titleAsc || "Title (A-Z)", value: "title:ascending" },
-            { label: t.titleDesc || "Title (Z-A)", value: "title:descending" }
+            { label: t.nameAsc || "Name (A-Z)", value: "name:ascending" },
+            { label: t.ptsDesc || "Points (Highest)", value: "points:descending" }
           ]}
           actionButton={
-            <button 
+            <button
               onClick={handleOpenAdd}
-              className="bg-[#8B6914] text-white text-[11px] font-bold px-4 py-2 rounded-lg hover:bg-[#6a5010] transition-colors flex items-center gap-2"
+              className="bg-[#8B6914] text-white text-[11px] font-bold px-4 py-2 rounded-xl hover:bg-[#6a5010] transition-colors flex items-center gap-2"
             >
-              <span>+</span> {t.createMission}
+              <span>+</span> {t.addMission}
             </button>
           }
         />
-
-        <DataTable 
-          columns={columns}
-          data={missions}
-          loading={loading}
-          emptyMessage={t.noMissionsFound || "No missions found."}
-        />
-
-        <Pagination 
-          meta={meta}
-          onPageChange={(page) => setQueryParams(p => ({ ...p, page }))}
-        />
+        <div className="overflow-x-auto">
+          <DataTable
+            columns={columns}
+            data={missions}
+            loading={loading}
+            emptyMessage={t.noMissionsFound || "No missions found."}
+          />
+        </div>
+        <div className="bg-[#fcfaf7]">
+          <Pagination
+            meta={meta}
+            onPageChange={(page) => setQueryParams(p => ({ ...p, page }))}
+          />
+        </div>
       </div>
 
       <CRUDModal

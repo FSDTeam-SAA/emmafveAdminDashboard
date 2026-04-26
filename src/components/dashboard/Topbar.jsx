@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useLang } from "../../context/LanguageContext";
+import { useApiCache } from "../../context/ApiCacheContext";
 import { socket } from "../../context/SocketContect";
 import api from "../../utils/api";
 import ProfileModal from "./ProfileModal";
@@ -9,21 +10,21 @@ import { toast } from "react-toastify";
 const Topbar = React.memo(() => {
   const { lang, setLang, t } = useLang();
   const location = useLocation();
+  const { fetchWithCache } = useApiCache();
 
   // Live stats for dynamic subtitles — declared first so PAGE_TITLES can use it
   const [liveStats, setLiveStats] = useState(null);
 
   useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const res = await api.get("/admin/stats");
-        if (res.data.status === "ok") setLiveStats(res.data.data);
-      } catch { /* silent */ }
+    const fetchStats = () => {
+      fetchWithCache("/admin/stats", { expireIn: 30000 })
+        .then(res => { if (res.data.status === "ok") setLiveStats(res.data.data); })
+        .catch(() => {});
     };
     fetchStats();
     const interval = setInterval(fetchStats, 60000);
     return () => clearInterval(interval);
-  }, []);
+  }, [fetchWithCache]);
 
   // Per-route supplemental stats (for pages not covered by /admin/stats)
   const [contactsStats, setContactsStats] = useState(null);
@@ -32,21 +33,21 @@ const Topbar = React.memo(() => {
 
   useEffect(() => {
     if (location.pathname === "/contacts") {
-      api.get("/contacts/stats")
+      fetchWithCache("/contacts/stats", { expireIn: 60000 })
         .then(res => { if (res.data.status === "ok" || res.data.data) setContactsStats(res.data.data); })
         .catch(() => {});
     }
     if (location.pathname === "/collection-points") {
-      api.get("/partner-ads/get-all-partner-ads?type=collection_point&limit=1")
+      fetchWithCache("/partner-ads/get-all-partner-ads?type=collection_point&limit=1", { expireIn: 60000 })
         .then(res => { if (res.data.status === "ok") setCollectionPointsTotal(res.data.meta?.total ?? null); })
         .catch(() => {});
     }
     if (location.pathname === "/donations") {
-      api.get("/donations/stats")
+      fetchWithCache("/donations/stats", { expireIn: 60000 })
         .then(res => { if (res.data.status === "ok" || res.data.success) setDonationsStats(res.data.data); })
         .catch(() => {});
     }
-  }, [location.pathname]);
+  }, [location.pathname, fetchWithCache]);
 
   const s = liveStats;
   const PAGE_TITLES = {

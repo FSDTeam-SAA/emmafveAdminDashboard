@@ -82,8 +82,7 @@ export default function NotificationsPage() {
   };
 
   return (
-    <div className="px-6 py-4 flex flex-col gap-6">
-
+    <div className="px-6 py-4 flex flex-col gap-4">
       <div className="grid grid-cols-5 gap-4">
         {/* Create Alert Form */}
         <div className="col-span-3 bg-white rounded-xl border border-[#e8ddd0] p-6 flex flex-col gap-5">
@@ -93,14 +92,14 @@ export default function NotificationsPage() {
            <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-1.5">
                  <label className="text-[9px] font-bold text-[#9a8a7a] uppercase">{t.geoTarget}</label>
-                 <select className="bg-[#fcfaf7] border border-[#e8ddd0] rounded px-3 py-2 text-xs text-[#3a2a1a] outline-none">
+                 <select className="bg-[#fcfaf7] border border-[#e8ddd0] rounded-xl px-3 py-2 text-xs text-[#3a2a1a] outline-none">
                     <option>Toute la France</option>
                     <option>Provence-Alpes-C\u00F4te d'Azur</option>
                  </select>
               </div>
               <div className="flex flex-col gap-1.5">
                  <label className="text-[9px] font-bold text-[#9a8a7a] uppercase">{t.userType}</label>
-                 <select className="bg-[#fcfaf7] border border-[#e8ddd0] rounded px-3 py-2 text-xs text-[#3a2a1a] outline-none">
+                 <select className="bg-[#fcfaf7] border border-[#e8ddd0] rounded-xl px-3 py-2 text-xs text-[#3a2a1a] outline-none">
                     <option>Tous</option>
                     <option>Propri\u00E9taires</option>
                  </select>
@@ -109,17 +108,17 @@ export default function NotificationsPage() {
                  <label className="text-[9px] font-bold text-[#9a8a7a] uppercase">{t.message}</label>
                  <textarea 
                     placeholder="Saisissez votre message d'alerte..."
-                    className="bg-[#fcfaf7] border border-[#e8ddd0] rounded px-3 py-2 text-xs text-[#3a2a1a] outline-none h-32 resize-none"
+                    className="bg-[#fcfaf7] border border-[#e8ddd0] rounded-xl px-3 py-2 text-xs text-[#3a2a1a] outline-none h-32 resize-none"
                  />
               </div>
-              <button className="bg-[#8B6914] text-white text-[11px] font-bold py-3 rounded-lg hover:bg-[#6a5010] transition-colors flex items-center justify-center gap-2">
+              <button className="bg-[#8B6914] text-white text-[11px] font-bold py-3 rounded-xl hover:bg-[#6a5010] transition-colors flex items-center justify-center gap-2">
                  <span>🚀</span> {t.sendAlert}
               </button>
            </div>
         </div>
 
         {/* History Card */}
-        <div className="col-span-2 bg-white rounded-xl border border-[#e8ddd0] p-6 flex flex-col gap-5">
+        <div className="col-span-2 bg-white rounded-xl border border-[#e8ddd0] p-4 flex flex-col gap-4">
            <div className="flex items-center justify-between">
              <h3 className="font-bold text-[#3a2a1a] text-xs flex items-center gap-2">
                <span>📋</span> {t.notifHistory}
