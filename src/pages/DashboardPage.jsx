@@ -50,7 +50,7 @@ export default function DashboardPage() {
     },
     {
       label: t.donationsCollected,
-      value: { text: loading ? "..." : `${(stats?.donations?.collectedThisMonth || 0).toLocaleString()}\u20AC`, color: "text-orange-500" },
+      value: { text: loading ? "..." : `${(stats?.donations?.collectedThisMonth || 0).toLocaleString()}€`, color: "text-orange-500" },
       sub: stats?.donations?.growthText || t.thisMonth206,
       subType: "up",
     },

@@ -35,9 +35,9 @@ export default function CrowdfundingCard() {
       </h3>
 
       <p className="text-3xl font-bold text-orange-500 leading-none">
-        {loading ? "..." : `${total.toLocaleString()}\u20AC`}
+        {loading ? "..." : `${total.toLocaleString()}€`}
       </p>
-      <p className="text-[11px] text-[#9a8a7a] mt-1 mb-3">{t.goal} ({goal.toLocaleString()}\u20AC)</p>
+      <p className="text-[11px] text-[#9a8a7a] mt-1 mb-3">{t.goal} ({goal.toLocaleString()}€)</p>
 
       {/* Progress */}
       <div className="bg-[#f0e8d8] rounded-full h-2.5 overflow-hidden mb-4">
@@ -52,7 +52,7 @@ export default function CrowdfundingCard() {
         {[
           { val: "142", lbl: t.donors },
           { val: "18j", lbl: t.remaining },
-          { val: loading ? "..." : `${left.toLocaleString()}\u20AC`, lbl: t.left },
+          { val: loading ? "..." : `${left.toLocaleString()}€`, lbl: t.left },
         ].map((s) => (
           <div
             key={s.lbl}

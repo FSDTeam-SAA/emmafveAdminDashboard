@@ -5,7 +5,7 @@ import api from "../utils/api";
 const DonorRow = React.memo(({ donor, t }) => (
   <tr className="border-b border-[#f0e8d8] last:border-0 hover:bg-[#fcfaf7] transition-colors text-xs">
     <td className="py-4 px-4 font-bold text-[#3a2a1a]">{donor.user}</td>
-    <td className="py-4 px-4 font-bold text-[#3a2a1a]">{donor.amount}\u20AC</td>
+    <td className="py-4 px-4 font-bold text-[#3a2a1a]">{donor.amount}€</td>
     <td className="py-4 px-4 text-[#3a2a1a]">{donor.counterpart}</td>
     <td className="py-4 px-4 text-[#9a8a7a]">{donor.date}</td>
     <td className="py-4 px-4">
@@ -54,8 +54,8 @@ export default function CrowdfundingPage() {
       <div className="bg-white rounded-xl border border-[#e8ddd0] p-6 flex flex-col gap-6">
         <div className="flex flex-col gap-2">
           <div className="flex items-end gap-3">
-            <span className="text-5xl font-bold text-[#3a2a1a]">{stats?.totalCollected?.toLocaleString() || 0}\u20AC</span>
-            <span className="text-xl text-[#9a8a7a] mb-1.5">{t.of || "sur"} {stats?.goalAmount?.toLocaleString() || 0}\u20AC {t.goal || "goal"}</span>
+            <span className="text-5xl font-bold text-[#3a2a1a]">{stats?.totalCollected?.toLocaleString() || 0}€</span>
+            <span className="text-xl text-[#9a8a7a] mb-1.5">{t.of || "sur"} {stats?.goalAmount?.toLocaleString() || 0}€ {t.goal || "goal"}</span>
           </div>
           {/* Progress Bar */}
           <div className="w-full h-8 bg-[#f5f0e8] rounded-full overflow-hidden relative border border-[#e8ddd0]">
@@ -71,15 +71,18 @@ export default function CrowdfundingPage() {
         <div className="grid grid-cols-4 gap-4">
           {[
             { label: t.donors, value: stats?.donorsCount || "0", color: "bg-blue-500" },
-            { label: t.averageBasket, value: "33,9\u20AC", color: "bg-green-500" },
+            { label: t.averageBasket, value: "33,9€", color: "bg-green-500" },
             { label: t.remaining, value: "18j", color: "bg-orange-500" },
-            { label: t.left, value: `${(stats?.goalAmount || 0) - (stats?.totalCollected || 0)}\u20AC`, color: "bg-purple-500" },
+            { label: t.left, value: `${(stats?.goalAmount || 0) - (stats?.totalCollected || 0)}€`, color: "bg-purple-500" },
           ].map((stat, i) => (
             <div key={i} className="bg-[#fcfaf7] rounded-xl p-3 px-4 border border-[#e8ddd0] flex flex-col justify-between h-[85px] transition-all hover:shadow-sm relative overflow-hidden">
               <div className={`absolute left-0 top-0 w-1 h-full ${stat.color || "bg-[#8B6914]"}`}></div>
               <div>
                 <span className="text-[10px] font-black text-[#9a8a7a] uppercase tracking-widest block mb-0.5">{stat.label}</span>
                 <span className="text-2xl font-black text-[#3a2a1a] leading-none">{stat.value}</span>
+              </div>
+              <div className="mt-auto">
+                <p className="text-[10px] invisible leading-none">&nbsp;</p>
               </div>
             </div>
           ))}
