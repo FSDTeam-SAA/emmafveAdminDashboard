@@ -72,7 +72,7 @@ export default function CrowdfundingPage() {
           {[
             { label: t.donors, value: stats?.donorsCount || "0", color: "bg-blue-500" },
             { label: t.averageBasket, value: "33,9€", color: "bg-green-500" },
-            { label: t.remaining, value: "18j", color: "bg-orange-500" },
+            { label: t.remaining, value: t.daysRemainingValue || "18j", color: "bg-orange-500" },
             { label: t.left, value: `${(stats?.goalAmount || 0) - (stats?.totalCollected || 0)}€`, color: "bg-purple-500" },
           ].map((stat, i) => (
             <div key={i} className="bg-[#fcfaf7] rounded-xl p-3 px-4 border border-[#e8ddd0] flex flex-col justify-between h-[85px] transition-all hover:shadow-sm relative overflow-hidden">

@@ -19,7 +19,7 @@ const Topbar = React.memo(() => {
     const fetchStats = () => {
       fetchWithCache("/admin/stats", { expireIn: 30000 })
         .then(res => { if (res.data.status === "ok") setLiveStats(res.data.data); })
-        .catch(() => {});
+        .catch(() => { });
     };
     fetchStats();
     const interval = setInterval(fetchStats, 60000);
@@ -35,38 +35,38 @@ const Topbar = React.memo(() => {
     if (location.pathname === "/contacts") {
       fetchWithCache("/contacts/stats", { expireIn: 60000 })
         .then(res => { if (res.data.status === "ok" || res.data.data) setContactsStats(res.data.data); })
-        .catch(() => {});
+        .catch(() => { });
     }
     if (location.pathname === "/collection-points") {
       fetchWithCache("/partner-ads/get-all-partner-ads?type=collection_point&limit=1", { expireIn: 60000 })
         .then(res => { if (res.data.status === "ok") setCollectionPointsTotal(res.data.meta?.total ?? null); })
-        .catch(() => {});
+        .catch(() => { });
     }
     if (location.pathname === "/donations") {
       fetchWithCache("/donations/stats", { expireIn: 60000 })
         .then(res => { if (res.data.status === "ok" || res.data.success) setDonationsStats(res.data.data); })
-        .catch(() => {});
+        .catch(() => { });
     }
   }, [location.pathname, fetchWithCache]);
 
   const s = liveStats;
   const PAGE_TITLES = {
-    "/dashboard":           { title: t.overview,                        sub: s ? `${(s.users?.total || 0).toLocaleString()} ${t.users?.toLowerCase()} · ${(s.reports?.total || 0).toLocaleString()} ${t.reports?.toLowerCase()}` : t.dashboardSub },
-    "/reports":             { title: t.reports,                         sub: s ? `${(s.reports?.total || 0).toLocaleString()} ${t.totalCount} · ${(s.reports?.pending || 0).toLocaleString()} ${t.pendingCountLabel}` : t.reportsSub },
-    "/users":               { title: t.users,                           sub: s ? `${(s.users?.total || 0).toLocaleString()} ${t.registeredCount} · ${(s.users?.active || 0).toLocaleString()} ${t.active?.toLowerCase()}` : t.usersSub },
-    "/partners":            { title: t.partners,                        sub: s ? `${(s.partners?.total || 0).toLocaleString()} ${t.totalCount} · ${(s.partners?.pending || 0).toLocaleString()} ${t.pendingCountLabel}` : t.partnersSub },
-    "/missions":            { title: t.localMissions,                   sub: s ? `${(s.missions?.total || 0).toLocaleString()} ${t.missions?.toLowerCase()} · ${(s.missions?.inProgress || 0).toLocaleString()} ${t.inProgressCount}` : t.missionsSub },
-    "/collection-points":   { title: t.collectionPoints, sub: collectionPointsTotal !== null ? `${collectionPointsTotal.toLocaleString()} ${t.collectionPointsCount}` : t.collPointsSub },
-    "/points":              { title: t.pointsSystem,                    sub: s ? `${(s.points?.distributed?.total || 0).toLocaleString()} ${t.ptsDistributedCount}` : t.pointsSub },
-    "/items":               { title: t.physicalItems,                   sub: s ? `${(s.items?.total || 0).toLocaleString()} ${t.itemsInCatalog}` : t.itemsSub },
-    "/donations":           { title: t.donations, sub: donationsStats ? `${(donationsStats.totalDonations || donationsStats.total || 0).toLocaleString()} ${t.donationsCount} · ${(donationsStats.totalCollected || 0).toLocaleString()}€` : t.donationsSub },
-    "/validation-donations":{ title: t.validationDonationsTitle || "Donation Validation", sub: s ? `${(s.donationProofs?.pending || 0).toLocaleString()} ${t.pendingCountLabel}` : t.valDonationsSub },
-    "/crowdfunding":        { title: t.crowdfunding,                    sub: s ? `${(s.crowdfunding?.totalCollected || 0).toLocaleString()}€ ${t.collected}` : t.crowdSub },
-    "/analytics":           { title: t.analytics,                       sub: t.analyticsSub },
-    "/notifications":       { title: t.notifications,                   sub: s ? `${(s.notifications?.total || 0).toLocaleString()} ${t.sentCount}` : t.notifsSub },
-    "/settings":            { title: t.settings,                        sub: t.settingsSub },
-    "/contacts":            { title: t.contacts,     sub: contactsStats ? `${(contactsStats.all || 0).toLocaleString()} ${t.contacts?.toLowerCase()} · ${(contactsStats.active || 0).toLocaleString()} ${t.active?.toLowerCase()}` : "Manage contacts" },
-    "/shopify-products":    { title: t.shopifyProducts, sub: "Manage Shopify products" },
+    "/dashboard": { title: t.overview, sub: s ? `${(s.users?.total || 0).toLocaleString()} ${t.users?.toLowerCase()} · ${(s.reports?.total || 0).toLocaleString()} ${t.reports?.toLowerCase()}` : t.dashboardSub },
+    "/reports": { title: t.reports, sub: s ? `${(s.reports?.total || 0).toLocaleString()} ${t.totalCount} · ${(s.reports?.pending || 0).toLocaleString()} ${t.pendingCountLabel}` : t.reportsSub },
+    "/users": { title: t.users, sub: s ? `${(s.users?.total || 0).toLocaleString()} ${t.registeredCount} · ${(s.users?.active || 0).toLocaleString()} ${t.active?.toLowerCase()}` : t.usersSub },
+    "/partners": { title: t.partners, sub: s ? `${(s.partners?.total || 0).toLocaleString()} ${t.totalCount} · ${(s.partners?.pending || 0).toLocaleString()} ${t.pendingCountLabel}` : t.partnersSub },
+    "/missions": { title: t.localMissions, sub: s ? `${(s.missions?.total || 0).toLocaleString()} ${t.missions?.toLowerCase()} · ${(s.missions?.inProgress || 0).toLocaleString()} ${t.inProgressCount}` : t.missionsSub },
+    "/collection-points": { title: t.collectionPoints, sub: collectionPointsTotal !== null ? `${collectionPointsTotal.toLocaleString()} ${t.collectionPointsCount}` : t.collPointsSub },
+    "/points": { title: t.pointsSystem, sub: s ? `${(s.points?.distributed?.total || 0).toLocaleString()} ${t.ptsDistributedCount}` : t.pointsSub },
+    "/items": { title: t.physicalItems, sub: s ? `${(s.items?.total || 0).toLocaleString()} ${t.itemsInCatalog}` : t.itemsSub },
+    "/donations": { title: t.donations, sub: donationsStats ? `${(donationsStats.totalDonations || donationsStats.total || 0).toLocaleString()} ${t.donationsCount} · ${(donationsStats.totalCollected || 0).toLocaleString()}€` : t.donationsSub },
+    "/validation-donations": { title: t.validationDonationsTitle || "Donation Validation", sub: s ? `${(s.donationProofs?.pending || 0).toLocaleString()} ${t.pendingCountLabel}` : t.valDonationsSub },
+    "/crowdfunding": { title: t.crowdfunding, sub: s ? `${(s.crowdfunding?.totalCollected || 0).toLocaleString()}€ ${t.collected}` : t.crowdSub },
+    "/analytics": { title: t.analytics, sub: t.analyticsSub },
+    "/notifications": { title: t.notifications, sub: s ? `${(s.notifications?.total || 0).toLocaleString()} ${t.sentCount}` : t.notifsSub },
+    "/settings": { title: t.settings, sub: t.settingsSub },
+    "/contacts": { title: t.contacts, sub: contactsStats ? `${(contactsStats.all || 0).toLocaleString()} ${t.contacts?.toLowerCase()} · ${(contactsStats.active || 0).toLocaleString()} ${t.active?.toLowerCase()}` : "Manage contacts" },
+    "/shopify-products": { title: t.shopifyProducts, sub: "Manage Shopify products" },
   };
 
   const page = PAGE_TITLES[location.pathname] || { title: t.dashboard || "Dashboard", sub: "HESTEKA Admin" };
@@ -183,8 +183,8 @@ const Topbar = React.memo(() => {
               key={l}
               onClick={() => setLang(l)}
               className={`px-2.5 py-1 rounded-md text-[11px] font-bold transition-all ${lang === l
-                  ? "bg-[#8B6914] text-white"
-                  : "text-[#9a8a7a] hover:text-[#3a2a1a]"
+                ? "bg-[#8B6914] text-white"
+                : "text-[#9a8a7a] hover:text-[#3a2a1a]"
                 }`}
             >
               {l.toUpperCase()}

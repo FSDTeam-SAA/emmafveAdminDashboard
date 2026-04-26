@@ -132,10 +132,10 @@ export default function ReportsPage() {
 
   const reportFields = [
     { name: "animalName", label: "Animal Name", required: true },
-    { 
-      name: "species", 
-      label: "Species", 
-      type: "select", 
+    {
+      name: "species",
+      label: "Species",
+      type: "select",
       required: true,
       options: [
         { label: "Dog", value: "Dog" },
@@ -145,10 +145,10 @@ export default function ReportsPage() {
       ]
     },
     { name: "breed", label: "Breed" },
-    { 
-      name: "status", 
-      label: "Status", 
-      type: "select", 
+    {
+      name: "status",
+      label: "Status",
+      type: "select",
       required: true,
       options: [
         { label: "Lost", value: "lost" },
@@ -325,7 +325,7 @@ export default function ReportsPage() {
             { label: t.nameDesc || "Name (Z-A)", value: "name:descending" }
           ]}
           actionButton={
-            <button 
+            <button
               onClick={() => setIsAddModalOpen(true)}
               className="bg-[#8B6914] text-white text-[11px] font-bold px-4 py-2 rounded-xl hover:bg-[#6a5010] transition-colors flex items-center gap-2"
             >

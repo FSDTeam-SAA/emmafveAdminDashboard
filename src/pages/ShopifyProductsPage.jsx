@@ -24,7 +24,6 @@ const ShopifyProductCard = ({ product, t }) => {
 
   return (
     <div className="bg-white rounded-xl border border-[#e8ddd0] p-3 flex flex-col gap-2 hover:shadow-md transition-shadow relative h-[290px] overflow-hidden">
-      <div className="absolute left-0 top-0 w-1 h-full bg-[#8B6914]"></div>
       <div className="bg-[#fcfaf7] rounded-lg h-32 flex items-center justify-center relative overflow-hidden group">
         {mainImage ? (
           <img src={mainImage} alt={product.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />

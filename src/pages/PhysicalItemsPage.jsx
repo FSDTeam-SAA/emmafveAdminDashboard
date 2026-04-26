@@ -25,7 +25,6 @@ const ItemSkeleton = () => (
 
 const ItemCard = React.memo(({ item, onEdit, onDelete, t }) => (
   <div className="bg-white rounded-xl border border-[#e8ddd0] p-3 flex flex-col gap-2 hover:shadow-md transition-shadow relative overflow-hidden">
-    <div className="absolute left-0 top-0 w-1 h-full bg-[#8B6914]"></div>
     <div className="bg-[#fcfaf7] rounded-lg h-24 flex items-center justify-center text-3xl relative overflow-hidden">
       {item.photo?.secure_url ? (
         <img src={item.photo.secure_url} alt={item.title} className="w-full h-full object-cover" />
@@ -46,13 +45,13 @@ const ItemCard = React.memo(({ item, onEdit, onDelete, t }) => (
       <p className="text-[9px] text-[#9a8a7a]">Stock: {item.stock} — {item.category}</p>
     </div>
     <div className="flex gap-1 mt-1">
-      <button 
+      <button
         onClick={() => onEdit(item)}
         className="flex-1 text-[10px] font-bold py-1.5 rounded-xl bg-[#f5f0e8] text-[#3a2a1a] hover:bg-[#e8ddd0] transition-colors"
       >
         {t.editBtn}
       </button>
-      <button 
+      <button
         onClick={() => onDelete(item._id)}
         className="px-2 py-1.5 rounded-xl bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
       >
@@ -236,10 +235,9 @@ export default function PhysicalItemsPage() {
     {
       header: t.statusLabel || "STATUS",
       cell: (req) => (
-        <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full uppercase ${
-          req.status === 'completed' ? 'bg-green-100 text-green-600' : 
-          req.status === 'pending' ? 'bg-orange-100 text-orange-600' : 'bg-gray-100 text-gray-600'
-        }`}>
+        <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full uppercase ${req.status === 'completed' ? 'bg-green-100 text-green-600' :
+            req.status === 'pending' ? 'bg-orange-100 text-orange-600' : 'bg-gray-100 text-gray-600'
+          }`}>
           {t[req.status] || req.status}
         </span>
       )
@@ -250,7 +248,7 @@ export default function PhysicalItemsPage() {
       cell: (req) => (
         <div className="flex gap-1 justify-end">
           {req.status === 'pending' && (
-            <button 
+            <button
               onClick={() => handleUpdateRedemptionStatus(req._id, 'completed')}
               className="bg-green-100 text-green-600 text-[10px] font-bold px-3 py-1 rounded-xl hover:bg-green-200 transition-colors"
             >
@@ -268,20 +266,20 @@ export default function PhysicalItemsPage() {
     { name: "description", label: t.descriptionLabel || "Description", type: "textarea", required: true },
     { name: "points", label: t.pointsRequired || "Points Required", type: "number", required: true },
     { name: "stock", label: t.stockLabel || "Stock", type: "number", required: true },
-    { 
-      name: "type", 
-      label: t.type || "Type", 
-      type: "select", 
+    {
+      name: "type",
+      label: t.type || "Type",
+      type: "select",
       required: true,
       options: [
         { label: t.productType || "Product", value: "product" },
         { label: t.giftCardType || "Gift Card", value: "giftcard" },
       ]
     },
-    { 
-      name: "category", 
-      label: t.categoryLabel || "Category", 
-      type: "select", 
+    {
+      name: "category",
+      label: t.categoryLabel || "Category",
+      type: "select",
       required: true,
       options: [
         { label: "Limited", value: "limited" },
@@ -296,23 +294,23 @@ export default function PhysicalItemsPage() {
     <div className="px-6 py-4 flex flex-col gap-4">
       {/* Catalog Table */}
       <div className="bg-white rounded-xl border border-[#e8ddd0] overflow-hidden flex flex-col shadow-sm">
-        <FilterBar 
+        <FilterBar
           onSearch={(val) => setItemsQuery(p => p.search === val ? p : { ...p, search: val, page: 1 })}
           onFilterChange={(name, val) => setItemsQuery(p => p[name] === val ? p : { ...p, [name]: val, page: 1 })}
           related={true}
           filters={[
-            { 
-              name: "category", 
-              label: t.allCategories || "All categories", 
+            {
+              name: "category",
+              label: t.allCategories || "All categories",
               options: [
                 { label: "Limited", value: "limited" },
                 { label: "Featured", value: "featured" },
                 { label: "Solidarity", value: "solidarity" }
               ]
             },
-            { 
-              name: "type", 
-              label: t.allTypes || "All types", 
+            {
+              name: "type",
+              label: t.allTypes || "All types",
               options: [
                 { label: "Product", value: "product" },
                 { label: "Gift Card", value: "giftcard" }
@@ -320,7 +318,7 @@ export default function PhysicalItemsPage() {
             }
           ]}
           actionButton={
-            <button 
+            <button
               onClick={handleOpenAdd}
               className="bg-[#8B6914] text-white text-[11px] font-bold px-4 py-2 rounded-xl hover:bg-[#6a5010] transition-colors flex items-center gap-2"
             >
@@ -335,12 +333,12 @@ export default function PhysicalItemsPage() {
               Array(6).fill(0).map((_, i) => <ItemSkeleton key={i} />)
             ) : items.length > 0 ? (
               items.map((item) => (
-                <ItemCard 
-                  key={item._id} 
-                  item={item} 
+                <ItemCard
+                  key={item._id}
+                  item={item}
                   onEdit={handleOpenEdit}
                   onDelete={handleDelete}
-                  t={t} 
+                  t={t}
                 />
               ))
             ) : (
@@ -350,7 +348,7 @@ export default function PhysicalItemsPage() {
             )}
           </div>
           <div className="bg-[#fcfaf7] px-4 py-1">
-            <Pagination 
+            <Pagination
               meta={itemsMeta}
               onPageChange={(page) => setItemsQuery(p => ({ ...p, page }))}
               loading={loadingItems && !timedOut}
@@ -366,7 +364,7 @@ export default function PhysicalItemsPage() {
           </h3>
         </div>
 
-        <FilterBar 
+        <FilterBar
           onSearch={(val) => setRequestsQuery(p => p.search === val ? p : { ...p, search: val, page: 1 })}
           onFilterChange={(name, val) => setRequestsQuery(p => p[name] === val ? p : { ...p, [name]: val, page: 1 })}
           onSortChange={(sortBy, sort) => setRequestsQuery(p => p.sortBy === sortBy && p.sort === sort ? p : { ...p, sortBy, sort, page: 1 })}
@@ -391,7 +389,7 @@ export default function PhysicalItemsPage() {
         />
 
         <div className="overflow-x-auto">
-          <DataTable 
+          <DataTable
             columns={redemptionColumns}
             data={requests}
             loading={loadingRequests}
@@ -399,7 +397,7 @@ export default function PhysicalItemsPage() {
           />
         </div>
         <div className="bg-[#fcfaf7] px-4 py-1">
-          <Pagination 
+          <Pagination
             meta={requestsMeta}
             onPageChange={(page) => setRequestsQuery(p => ({ ...p, page }))}
             loading={loadingRequests}

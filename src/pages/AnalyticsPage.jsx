@@ -36,10 +36,10 @@ export default function AnalyticsPage() {
   const { t } = useLang();
 
   const zones = [
-    { label: "Provence-Alpes-C\u00F4te d'Azur", percentage: 38, color: "bg-orange-600" },
-    { label: "\u00CEle-de-France", percentage: 24, color: "bg-green-600" },
-    { label: "Occitanie", percentage: 18, color: "bg-blue-500" },
-    { label: "Auvergne-Rh\u00F4ne-Alpes", percentage: 12, color: "bg-purple-600" },
+    { label: t.zone1 || "Provence-Alpes-Cote d'Azur", percentage: 38, color: "bg-orange-600" },
+    { label: t.zone2 || "Ile-de-France", percentage: 24, color: "bg-green-600" },
+    { label: t.zone3 || "Occitanie", percentage: 18, color: "bg-blue-500" },
+    { label: t.zone4 || "Auvergne-Rhone-Alpes", percentage: 12, color: "bg-purple-600" },
   ];
 
   const chartMonths = [
@@ -63,27 +63,27 @@ export default function AnalyticsPage() {
       <div className="grid grid-cols-5 gap-4">
         {/* Reports Chart Card */}
         <div className="col-span-3 bg-white rounded-xl border border-[#e8ddd0] p-6 flex flex-col gap-6">
-           <h3 className="font-bold text-[#3a2a1a] text-xs flex items-center gap-2">
-             <span>📊</span> {t.reportsMonth}
-           </h3>
-           <div className="flex items-end justify-between h-[180px] px-4">
-              {chartMonths.map((m, i) => (
-                <div key={i} className="flex flex-col items-center gap-3 w-16">
-                   <div className={`w-full ${m.color} rounded-t-lg transition-all duration-1000`} style={{ height: `${m.val}%` }}></div>
-                   <span className="text-[10px] font-bold text-[#9a8a7a]">{m.month}</span>
-                </div>
-              ))}
-           </div>
+          <h3 className="font-bold text-[#3a2a1a] text-xs flex items-center gap-2">
+            <span>📊</span> {t.reportsMonth}
+          </h3>
+          <div className="flex items-end justify-between h-[180px] px-4">
+            {chartMonths.map((m, i) => (
+              <div key={i} className="flex flex-col items-center gap-3 w-16">
+                <div className={`w-full ${m.color} rounded-t-lg transition-all duration-1000`} style={{ height: `${m.val}%` }}></div>
+                <span className="text-[10px] font-bold text-[#9a8a7a]">{m.month}</span>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Zones Card */}
         <div className="col-span-2 bg-white rounded-xl border border-[#e8ddd0] p-6 flex flex-col gap-6">
-           <h3 className="font-bold text-[#3a2a1a] text-xs flex items-center gap-2">
-             <span>🗽</span> {t.activeZones}
-           </h3>
-           <div className="flex flex-col gap-5">
-              {zones.map((z, i) => <ZoneRow key={i} {...z} />)}
-           </div>
+          <h3 className="font-bold text-[#3a2a1a] text-xs flex items-center gap-2">
+            <span>🗽</span> {t.activeZones}
+          </h3>
+          <div className="flex flex-col gap-5">
+            {zones.map((z, i) => <ZoneRow key={i} {...z} />)}
+          </div>
         </div>
       </div>
     </div>

@@ -60,7 +60,7 @@ export default function DashboardPage() {
     {
       label: t.pointsDistributed,
       value: { text: loading ? "..." : (stats?.points?.totalEarnedThisMonth || 0).toLocaleString(), color: "text-red-600" },
-      sub: stats?.points?.pending ? `${stats.points.pending?.toLocaleString()} ${t.pendingPoints}` : `${(0).toLocaleString() +" in"} ${t.pendingPoints}`,
+      sub: stats?.points?.pending ? `${stats.points.pending?.toLocaleString()} ${t.pendingPoints}` : `${(0).toLocaleString() + " in"} ${t.pendingPoints}`,
       subType: "wait",
     },
     {
