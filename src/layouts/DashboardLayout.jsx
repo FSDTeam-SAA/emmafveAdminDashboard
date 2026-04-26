@@ -55,7 +55,7 @@ const DashboardLayout = React.memo(() => {
   return (
     <div className="flex min-h-screen bg-[#f5f0e8]">
       <Sidebar />
-      <div className="ml-40 flex-1 flex flex-col min-h-screen">
+      <div className="ml-52 flex-1 flex flex-col min-h-screen">
         <Topbar />
         <main className="flex-1 overflow-y-auto">
           <Outlet />

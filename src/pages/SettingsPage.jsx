@@ -31,20 +31,7 @@ export default function SettingsPage() {
   ];
 
   return (
-    <div className="p-5 flex flex-col gap-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="text-xl">⚙️</span>
-          <div>
-            <h2 className="text-xl font-bold text-[#3a2a1a]">{t.settingsTitle}</h2>
-            <p className="text-[11px] text-[#9a8a7a]">{t.settingsSub}</p>
-          </div>
-        </div>
-        <button className="bg-[#3a2a1a] text-white text-[11px] font-bold px-4 py-2 rounded-lg hover:bg-[#2a1a0a] transition-colors flex items-center gap-2">
-          <span>📄</span> {t.saveBtn}
-        </button>
-      </div>
+    <div className="px-6 py-4 flex flex-col gap-6">
 
       <div className="grid grid-cols-3 gap-4">
         {/* Admin Team Card */}

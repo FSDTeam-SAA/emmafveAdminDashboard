@@ -8,22 +8,34 @@ import FilterBar from "../components/common/FilterBar";
 import StatusBadge from "../components/common/StatusBadge";
 import { toast } from "react-toastify";
 import ConfirmModal from "../components/common/ConfirmModal";
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 
-const MapPin = ({ top, left, type, label }) => (
-  <div 
-    className="absolute cursor-pointer drop-shadow-lg transition-all hover:scale-125 z-10 group"
-    style={{ top, left }}
-  >
-    <div className="bg-white px-2 py-1 rounded shadow-sm border border-[#e8ddd0] text-[8px] font-bold absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-      {label}
-    </div>
-    <span className="text-xl">{type === 'collection_point' ? '🛒' : '🏠'}</span>
-  </div>
-);
+// Fix default Leaflet marker icons
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+});
+
+// Auto-fit map bounds to all markers
+const FitBounds = ({ points }) => {
+  const map = useMap();
+  useEffect(() => {
+    const valid = points.filter(p => Array.isArray(p.location?.coordinates) && p.location.coordinates.length === 2);
+    if (valid.length === 0) return;
+    const bounds = L.latLngBounds(valid.map(p => [p.location.coordinates[1], p.location.coordinates[0]]));
+    map.fitBounds(bounds, { padding: [40, 40], maxZoom: 14 });
+  }, [points, map]);
+  return null;
+};
 
 export default function CollectionPointsPage() {
   const { t } = useLang();
   const [points, setPoints] = useState([]);
+  const [allPoints, setAllPoints] = useState([]); // All points for the map (no pagination)
   const [meta, setMeta] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -44,6 +56,16 @@ export default function CollectionPointsPage() {
 
   const [confirmModal, setConfirmModal] = useState({ isOpen: false, title: "", message: "", onConfirm: null });
   const [confirmLoading, setConfirmLoading] = useState(false);
+
+  // Fetch ALL points (no pagination) specifically for map pins
+  const fetchAllForMap = useCallback(async () => {
+    try {
+      const res = await api.get("/partner-ads/get-all-partner-ads?type=collection_point&limit=500");
+      if (res.data.status === "ok") setAllPoints(res.data.data || []);
+    } catch { /* silent */ }
+  }, []);
+
+  useEffect(() => { fetchAllForMap(); }, [fetchAllForMap]);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -189,65 +211,60 @@ export default function CollectionPointsPage() {
 
   const pointFields = [
     { name: "title", label: "Name", required: true },
-    { name: "description", label: "Description", type: "textarea", required: true },
     { name: "address", label: "Full Address", required: true },
+    { name: "description", label: "Description", type: "textarea" },
     { name: "image", label: "Photo", type: "file" },
+    { name: "latitude", label: "Latitude", type: "number" },
+    { name: "longitude", label: "Longitude", type: "number" },
   ];
 
   return (
-    <div className="p-5 flex flex-col gap-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="text-xl">📍</span>
-          <div>
-            <h2 className="text-xl font-bold text-[#3a2a1a]">{t.collectionPointsTitle}</h2>
-            <p className="text-[11px] text-[#9a8a7a]">{t.collectionPointsSub}</p>
-          </div>
-        </div>
-        <button 
-          onClick={handleOpenAdd}
-          className="bg-[#8B6914] text-white text-[11px] font-bold px-4 py-2 rounded-lg hover:bg-[#6a5010] transition-colors flex items-center gap-2"
-        >
-          <span>+</span> {t.addPoint}
-        </button>
-      </div>
+    <div className="px-6 py-4 flex flex-col gap-6">
 
       <div className="grid grid-cols-1 xl:grid-cols-5 gap-6">
-        {/* Map View */}
-        <div className="xl:col-span-3 bg-white rounded-xl border border-[#e8ddd0] p-4 relative h-[450px] shadow-sm">
-          <div className="absolute inset-4 rounded-xl overflow-hidden bg-[#f5f0e8] border border-[#e8ddd0]/50 shadow-inner">
-            {/* Mock Map Texture */}
-            <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/pinstriped-suit.png')]"></div>
-            <div className="absolute inset-0 bg-gradient-to-br from-[#e8d5b0]/20 to-[#c8a87a]/10"></div>
-            
-            {/* Map Labels/Features (SVG) */}
-            <svg className="absolute inset-0 w-full h-full opacity-20" viewBox="0 0 500 300">
-               <path d="M0 100 Q150 80 250 120 T500 90" stroke="#8B6914" fill="none" strokeWidth="20" className="opacity-10" />
-               <path d="M100 0 Q120 150 80 300" stroke="#8B6914" fill="none" strokeWidth="15" className="opacity-10" />
-            </svg>
+        {/* Real Leaflet Map */}
+        <div className="xl:col-span-3 bg-white rounded-xl border border-[#e8ddd0] overflow-hidden relative h-[450px] shadow-sm">
+          <MapContainer
+            center={[46.2276, 2.2137]}
+            zoom={5}
+            style={{ height: "100%", width: "100%" }}
+            className="z-0"
+          >
+            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+            <FitBounds points={allPoints} />
+            {allPoints
+              .filter(p => Array.isArray(p.location?.coordinates) && p.location.coordinates.length === 2)
+              .map(p => (
+                <Marker
+                  key={p._id}
+                  position={[
+                    p.location.coordinates[1], // latitude
+                    p.location.coordinates[0]  // longitude
+                  ]}
+                >
+                  <Popup>
+                    <div style={{ minWidth: 140 }}>
+                      <div style={{ fontWeight: 'bold', fontSize: 12, color: '#3a2a1a' }}>{p.title}</div>
+                      {p.address && <div style={{ fontSize: 10, color: '#9a8a7a', marginTop: 2 }}>{p.address}</div>}
+                      {p.partner?.company && <div style={{ fontSize: 10, color: '#8B6914', marginTop: 2, fontWeight: 'bold' }}>{p.partner.company}</div>}
+                      {p.status && <div style={{ fontSize: 10, marginTop: 4, textTransform: 'capitalize', fontWeight: 'bold', color: p.status === 'active' ? '#16a34a' : '#9a8a7a' }}>{p.status}</div>}
+                    </div>
+                  </Popup>
+                </Marker>
+              ))
+            }
+          </MapContainer>
 
-            {/* Dynamic Map Pins */}
-            {!loading && points.map((p, i) => (
-               <MapPin 
-                 key={p._id} 
-                 top={`${20 + (i * 15) % 60}%`} 
-                 left={`${10 + (i * 25) % 80}%`} 
-                 type="collection_point" 
-                 label={p.title} 
-               />
-            ))}
-
-            {loading && (
-              <div className="absolute inset-0 flex items-center justify-center bg-white/30 backdrop-blur-sm">
-                <div className="w-8 h-8 border-4 border-[#8B6914] border-t-transparent rounded-full animate-spin"></div>
-              </div>
-            )}
-            
-            <div className="absolute bottom-4 left-4 bg-white/95 backdrop-blur shadow-lg px-4 py-2 rounded-xl text-[10px] font-extrabold text-[#3a2a1a] border border-[#e8ddd0] flex items-center gap-2">
-               <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-               {meta?.total || 0} {t.activePointsLabel || "points de collecte actifs"}
+          {/* Loading overlay — shown while allPoints not yet ready */}
+          {loading && allPoints.length === 0 && (
+            <div className="absolute inset-0 z-[400] flex items-center justify-center bg-white/60 backdrop-blur-sm">
+              <div className="w-8 h-8 border-4 border-[#8B6914] border-t-transparent rounded-full animate-spin"></div>
             </div>
+          )}
+
+          <div className="absolute bottom-4 left-4 z-[400] bg-white/95 backdrop-blur shadow-lg px-4 py-2 rounded-xl text-[10px] font-extrabold text-[#3a2a1a] border border-[#e8ddd0] flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+            {meta?.total || 0} {t.activePointsLabel || "active collection points"}
           </div>
         </div>
 
@@ -280,6 +297,14 @@ export default function CollectionPointsPage() {
                { label: t.nameAsc || "Name (A-Z)", value: "title:ascending" },
                { label: t.nameDesc || "Name (Z-A)", value: "title:descending" }
              ]}
+             actionButton={
+               <button 
+                 onClick={handleOpenAdd}
+                 className="bg-[#8B6914] text-white text-[11px] font-bold px-4 py-2 rounded-lg hover:bg-[#6a5010] transition-colors flex items-center gap-2"
+               >
+                 <span>+</span> {t.addPoint}
+               </button>
+             }
            />
            
            <DataTable 

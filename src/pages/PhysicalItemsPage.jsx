@@ -292,25 +292,9 @@ export default function PhysicalItemsPage() {
   ];
 
   return (
-    <div className="p-5 flex flex-col gap-6">
-      {/* Catalog Header */}
+    <div className="px-6 py-4 flex flex-col gap-6">
+      {/* Catalog Table */}
       <div className="flex flex-col gap-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-xl">🎁</span>
-            <div>
-              <h2 className="text-xl font-bold text-[#3a2a1a]">{t.itemsTitle}</h2>
-              <p className="text-[11px] text-[#9a8a7a]">{t.itemsSub}</p>
-            </div>
-          </div>
-          <button 
-            onClick={handleOpenAdd}
-            className="bg-[#8B6914] text-white text-[11px] font-bold px-4 py-2 rounded-lg hover:bg-[#6a5010] transition-colors flex items-center gap-2"
-          >
-            <span>+</span> {t.addItem}
-          </button>
-        </div>
-
         <FilterBar 
           onSearch={(val) => setItemsQuery(p => p.search === val ? p : { ...p, search: val, page: 1 })}
           onFilterChange={(name, val) => setItemsQuery(p => p[name] === val ? p : { ...p, [name]: val, page: 1 })}
@@ -333,6 +317,14 @@ export default function PhysicalItemsPage() {
               ]
             }
           ]}
+          actionButton={
+            <button 
+              onClick={handleOpenAdd}
+              className="bg-[#8B6914] text-white text-[11px] font-bold px-4 py-2 rounded-lg hover:bg-[#6a5010] transition-colors flex items-center gap-2"
+            >
+              <span>+</span> {t.addItem}
+            </button>
+          }
         />
       </div>
 

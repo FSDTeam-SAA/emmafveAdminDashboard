@@ -58,6 +58,7 @@ const Sidebar = React.memo(() => {
         { icon: "🚩", key: "reports", path: "/reports", badge: stats?.reports?.total > 0 ? stats.reports.total : null, badgeColor: "bg-red-600" },
         { icon: "👥", key: "users", path: "/users", badge: null },
         { icon: "🤝", key: "partners", path: "/partners", badge: stats?.partners?.pending > 0 ? stats.partners.pending : null, badgeColor: "bg-orange-500" },
+        { icon: "📞", key: "contacts", path: "/contacts", badge: null },
       ],
     },
     {
@@ -91,9 +92,9 @@ const Sidebar = React.memo(() => {
   const sections = navSections(t, stats);
 
   return (
-    <aside className="fixed top-0 left-0 h-screen w-40 bg-[#3a2a1a] flex flex-col overflow-y-auto z-50">
+    <aside className="fixed top-0 left-0 h-screen w-52 bg-[#3a2a1a] flex flex-col overflow-y-auto z-50">
       {/* Logo */}
-      <div className="bg-[#2a1a0a] px-3 py-3 flex items-center gap-2">
+      <div className="bg-[#2a1a0a] px-3 h-[73px] flex items-center gap-2 shrink-0">
         <span className="text-white font-bold text-base tracking-widest">HESTEKA</span>
         <span className="bg-red-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
           {t.admin}

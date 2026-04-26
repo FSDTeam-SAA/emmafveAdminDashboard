@@ -223,31 +223,13 @@ export default function MissionsPage() {
   ];
 
   return (
-    <div className="p-5 flex flex-col gap-4">
-      {/* Header with Stats */}
-      <div className="flex flex-col gap-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-xl">🎯</span>
-            <div>
-              <h2 className="text-xl font-bold text-[#3a2a1a]">{t.missionsTitle}</h2>
-              <p className="text-[11px] text-[#9a8a7a]">{t.missionsSub}</p>
-            </div>
-          </div>
-          <button 
-            onClick={handleOpenAdd}
-            className="bg-[#8B6914] text-white text-[11px] font-bold px-4 py-2 rounded-lg hover:bg-[#6a5010] transition-colors flex items-center gap-2"
-          >
-            <span>+</span> {t.createMission}
-          </button>
-        </div>
-
-        <div className="grid grid-cols-4 gap-3">
-          <StatCard loading={loading} label={t.inProgressLabel} value={{ text: stats?.inProgress?.toLocaleString() || "0", color: "text-[#3a2a1a]" }} />
-          <StatCard loading={loading} label={"To Come"} value={{ text: stats?.toCome?.toLocaleString() || "0", color: "text-[#3a2a1a]" }} />
-          <StatCard loading={loading} label={t.finishedLabel} value={{ text: stats?.finished?.toLocaleString() || "0", color: "text-[#3a2a1a]" }} />
-          <StatCard loading={loading} label={t.pointsAttributed} value={{ text: stats?.pointsAttributed?.toLocaleString() || "0", color: "text-orange-500" }} />
-        </div>
+    <div className="px-6 py-4 flex flex-col gap-4">
+      {/* Stats */}
+      <div className="grid grid-cols-4 gap-3">
+        <StatCard loading={loading} label={t.inProgressLabel} value={{ text: stats?.inProgress?.toLocaleString() || "0", color: "text-[#3a2a1a]" }} />
+        <StatCard loading={loading} label={"To Come"} value={{ text: stats?.toCome?.toLocaleString() || "0", color: "text-[#3a2a1a]" }} />
+        <StatCard loading={loading} label={t.finishedLabel} value={{ text: stats?.finished?.toLocaleString() || "0", color: "text-[#3a2a1a]" }} />
+        <StatCard loading={loading} label={t.pointsAttributed} value={{ text: stats?.pointsAttributed?.toLocaleString() || "0", color: "text-orange-500" }} />
       </div>
 
       {/* Table Card */}
@@ -272,6 +254,14 @@ export default function MissionsPage() {
             { label: t.titleAsc || "Title (A-Z)", value: "title:ascending" },
             { label: t.titleDesc || "Title (Z-A)", value: "title:descending" }
           ]}
+          actionButton={
+            <button 
+              onClick={handleOpenAdd}
+              className="bg-[#8B6914] text-white text-[11px] font-bold px-4 py-2 rounded-lg hover:bg-[#6a5010] transition-colors flex items-center gap-2"
+            >
+              <span>+</span> {t.createMission}
+            </button>
+          }
         />
 
         <DataTable 

@@ -188,15 +188,8 @@ export default function ValidationDonationsPage() {
         </div>
       )}
 
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="text-xl">📦</span>
-          <div>
-            <h2 className="text-xl font-bold text-[#3a2a1a]">{t.valDonationsTitle}</h2>
-            <p className="text-[11px] text-[#9a8a7a]">{t.valDonationsSub}</p>
-          </div>
-        </div>
+      {/* Validate All action */}
+      {/* <div className="flex justify-end">
         <button 
           onClick={handleValidateAll}
           disabled={loading || !pending.length}
@@ -204,7 +197,7 @@ export default function ValidationDonationsPage() {
         >
            ✓ {t.validateAllDon} ({meta?.total || 0})
         </button>
-      </div>
+      </div> */}
 
       {/* Stats Bar */}
       <div className="grid grid-cols-4 gap-4">

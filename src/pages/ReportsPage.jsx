@@ -186,7 +186,31 @@ export default function ReportsPage() {
               {t.validateBtn}
             </button>
           )}
-          <button className="bg-red-50 text-red-600 text-[10px] font-bold px-3 py-1 rounded hover:bg-red-100 transition-colors">
+          <button
+            onClick={() => {
+              setConfirmModal({
+                isOpen: true,
+                title: "Delete Report",
+                message: "Are you sure you want to delete this report? This action cannot be undone.",
+                onConfirm: async () => {
+                  setConfirmLoading(true);
+                  try {
+                    const res = await api.delete(`/reports/delete-report/${r._id}`);
+                    if (res.data.status === "ok" || res.status === 200) {
+                      toast.success("Report deleted successfully");
+                      fetchData();
+                    }
+                  } catch (err) {
+                    toast.error(err.response?.data?.message || "Failed to delete report");
+                  } finally {
+                    setConfirmLoading(false);
+                    setConfirmModal(prev => ({ ...prev, isOpen: false }));
+                  }
+                }
+              });
+            }}
+            className="bg-red-50 text-red-600 text-[10px] font-bold px-3 py-1 rounded hover:bg-red-100 transition-colors"
+          >
             {t.deleteBtn}
           </button>
         </div>
@@ -195,17 +219,9 @@ export default function ReportsPage() {
   ];
 
   return (
-    <div className="p-5 flex flex-col gap-4">
-      {/* Header with Stats */}
+    <div className="px-6 py-4 flex flex-col gap-4">
+      {/* Stats */}
       <div className="flex flex-col gap-3">
-        <div className="flex items-center gap-2">
-          <span className="text-xl">📍</span>
-          <div>
-            <h2 className="text-xl font-bold text-[#3a2a1a]">{t.reportsTitle}</h2>
-            <p className="text-[11px] text-[#9a8a7a]">{t.reportsSub}</p>
-          </div>
-        </div>
-
         <div className="grid grid-cols-4 gap-3">
           <StatCard loading={loading} label={t.totalActive} value={{ text: stats?.total?.toLocaleString() || "0", color: "text-[#3a2a1a]" }} />
           <StatCard loading={loading} label={t.resolvedLabel} value={{ text: stats?.resolved?.toLocaleString() || "0", color: "text-[#3a2a1a]" }} />
@@ -248,6 +264,11 @@ export default function ReportsPage() {
             { label: t.nameAsc || "Name (A-Z)", value: "name:ascending" },
             { label: t.nameDesc || "Name (Z-A)", value: "name:descending" }
           ]}
+          actionButton={
+            <button className="bg-[#8B6914] text-white text-[11px] font-bold px-4 py-2 rounded-lg hover:bg-[#6a5010] transition-colors flex items-center gap-2">
+              <span>+</span> {t.createReport || "Create Report"}
+            </button>
+          }
         />
 
         <DataTable

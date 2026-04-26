@@ -128,25 +128,8 @@ export default function ShopifyProductsPage() {
   );
 
   return (
-    <div className="p-5 flex flex-col gap-6">
+    <div className="px-6 py-4 flex flex-col gap-6">
       <div className="flex flex-col gap-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-xl">🛍️</span>
-            <div>
-              <h2 className="text-xl font-bold text-[#3a2a1a]">{t.shopifyProducts}</h2>
-              <p className="text-[11px] text-[#9a8a7a]">Manage and sync products directly from your Shopify store</p>
-            </div>
-          </div>
-          <button 
-            onClick={() => { setCurrentPageInfo(null); fetchData(); }}
-            disabled={loading}
-            className="bg-[#8B6914] text-white text-[11px] font-bold px-4 py-2 rounded-lg hover:bg-[#6a5010] transition-colors flex items-center gap-2 disabled:opacity-50"
-          >
-            <span className={loading ? "animate-spin" : ""}>🔄</span> Sync Shopify
-          </button>
-        </div>
-
         <FilterBar 
           onSearch={(val) => setQuery(p => ({ ...p, search: val }))}
           onFilterChange={handleFilterChange}
@@ -157,6 +140,15 @@ export default function ShopifyProductsPage() {
               options: collections.map(c => ({ label: c.title, value: c.id.toString() }))
             }
           ]}
+          actionButton={
+            <button 
+              onClick={() => { setCurrentPageInfo(null); fetchData(); }}
+              disabled={loading}
+              className="bg-[#8B6914] text-white text-[11px] font-bold px-4 py-2 rounded-lg hover:bg-[#6a5010] transition-colors flex items-center gap-2 disabled:opacity-50"
+            >
+              <span className={loading ? "animate-spin inline-block" : ""}>&#x1F504;</span> Sync Shopify
+            </button>
+          }
         />
       </div>
 

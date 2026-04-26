@@ -1,13 +1,13 @@
 import React from 'react';
 import { useLang } from '../../context/LanguageContext';
 
-const DataTable = ({ 
-  columns, 
-  data, 
-  loading, 
+const DataTable = ({
+  columns,
+  data,
+  loading,
   onRowClick,
   skeletonCount = 10,
-  emptyMessage 
+  emptyMessage
 }) => {
   const { t } = useLang();
   const displayEmptyMessage = emptyMessage || t.noDataFound || "No data found.";
@@ -32,7 +32,11 @@ const DataTable = ({
             {columns.map((col, i) => (
               <th 
                 key={i} 
-                className={`py-4 px-4 text-[10px] font-bold text-[#9a8a7a] tracking-widest uppercase ${col.align === 'center' ? 'text-center' : col.align === 'right' ? 'text-right' : ''}`}
+                className={`py-4 px-4 text-[10px] font-bold text-[#9a8a7a] tracking-widest uppercase ${
+                  col.align === 'right' ? 'text-right' : 
+                  col.align === 'center' ? 'text-center' : 
+                  'text-left'
+                }`}
                 style={{ width: col.width }}
               >
                 {col.header}
@@ -64,7 +68,11 @@ const DataTable = ({
                 {columns.map((col, j) => (
                   <td 
                     key={j} 
-                    className={`py-5 px-4 text-xs text-[#3a2a1a] font-medium ${col.align === 'center' ? 'text-center' : col.align === 'right' ? 'text-right' : ''}`}
+                    className={`py-5 px-4 text-xs text-[#3a2a1a] font-medium ${
+                      col.align === 'right' ? 'text-right' : 
+                      col.align === 'center' ? 'text-center' : 
+                      'text-left'
+                    }`}
                   >
                     {col.cell ? col.cell(row) : row[col.accessor]}
                   </td>

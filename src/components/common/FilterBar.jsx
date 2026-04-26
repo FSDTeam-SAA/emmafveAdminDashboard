@@ -7,7 +7,8 @@ const FilterBar = ({
   onSortChange, 
   filters = [], 
   sortOptions = [],
-  placeholder
+  placeholder,
+  actionButton
 }) => {
   const { t } = useLang();
   const [searchTerm, setSearchTerm] = useState("");
@@ -68,6 +69,13 @@ const FilterBar = ({
                 <option key={opt.value} value={opt.value}>{opt.label}</option>
               ))}
             </select>
+          </div>
+        )}
+        
+        {/* Action Button */}
+        {actionButton && (
+          <div className="ml-2">
+            {actionButton}
           </div>
         )}
       </div>

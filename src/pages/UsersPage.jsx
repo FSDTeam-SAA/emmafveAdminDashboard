@@ -234,39 +234,13 @@ export default function UsersPage() {
   ];
 
   return (
-    <div className="p-5 flex flex-col gap-4">
-      {/* Header with Stats */}
-      <div className="flex flex-col gap-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-xl">👥</span>
-            <div>
-              <h2 className="text-xl font-bold text-[#3a2a1a]">{t.usersTitle}</h2>
-              <p className="text-[11px] text-[#9a8a7a]">{t.usersSub}</p>
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <button 
-              onClick={() => {
-                setEditingUser(null);
-                setIsModalOpen(true);
-              }}
-              className="bg-[#8B6914] text-white text-[11px] font-bold px-4 py-2 rounded-lg hover:bg-[#6a5010] transition-colors flex items-center gap-2"
-            >
-              <span>+</span> {t.addUser || "Add User"}
-            </button>
-            <button className="bg-[#3a2a1a] text-white text-[11px] font-bold px-4 py-2 rounded-lg hover:bg-[#2a1a0a] transition-colors flex items-center gap-2">
-              <span>📤</span> {t.exportBtn}
-            </button>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-4 gap-3">
-          <StatCard loading={loading} label={t.totalRegistered} value={{ text: (stats?.total || 0).toLocaleString(), color: "text-[#3a2a1a]" }} />
-          <StatCard loading={loading} label={t.activeLabel} value={{ text: (stats?.active || 0).toLocaleString(), color: "text-[#3a2a1a]" }} />
-          <StatCard loading={loading} label={t.suspendedLabel} value={{ text: (stats?.suspended || 0).toLocaleString(), color: "text-[#3a2a1a]" }} />
-          <StatCard loading={loading} label={t.newThisMonth} value={{ text: (stats?.newThisMonth || 0).toLocaleString(), color: "text-blue-600" }} />
-        </div>
+    <div className="px-6 py-4 flex flex-col gap-4">
+      {/* Stats */}
+      <div className="grid grid-cols-4 gap-3">
+        <StatCard loading={loading} label={t.totalRegistered} value={{ text: (stats?.total || 0).toLocaleString(), color: "text-[#3a2a1a]" }} />
+        <StatCard loading={loading} label={t.activeLabel} value={{ text: (stats?.active || 0).toLocaleString(), color: "text-[#3a2a1a]" }} />
+        <StatCard loading={loading} label={t.suspendedLabel} value={{ text: (stats?.suspended || 0).toLocaleString(), color: "text-[#3a2a1a]" }} />
+        <StatCard loading={loading} label={t.newThisMonth} value={{ text: (stats?.newThisMonth || 0).toLocaleString(), color: "text-blue-600" }} />
       </div>
 
       {/* Table Card */}
@@ -276,25 +250,17 @@ export default function UsersPage() {
           onFilterChange={(name, val) => setQueryParams(p => p[name] === val ? p : { ...p, [name]: val, page: 1 })}
           onSortChange={(sortBy, sort) => setQueryParams(p => p.sortBy === sortBy && p.sort === sort ? p : { ...p, sortBy, sort, page: 1 })}
           filters={[
-            { 
-              name: "role", 
-              label: t.allRoles || "All roles", 
-              options: [
+            { name: "role", label: t.allRoles || "All roles", options: [
                 { label: "User", value: "user" },
                 { label: "Partner", value: "partners" },
                 { label: "Admin", value: "admin" }
-              ]
-            },
-            {
-              name: "status",
-              label: t.allStatuses || "All statuses",
-              options: [
+            ]},
+            { name: "status", label: t.allStatuses || "All statuses", options: [
                 { label: "Active", value: "active" },
                 { label: "Inactive", value: "inactive" },
                 { label: "Blocked", value: "blocked" },
                 { label: "Banned", value: "banned" }
-              ]
-            }
+            ]}
           ]}
           sortOptions={[
             { label: t.dateDesc || "Date (Newest)", value: "date:descending" },
@@ -303,6 +269,19 @@ export default function UsersPage() {
             { label: t.nameDesc || "Name (Z-A)", value: "name:descending" },
             { label: t.emailAsc || "Email (A-Z)", value: "email:ascending" }
           ]}
+          actionButton={
+            <div className="flex gap-2">
+              <button 
+                onClick={() => { setEditingUser(null); setIsModalOpen(true); }}
+                className="bg-[#8B6914] text-white text-[11px] font-bold px-4 py-2 rounded-lg hover:bg-[#6a5010] transition-colors flex items-center gap-2"
+              >
+                <span>+</span> {t.addUser || "Add User"}
+              </button>
+              <button className="bg-[#3a2a1a] text-white text-[11px] font-bold px-4 py-2 rounded-lg hover:bg-[#2a1a0a] transition-colors flex items-center gap-2">
+                <span>📤</span> {t.exportBtn}
+              </button>
+            </div>
+          }
         />
 
         <DataTable 

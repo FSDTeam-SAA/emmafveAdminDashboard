@@ -24,6 +24,7 @@ import NotificationsPage from "./pages/NotificationsPage";
 import SettingsPage from "./pages/SettingsPage";
 import ValidationDonationsPage from "./pages/ValidationDonationsPage";
 import ShopifyProductsPage from "./pages/ShopifyProductsPage";
+import ContactsPage from "./pages/ContactsPage";
 
 // Helper: is admin logged in?
 const isAdmin = () => {
@@ -79,6 +80,7 @@ const App = () => {
           <Route path="donations" element={<DonationsPage />} />
           <Route path="validation-donations" element={<ValidationDonationsPage />} />
           <Route path="shopify-products" element={<ShopifyProductsPage />} />
+          <Route path="contacts" element={<ContactsPage />} />
           <Route path="crowdfunding" element={<CrowdfundingPage />} />
           <Route path="analytics" element={<AnalyticsPage />} />
           <Route path="notifications" element={<NotificationsPage />} />

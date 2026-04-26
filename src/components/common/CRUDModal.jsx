@@ -1,31 +1,175 @@
 import React, { useState, useEffect } from 'react';
+import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import axios from 'axios';
 
-const CRUDModal = ({ title, fields, initialData, isOpen, onClose, onSubmit, loading }) => {
-  const [formData, setFormData] = useState({});
+// Fix for default marker icon in Leaflet + React
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+});
+
+// Component to fly to search results
+const MapFlyTo = ({ center }) => {
+  const map = useMap();
+  useEffect(() => {
+    if (center) {
+      map.flyTo(center, 14, { duration: 1.5 });
+    }
+  }, [center, map]);
+  return null;
+};
+
+const LocationPicker = ({ lat, lng, onChange }) => {
+  const [position, setPosition] = useState(lat && lng ? [lat, lng] : [48.8566, 2.3522]); 
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
 
   useEffect(() => {
-    if (initialData) {
-      const initial = {};
-      fields.forEach(f => {
-        if (initialData[f.name] !== undefined) {
-          initial[f.name] = initialData[f.name];
-        }
-      });
-      setFormData(initial);
-    } else {
-      setFormData({});
+    if (lat && lng) {
+      setPosition([lat, lng]);
     }
-  }, [initialData, isOpen, fields]);
+  }, [lat, lng]);
+
+  const MapEvents = () => {
+    useMapEvents({
+      click(e) {
+        const { lat, lng } = e.latlng;
+        setPosition([lat, lng]);
+        onChange(lat, lng);
+      },
+    });
+    return position ? <Marker position={position} /> : null;
+  };
+
+  const handleSearch = async (e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    if (!searchQuery.trim()) return;
+
+    setIsSearching(true);
+    try {
+      const response = await axios.get(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=1`);
+      if (response.data && response.data.length > 0) {
+        const { lat, lon } = response.data[0];
+        const newLat = parseFloat(lat);
+        const newLng = parseFloat(lon);
+        setPosition([newLat, newLng]);
+        onChange(newLat, newLng);
+      }
+    } catch (error) {
+      console.error("Search failed:", error);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="relative">
+        <input 
+          type="text"
+          placeholder="Search location..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              e.stopPropagation();
+              handleSearch(e);
+            }
+          }}
+          className="w-full bg-[#fcfaf7] border border-[#e8ddd0] rounded-lg pl-8 pr-20 py-1.5 text-[10px] text-[#3a2a1a] outline-none focus:border-[#8B6914] transition-all font-medium"
+        />
+        <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs opacity-40">🔍</span>
+        <button 
+          type="button"
+          onClick={handleSearch}
+          disabled={isSearching}
+          className="absolute right-1 top-1/2 -translate-y-1/2 bg-[#8B6914] text-white text-[9px] font-bold px-3 py-1 rounded-md hover:bg-[#6a5010] transition-all disabled:opacity-50"
+        >
+          {isSearching ? "..." : "Find"}
+        </button>
+      </div>
+
+      <div className="h-48 w-full rounded-xl overflow-hidden border border-[#e8ddd0] shadow-sm relative z-0">
+        <MapContainer center={position} zoom={13} style={{ height: '100%', width: '100%' }}>
+          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+          <MapEvents />
+          <MapFlyTo center={position} />
+        </MapContainer>
+        <div className="absolute bottom-2 right-2 z-[400] bg-white/90 backdrop-blur-sm px-2 py-1 rounded-lg text-[8px] font-bold text-[#8B6914] border border-[#e8ddd0] shadow-sm">
+          CLICK TO PIN
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const CRUDModal = ({ title, fields, initialData, isOpen, onClose, onSubmit, loading, isViewOnly }) => {
+  const [formData, setFormData] = useState({});
+  const [previews, setPreviews] = useState({});
+
+  useEffect(() => {
+    if (isOpen) {
+      if (initialData) {
+        const initial = {};
+        const initialPreviews = {};
+        fields.forEach(f => {
+          if (initialData[f.name] !== undefined) {
+            initial[f.name] = initialData[f.name];
+          }
+          // Detect photo/image preview from any common field naming
+          if (f.type === 'file') {
+            const imgUrl =
+              initialData.photo?.secure_url ||
+              initialData.image?.secure_url ||
+              initialData.profileImage?.secure_url ||
+              initialData[f.name]?.secure_url;
+            if (imgUrl) initialPreviews[f.name] = imgUrl;
+          }
+
+          if (f.name === 'latitude' && initialData.location?.coordinates?.[1]) {
+            initial.latitude = initialData.location.coordinates[1];
+          }
+          if (f.name === 'longitude' && initialData.location?.coordinates?.[0]) {
+            initial.longitude = initialData.location.coordinates[0];
+          }
+        });
+        setFormData(initial);
+        setPreviews(initialPreviews);
+      } else {
+        // Only reset when opening a fresh "Create" modal (no initialData)
+        setFormData({});
+        setPreviews({});
+      }
+    }
+  }, [initialData, isOpen]);
 
   if (!isOpen) return null;
 
   const handleChange = (e) => {
+    if (isViewOnly) return;
     const { name, value, type, checked, files } = e.target;
     if (type === 'file') {
+      const file = files[0];
       setFormData((prev) => ({
         ...prev,
-        [name]: files[0],
+        [name]: file,
       }));
+      
+      if (file) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setPreviews(prev => ({ ...prev, [name]: reader.result }));
+        };
+        reader.readAsDataURL(file);
+      }
     } else {
       setFormData((prev) => ({
         ...prev,
@@ -34,101 +178,202 @@ const CRUDModal = ({ title, fields, initialData, isOpen, onClose, onSubmit, load
     }
   };
 
+  const handleLocationChange = (lat, lng) => {
+    if (isViewOnly) return;
+    setFormData(prev => ({
+      ...prev,
+      latitude: lat,
+      longitude: lng
+    }));
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (isViewOnly) {
+      onClose();
+      return;
+    }
     onSubmit(formData);
   };
 
+  const fileField = fields.find(f => f.type === 'file');
+  const hasLocation = fields.some(f => f.name === 'latitude') && fields.some(f => f.name === 'longitude');
+
+  // Resolve best available image from initialData or live file preview
+  const liveFilePreview = fileField ? previews[fileField.name] : null;
+  const staticImageUrl =
+    initialData?.profileImage?.secure_url ||
+    initialData?.photo?.secure_url ||
+    initialData?.image?.secure_url ||
+    initialData?.images?.[0]?.secure_url ||
+    null;
+  const bannerImageUrl = liveFilePreview || staticImageUrl;
+  const entityName =
+    formData.name ||
+    formData.title ||
+    (formData.firstName ? `${formData.firstName} ${formData.lastName || ''}`.trim() : null) ||
+    initialData?.name ||
+    initialData?.title ||
+    (initialData?.firstName ? `${initialData.firstName} ${initialData.lastName || ''}`.trim() : null) ||
+    "Details";
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
-        <div className="p-6 border-b border-[#f0e8d8] flex justify-between items-center bg-[#fcfaf7]">
-          <h2 className="text-xl font-bold text-[#3a2a1a]">{title}</h2>
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
+      <div className="bg-white rounded-2xl w-full max-w-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200 my-auto border border-[#e8ddd0]">
+        {/* Header */}
+        <div className="px-5 py-4 border-b border-[#f0e8d8] flex justify-between items-center bg-white relative z-10">
+          <h2 className="text-lg font-black text-[#3a2a1a] tracking-tight">{isViewOnly ? `View ${title.replace('Edit ', '').replace('Add ', '')}` : title}</h2>
           <button 
             onClick={onClose}
-            className="text-[#9a8a7a] hover:text-[#3a2a1a] transition-colors p-1"
+            className="text-[#9a8a7a] hover:text-[#3a2a1a] transition-all p-1.5 hover:bg-[#f5f0e8] rounded-full"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
+
+        {/* Cinematic Image Preview — shows for any record with an image */}
+        {bannerImageUrl ? (
+          <div className="w-full aspect-[21/9] bg-[#f5f0e8] border-b border-[#e8ddd0] relative overflow-hidden group">
+            <img
+              src={bannerImageUrl}
+              alt="Preview"
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#3a2a1a]/70 via-transparent to-transparent"></div>
+            <div className="absolute bottom-4 left-6 flex flex-col">
+              <span className="text-[9px] font-black text-white/90 uppercase tracking-[0.2em] mb-1">Visual Preview</span>
+              <span className="text-white font-black text-xl tracking-tight leading-none">{entityName}</span>
+            </div>
+          </div>
+        ) : entityName !== "Details" && (
+          // No image — show stylish initials banner
+          <div className="w-full h-[90px] bg-gradient-to-r from-[#3a2a1a] to-[#8B6914] border-b border-[#e8ddd0] relative overflow-hidden flex items-center px-6 gap-4">
+            <div className="w-14 h-14 rounded-full bg-white/20 border-2 border-white/40 flex items-center justify-center text-2xl font-black text-white shrink-0">
+              {entityName?.charAt(0)?.toUpperCase() || "?"}
+            </div>
+            <div className="flex flex-col">
+              <span className="text-[9px] font-black text-white/70 uppercase tracking-[0.2em] mb-0.5">Details</span>
+              <span className="text-white font-black text-xl tracking-tight leading-none">{entityName}</span>
+            </div>
+          </div>
+        )}
         
-        <form onSubmit={handleSubmit} className="p-6 flex flex-col gap-4">
-          <div className="max-h-[60vh] overflow-y-auto pr-2 flex flex-col gap-4 custom-scrollbar">
-            {fields.map((field) => (
-              <div key={field.name} className="flex flex-col gap-1.5">
-                <label className="text-xs font-bold text-[#9a8a7a] tracking-wider uppercase">
-                  {field.label}
+        <form onSubmit={handleSubmit} className="p-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 max-h-[45vh] overflow-y-auto pr-3 custom-scrollbar pb-2">
+            {fields.map((field) => {
+              if (field.name === 'latitude' || field.name === 'longitude') return null;
+
+              return (
+                <div key={field.name} className={`flex flex-col gap-1.5 ${field.type === 'textarea' || field.type === 'file' ? 'md:col-span-2' : ''}`}>
+                  <label className="text-[9px] font-black text-[#9a8a7a] tracking-wider uppercase ml-1 opacity-80">
+                    {field.label}
+                  </label>
+                  
+                  {field.type === 'select' ? (
+                    <select
+                      name={field.name}
+                      value={formData[field.name] || ''}
+                      onChange={handleChange}
+                      required={field.required}
+                      disabled={field.disabled || isViewOnly}
+                      className="bg-[#fcfaf7] border border-[#e8ddd0] rounded-xl px-4 py-2 text-xs text-[#3a2a1a] outline-none focus:border-[#8B6914] transition-all font-bold disabled:opacity-80"
+                    >
+                      <option value="">Select...</option>
+                      {field.options.map((opt) => (
+                        <option key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </option>
+                      ))}
+                    </select>
+                  ) : field.type === 'textarea' ? (
+                    <textarea
+                      name={field.name}
+                      value={formData[field.name] || ''}
+                      onChange={handleChange}
+                      required={field.required}
+                      disabled={field.disabled || isViewOnly}
+                      rows="3"
+                      className="bg-[#fcfaf7] border border-[#e8ddd0] rounded-xl px-4 py-2 text-xs text-[#3a2a1a] outline-none focus:border-[#8B6914] transition-all resize-none font-medium disabled:opacity-80"
+                      placeholder={`Enter ${field.label.toLowerCase()}...`}
+                    />
+                  ) : field.type === 'file' ? (
+                    <div className="flex flex-col gap-2">
+                      <div className={`relative flex items-center gap-4 bg-[#fcfaf7] border border-[#e8ddd0] border-dashed rounded-xl p-4 transition-all ${isViewOnly ? 'cursor-default' : 'hover:border-[#8B6914] cursor-pointer group'}`}>
+                        {!isViewOnly && (
+                          <input
+                            type="file"
+                            name={field.name}
+                            onChange={handleChange}
+                            required={field.required && !initialData}
+                            disabled={field.disabled}
+                            accept="image/*"
+                            className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                          />
+                        )}
+                        <div className={`w-10 h-10 bg-[#f5f0e8] rounded-lg flex items-center justify-center text-[#8B6914] transition-all ${!isViewOnly && 'group-hover:bg-[#8B6914] group-hover:text-white'}`}>
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                        </div>
+                        <div className="flex flex-col">
+                          <p className="text-xs font-black text-[#3a2a1a] truncate max-w-[200px]">{formData[field.name]?.name || (initialData ? "Existing Photo" : "Upload photo")}</p>
+                          <p className="text-[9px] text-[#9a8a7a]">{isViewOnly ? "View only mode" : "Click or drag & drop"}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <input
+                      type={field.type || 'text'}
+                      name={field.name}
+                      value={formData[field.name] || ''}
+                      onChange={handleChange}
+                      required={field.required}
+                      disabled={field.disabled || isViewOnly}
+                      className="bg-[#fcfaf7] border border-[#e8ddd0] rounded-xl px-4 py-2 text-xs text-[#3a2a1a] outline-none focus:border-[#8B6914] transition-all font-bold placeholder:font-medium placeholder:opacity-50 disabled:opacity-80"
+                      placeholder={`Enter ${field.label.toLowerCase()}...`}
+                    />
+                  )}
+                </div>
+              );
+            })}
+
+            {hasLocation && (
+              <div className="md:col-span-2 flex flex-col gap-2 mt-2">
+                <label className="text-[9px] font-black text-[#9a8a7a] tracking-wider uppercase ml-1 flex justify-between items-center">
+                  <span>{isViewOnly ? "Location Details" : "Map Location"}</span>
+                  <span className="text-[9px] font-bold text-[#8B6914]">
+                    {formData.latitude?.toFixed(4)}, {formData.longitude?.toFixed(4)}
+                  </span>
                 </label>
-                {field.type === 'select' ? (
-                  <select
-                    name={field.name}
-                    value={formData[field.name] || ''}
-                    onChange={handleChange}
-                    required={field.required}
-                    disabled={field.disabled}
-                    className="bg-[#fcfaf7] border border-[#e8ddd0] rounded-lg px-4 py-2.5 text-sm text-[#3a2a1a] outline-none focus:border-[#8B6914] focus:ring-2 focus:ring-[#8B6914]/10 transition-all disabled:opacity-50 disabled:bg-gray-100"
-                  >
-                    <option value="">Select {field.label}</option>
-                    {field.options.map((opt) => (
-                      <option key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </option>
-                    ))}
-                  </select>
-                ) : field.type === 'textarea' ? (
-                  <textarea
-                    name={field.name}
-                    value={formData[field.name] || ''}
-                    onChange={handleChange}
-                    required={field.required}
-                    disabled={field.disabled}
-                    rows="3"
-                    className="bg-[#fcfaf7] border border-[#e8ddd0] rounded-lg px-4 py-2.5 text-sm text-[#3a2a1a] outline-none focus:border-[#8B6914] focus:ring-2 focus:ring-[#8B6914]/10 transition-all resize-none disabled:opacity-50 disabled:bg-gray-100"
-                  />
-                ) : field.type === 'file' ? (
-                  <input
-                    type="file"
-                    name={field.name}
-                    onChange={handleChange}
-                    required={field.required && !initialData}
-                    disabled={field.disabled}
-                    accept="image/*"
-                    className="text-xs text-[#9a8a7a] file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-[#f5f0e8] file:text-[#3a2a1a] hover:file:bg-[#e8ddd0] transition-all disabled:opacity-50"
-                  />
-                ) : (
-                  <input
-                    type={field.type || 'text'}
-                    name={field.name}
-                    value={formData[field.name] || ''}
-                    onChange={handleChange}
-                    required={field.required}
-                    disabled={field.disabled}
-                    className="bg-[#fcfaf7] border border-[#e8ddd0] rounded-lg px-4 py-2.5 text-sm text-[#3a2a1a] outline-none focus:border-[#8B6914] focus:ring-2 focus:ring-[#8B6914]/10 transition-all disabled:opacity-50 disabled:bg-gray-100"
-                    placeholder={`Enter ${field.label.toLowerCase()}...`}
-                  />
-                )}
+                <LocationPicker 
+                  lat={formData.latitude} 
+                  lng={formData.longitude} 
+                  onChange={handleLocationChange} 
+                />
               </div>
-            ))}
+            )}
           </div>
 
-          <div className="flex gap-3 mt-4 pt-4 border-t border-[#f0e8d8]">
+          <div className="flex gap-4 mt-6 pt-4 border-t border-[#f0e8d8]">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2.5 rounded-lg border border-[#e8ddd0] text-[#3a2a1a] text-sm font-bold hover:bg-[#fcfaf7] transition-all"
+              className={`rounded-xl border border-[#e8ddd0] text-[#3a2a1a] text-xs font-black transition-all active:scale-[0.98] ${isViewOnly ? 'w-full py-3 bg-[#fcfaf7]' : 'flex-1 py-2.5 hover:bg-[#fcfaf7]'}`}
             >
-              Cancel
+              {isViewOnly ? 'Close View' : 'Discard'}
             </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="flex-1 px-4 py-2.5 rounded-lg bg-[#8B6914] text-white text-sm font-bold hover:bg-[#6a5010] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
-            >
-              {loading && <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
-              {initialData ? 'Update' : 'Create'}
-            </button>
+            {!isViewOnly && (
+              <button
+                type="submit"
+                disabled={loading}
+                className="flex-1 px-6 py-2.5 rounded-xl bg-[#8B6914] text-white text-xs font-black hover:bg-[#6a5010] transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-[#8B6914]/20 active:scale-[0.98]"
+              >
+                {loading && <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
+                {initialData ? 'Save Changes' : 'Create Contact'}
+              </button>
+            )}
           </div>
         </form>
       </div>

@@ -115,22 +115,14 @@ export default function PointsPage() {
   };
 
   return (
-    <div className="p-5 flex flex-col gap-6 max-w-7xl mx-auto">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#8B6914]/10 flex items-center justify-center text-xl">
-            ⭐
-          </div>
-          <div>
-            <h2 className="text-xl font-black text-[#3a2a1a] tracking-tight uppercase">{t.pointsSystem || "Points System"}</h2>
-            <p className="text-[11px] text-[#9a8a7a] font-bold uppercase tracking-widest">{stats?.distributed?.total?.toLocaleString()} pts distributed</p>
-          </div>
-        </div>
+    <div className="px-6 py-4 flex flex-col gap-6 max-w-7xl mx-auto">
+
+      {/* Save button */}
+      <div className="flex justify-end">
         <button 
           onClick={handleUpdateConfig}
           disabled={saving || loading}
-          className="bg-[#3a2a1a] text-white text-[11px] font-black px-6 py-3 rounded-xl hover:bg-[#2a1a0a] transition-all flex items-center gap-2 shadow-lg hover:shadow-xl disabled:opacity-50 active:scale-95 uppercase tracking-wider"
+          className="bg-[#3a2a1a] text-white text-[11px] font-black px-6 py-2.5 rounded-xl hover:bg-[#2a1a0a] transition-all flex items-center gap-2 disabled:opacity-50 active:scale-95"
         >
           {saving ? (
             <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
