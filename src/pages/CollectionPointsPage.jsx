@@ -152,8 +152,8 @@ const CollectionPointsPage = React.memo(() => {
   const handleDelete = (id) => {
     setConfirmModal({
       isOpen: true,
-      title: "Delete Collection Point",
-      message: "Are you sure you want to delete this collection point?",
+      title: t.deletePointTitle || "Delete Collection Point",
+      message: t.confirmDeletePoint || "Are you sure you want to delete this collection point?",
       onConfirm: async () => {
         setConfirmLoading(true);
         try {
@@ -224,12 +224,12 @@ const CollectionPointsPage = React.memo(() => {
   ];
 
   const pointFields = [
-    { name: "title", label: "Name", required: true },
-    { name: "address", label: "Full Address", required: true },
-    { name: "description", label: "Description", type: "textarea" },
-    { name: "image", label: "Photo", type: "file" },
-    { name: "latitude", label: "Latitude", type: "number" },
-    { name: "longitude", label: "Longitude", type: "number" },
+    { name: "title", label: t.nameLabel || "Name", required: true },
+    { name: "address", label: t.address || "Full Address", required: true },
+    { name: "description", label: t.descriptionLabel || "Description", type: "textarea" },
+    { name: "image", label: t.photoLabel || "Photo", type: "file" },
+    { name: "latitude", label: t.latitudeLabel || "Latitude", type: "number" },
+    { name: "longitude", label: t.longitudeLabel || "Longitude", type: "number" },
   ];
 
   return (
@@ -343,7 +343,7 @@ const CollectionPointsPage = React.memo(() => {
       <CRUDModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title={editingPoint ? "Edit Collection Point" : "Add New Point"}
+        title={editingPoint ? t.editPointLabel : t.addPointLabel}
         fields={pointFields}
         initialData={editingPoint}
         onSubmit={handleSubmit}
@@ -355,7 +355,7 @@ const CollectionPointsPage = React.memo(() => {
           <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto custom-scrollbar shadow-2xl animate-in fade-in zoom-in duration-200">
             <div className="p-5 border-b border-[#f0e8d8] flex justify-between items-center sticky top-0 bg-white z-10">
               <h2 className="text-xl font-bold text-[#3a2a1a] flex items-center gap-2">
-                <span>🛒</span> Détails: {selectedPoint.title}
+                <span>🛒</span> {t.viewBtn || "View"}: {selectedPoint.title}
               </h2>
               <button onClick={() => setIsViewModalOpen(false)} className="text-[#9a8a7a] hover:text-[#3a2a1a] transition-colors p-1">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
@@ -365,9 +365,9 @@ const CollectionPointsPage = React.memo(() => {
             <div className="p-6 flex flex-col gap-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="flex flex-col gap-4">
-                  <h3 className="font-bold text-[#3a2a1a] border-b pb-2">Informations Générales</h3>
+                  <h3 className="font-bold text-[#3a2a1a] border-b pb-2">{t.generalInfo || "General Information"}</h3>
                   <div className="grid grid-cols-2 gap-y-2 text-sm">
-                    <span className="text-[#9a8a7a]">Titre:</span><span className="font-medium text-[#3a2a1a]">{selectedPoint.title}</span>
+                    <span className="text-[#9a8a7a]">{t.titleLabel || "Title"}:</span><span className="font-medium text-[#3a2a1a]">{selectedPoint.title}</span>
                     <span className="text-[#9a8a7a]">Statut:</span>
                     <span className="font-bold uppercase text-[10px] bg-green-100 text-green-600 px-2 py-0.5 rounded-full w-fit">{selectedPoint.status}</span>
                     <span className="text-[#9a8a7a]">Adresse:</span><span className="font-medium text-[#3a2a1a] truncate" title={selectedPoint.address}>{selectedPoint.address}</span>
@@ -390,20 +390,20 @@ const CollectionPointsPage = React.memo(() => {
               </div>
 
               <div className="flex flex-col gap-2 bg-[#f5f0e8] p-4 rounded-xl">
-                <h3 className="font-bold text-[#3a2a1a] text-sm">Description</h3>
+                <h3 className="font-bold text-[#3a2a1a] text-sm">{t.descriptionLabel || "Description"}</h3>
                 <p className="text-sm text-[#5a4a3a] leading-relaxed whitespace-pre-wrap">{selectedPoint.description || t.noDescription}</p>
               </div>
 
               {selectedPoint.photo?.secure_url && (
                 <div className="flex flex-col gap-3">
-                  <h3 className="font-bold text-[#3a2a1a] border-b pb-2">Photo</h3>
+                  <h3 className="font-bold text-[#3a2a1a] border-b pb-2">{t.photoLabel || "Photo"}</h3>
                   <img src={selectedPoint.photo.secure_url} alt="Point" className="w-full max-h-64 object-cover rounded-lg border border-[#e8ddd0] shadow-sm" />
                 </div>
               )}
 
               {selectedPoint.location && selectedPoint.location.coordinates && (
                 <div className="flex flex-col gap-3">
-                  <h3 className="font-bold text-[#3a2a1a] border-b pb-2">Localisation</h3>
+                  <h3 className="font-bold text-[#3a2a1a] border-b pb-2">{t.localisationLabel || "Localization"}</h3>
                   <p className="text-sm text-[#5a4a3a] mb-2">📍 {selectedPoint.location.address || selectedPoint.address}</p>
                   <div className="w-full h-64 bg-gray-200 rounded-xl overflow-hidden border border-[#e8ddd0]">
                     <iframe

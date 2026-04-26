@@ -125,6 +125,7 @@ export default function PointsPage() {
           value={{ text: stats?.distributed?.total?.toLocaleString() || "0", color: "text-green-600" }} 
           sub={stats?.distributed?.thisMonth ? `+${stats.distributed.thisMonth.toLocaleString()} ${t.thisMonth || "This month"}` : t.thisMonth || "This month"} 
           subType="up" 
+          color="bg-green-500"
         />
         <StatCard 
           loading={loading} 
@@ -132,6 +133,7 @@ export default function PointsPage() {
           value={{ text: stats?.pending?.toLocaleString() || "0", color: "text-orange-500" }} 
           sub={t.pendingLabel || "PENDING"} 
           subType="wait" 
+          color="bg-orange-500"
         />
         <StatCard 
           loading={loading} 
@@ -139,6 +141,7 @@ export default function PointsPage() {
           value={{ text: stats?.exchanged?.total?.toLocaleString() || "0", color: "text-blue-600" }} 
           sub={t.converted || "Converted"} 
           subType="up" 
+          color="bg-blue-500"
         />
         <StatCard 
           loading={loading} 
@@ -146,6 +149,7 @@ export default function PointsPage() {
           value={{ text: stats?.expired?.toLocaleString() || "0", color: "text-red-600" }} 
           sub={t.unused || "Unused"} 
           subType="down" 
+          color="bg-red-500"
         />
       </div>
 

@@ -70,14 +70,17 @@ export default function CrowdfundingPage() {
 
         <div className="grid grid-cols-4 gap-4">
           {[
-            { label: t.donors, value: stats?.donorsCount || "0" },
-            { label: t.averageBasket, value: "33,9\u20AC" },
-            { label: t.remaining, value: "18j" },
-            { label: t.left, value: `${(stats?.goalAmount || 0) - (stats?.totalCollected || 0)}\u20AC` },
+            { label: t.donors, value: stats?.donorsCount || "0", color: "bg-blue-500" },
+            { label: t.averageBasket, value: "33,9\u20AC", color: "bg-green-500" },
+            { label: t.remaining, value: "18j", color: "bg-orange-500" },
+            { label: t.left, value: `${(stats?.goalAmount || 0) - (stats?.totalCollected || 0)}\u20AC`, color: "bg-purple-500" },
           ].map((stat, i) => (
-            <div key={i} className="bg-[#fcfaf7] rounded-xl p-4 border border-[#e8ddd0] flex flex-col items-center gap-1">
-              <span className="text-[9px] font-bold text-[#9a8a7a] uppercase tracking-widest">{stat.label}</span>
-              <span className="text-2xl font-bold text-[#3a2a1a]">{stat.value}</span>
+            <div key={i} className="bg-[#fcfaf7] rounded-xl p-3 px-4 border border-[#e8ddd0] flex flex-col justify-between h-[85px] transition-all hover:shadow-sm relative overflow-hidden">
+              <div className={`absolute left-0 top-0 w-1 h-full ${stat.color || "bg-[#8B6914]"}`}></div>
+              <div>
+                <span className="text-[10px] font-black text-[#9a8a7a] uppercase tracking-widest block mb-0.5">{stat.label}</span>
+                <span className="text-2xl font-black text-[#3a2a1a] leading-none">{stat.value}</span>
+              </div>
             </div>
           ))}
         </div>

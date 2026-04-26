@@ -126,7 +126,7 @@ const ReceiptModal = ({ donation, isOpen, onClose, t, isFiscal }) => {
             disabled={emailLoading}
             className="flex-1 bg-blue-600 text-white text-xs font-bold py-3 rounded-xl hover:bg-blue-700 transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-600/20 disabled:opacity-50"
           >
-            {emailLoading ? "SENDING..." : <><span>📧</span> {t.emailReceipt || "EMAIL"}</>}
+            {emailLoading ? t.sendingLabel || "SENDING..." : <><span>📧</span> {t.emailReceipt || "EMAIL"}</>}
           </button>
           <button
             onClick={handlePrint}
@@ -367,10 +367,10 @@ export default function DonationsPage() {
   }, [queryParams]);
 
   const statCards = [
-    { label: t.totalCollected, value: { text: `${stats?.totalCollected || 0}€`, color: "text-green-600" } },
-    { label: t.returnedAssos, value: { text: `${stats?.returnedToAssos || 0}€`, color: "text-blue-600" } },
-    { label: t.pendingLabel, value: { text: `${stats?.pendingAmount || 0}€`, color: "text-orange-500" } },
-    { label: t.averageBasket, value: { text: `${Math.round(stats?.averageBasket || 0)}€`, color: "text-[#3a2a1a]" } },
+    { label: t.totalCollected, value: { text: `${stats?.totalCollected || 0}€`, color: "text-green-600" }, color: "bg-green-500" },
+    { label: t.returnedAssos, value: { text: `${stats?.returnedToAssos || 0}€`, color: "text-blue-600" }, color: "bg-blue-500" },
+    { label: t.pendingLabel, value: { text: `${stats?.pendingAmount || 0}€`, color: "text-orange-500" }, color: "bg-orange-500" },
+    { label: t.averageBasket, value: { text: `${Math.round(stats?.averageBasket || 0)}€`, color: "text-[#3a2a1a]" }, color: "bg-purple-500" },
   ];
 
   return (
@@ -392,11 +392,11 @@ export default function DonationsPage() {
           related={true}
           filters={[
             {
-              name: "status", label: "ALL", options: [
-                { label: "COMPLETED", value: "completed" },
-                { label: "PENDING", value: "pending" },
-                { label: "CANCELLED", value: "cancelled" },
-                { label: "REJECTED", value: "failed" }
+              name: "status", label: t.allStatuses || "ALL", options: [
+                { label: t.approved || "COMPLETED", value: "completed" },
+                { label: t.pending || "PENDING", value: "pending" },
+                { label: t.cancelled || "CANCELLED", value: "cancelled" },
+                { label: t.rejected || "REJECTED", value: "failed" }
               ]
             }
           ]}
@@ -414,7 +414,7 @@ export default function DonationsPage() {
                 <th className="py-3 px-4 text-[10px] font-bold text-[#9a8a7a] tracking-widest">{t.donator}</th>
                 <th className="py-3 px-4 text-[10px] font-bold text-[#9a8a7a] tracking-widest">{t.amount}</th>
                 <th className="py-3 px-4 text-[10px] font-bold text-[#9a8a7a] tracking-widest">{t.association}</th>
-                <th className="py-3 px-4 text-[10px] font-bold text-[#9a8a7a] tracking-widest">METHOD</th>
+                <th className="py-3 px-4 text-[10px] font-bold text-[#9a8a7a] tracking-widest">{t.paymentMethodLabel || "METHOD"}</th>
                 <th className="py-3 px-4 text-[10px] font-bold text-[#9a8a7a] tracking-widest">{t.dateLabel || "DATE"}</th>
                 <th className="py-3 px-4 text-[10px] font-bold text-[#9a8a7a] tracking-widest">{t.statusLabel || "STATUS"}</th>
                 <th className="py-3 px-4 text-[10px] font-bold text-[#9a8a7a] tracking-widest text-right">{t.actionsLabel || "ACTIONS"}</th>

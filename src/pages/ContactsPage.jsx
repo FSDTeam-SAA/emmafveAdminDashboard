@@ -156,7 +156,7 @@ export default function ContactsPage() {
 
   const columns = [
     {
-      header: t.contactName || "NAME",
+      header: t.nameLabel || "NAME",
       cell: (contact) => (
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-full bg-[#8B6914] flex items-center justify-center text-white font-bold text-xs shrink-0 overflow-hidden border border-[#e8ddd0]">
@@ -168,13 +168,13 @@ export default function ContactsPage() {
           </div>
           <div className="flex flex-col">
             <span className="font-bold text-[#3a2a1a] truncate max-w-[150px]">{contact.name}</span>
-            <span className="text-[9px] text-[#9a8a7a] uppercase tracking-widest font-bold">{contact.type}</span>
+            <span className="text-[9px] text-[#9a8a7a] uppercase tracking-widest font-bold">{t[contact.type] || contact.type}</span>
           </div>
         </div>
       ),
     },
     {
-      header: t.contactAddress || "ADDRESS",
+      header: t.address || "ADDRESS",
       cell: (contact) => (
         <div className="max-w-[200px]">
           <p className="text-sm text-[#3a2a1a] truncate" title={contact.address}>{contact.address || "N/A"}</p>
@@ -183,12 +183,12 @@ export default function ContactsPage() {
       ),
     },
     {
-      header: t.contactPhone || "PHONE",
+      header: t.phone || "PHONE",
       accessor: "phone",
       cell: (contact) => <span className="text-sm font-medium text-[#5a4a3a]">{contact.phone || "N/A"}</span>
     },
     {
-      header: t.contactEmail || "EMAIL",
+      header: t.emailLabel || "EMAIL",
       accessor: "email",
       cell: (contact) => <span className="text-sm truncate max-w-[150px] inline-block text-[#5a4a3a]">{contact.email || "N/A"}</span>
     },
@@ -233,33 +233,33 @@ export default function ContactsPage() {
   ];
 
   const getContactFields = () => [
-    { name: "name", label: "Name", required: !editingContact, disabled: isViewOnly },
+    { name: "name", label: t.nameLabel || "Name", required: !editingContact, disabled: isViewOnly },
     {
       name: "type",
-      label: "Type",
+      label: t.type || "Type",
       type: "select",
       required: !editingContact,
       disabled: isViewOnly || !!editingContact,
       options: [
-        { label: "Shelter", value: "shelter" },
-        { label: "Veterinarian", value: "veterinarian" },
-        { label: "Authority", value: "authority" },
+        { label: t.shelter || "Shelter", value: "shelter" },
+        { label: t.veterinarian || "Veterinarian", value: "veterinarian" },
+        { label: t.authorityLabel || "Authority", value: "authority" },
         // Only show Partner if we are viewing/editing an existing one
-        ...(editingContact?.type === "partner" ? [{ label: "Partner", value: "partner" }] : []),
+        ...(editingContact?.type === "partner" ? [{ label: t.partnerRole || "Partner", value: "partner" }] : []),
       ].filter(opt => opt.value !== "partner" || editingContact?.type === "partner"),
     },
-    { name: "email", label: "Email", type: "email", disabled: isViewOnly },
-    { name: "phone", label: "Phone", disabled: isViewOnly },
-    { name: "website", label: "Website", disabled: isViewOnly },
-    { name: "address", label: "Address", required: !editingContact, disabled: isViewOnly },
-    { name: "city", label: "City", required: !editingContact, disabled: isViewOnly },
-    { name: "country", label: "Country", required: !editingContact, disabled: isViewOnly },
-    { name: "description", label: "Description", type: "textarea", disabled: isViewOnly },
-    { name: "latitude", label: "Latitude", type: "number", disabled: isViewOnly },
-    { name: "longitude", label: "Longitude", type: "number", disabled: isViewOnly },
+    { name: "email", label: t.emailLabel || "Email", type: "email", disabled: isViewOnly },
+    { name: "phone", label: t.phone || "Phone", disabled: isViewOnly },
+    { name: "website", label: t.websiteLabel || "Website", disabled: isViewOnly },
+    { name: "address", label: t.address || "Address", required: !editingContact, disabled: isViewOnly },
+    { name: "city", label: t.cityLabel || "City", required: !editingContact, disabled: isViewOnly },
+    { name: "country", label: t.countryLabel || "Country", required: !editingContact, disabled: isViewOnly },
+    { name: "description", label: t.descriptionLabel || "Description", type: "textarea", disabled: isViewOnly },
+    { name: "latitude", label: t.latitudeLabel || "Latitude", type: "number", disabled: isViewOnly },
+    { name: "longitude", label: t.longitudeLabel || "Longitude", type: "number", disabled: isViewOnly },
     {
       name: "status",
-      label: "Status",
+      label: t.statusLabel || "Status",
       type: "select",
       required: !editingContact,
       disabled: isViewOnly,

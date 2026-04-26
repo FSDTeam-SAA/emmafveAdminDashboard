@@ -1,6 +1,6 @@
 import React from "react";
 
-const StatCard = React.memo(({ label, value, sub, subType = "up", loading = false }) => {
+const StatCard = React.memo(({ label, value, sub, subType = "up", loading = false, color = "bg-[#8B6914]" }) => {
   const subColors = {
     up: "text-green-600",
     down: "text-red-600",
@@ -15,7 +15,7 @@ const StatCard = React.memo(({ label, value, sub, subType = "up", loading = fals
     neutral: "▶",
   };
 
-  const containerClasses = "bg-white rounded-xl p-3 px-4 border border-[#e8ddd0] flex flex-col justify-between h-[85px] w-full transition-all hover:shadow-md";
+  const containerClasses = "bg-white rounded-xl p-3 px-4 border border-[#e8ddd0] flex flex-col justify-between h-[85px] w-full transition-all hover:shadow-md relative overflow-hidden";
 
   if (loading || value.text === "...") {
     return (
@@ -31,6 +31,7 @@ const StatCard = React.memo(({ label, value, sub, subType = "up", loading = fals
 
   return (
     <div className={containerClasses}>
+      <div className={`absolute left-0 top-0 w-1 h-full ${color}`}></div>
       <div>
         <p className="text-[10px] font-black tracking-widest text-[#9a8a7a] uppercase mb-0.5">
           {label}

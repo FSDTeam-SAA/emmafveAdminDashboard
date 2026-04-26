@@ -12,6 +12,11 @@ api.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    
+    // Add language preference to headers
+    const lang = localStorage.getItem('adminLang') || 'en';
+    config.headers['Accept-Language'] = lang;
+    
     return config;
   },
   (error) => {

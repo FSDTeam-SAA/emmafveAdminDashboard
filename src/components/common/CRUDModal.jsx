@@ -3,6 +3,7 @@ import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-lea
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import axios from 'axios';
+import { useLang } from '../../context/LanguageContext';
 
 // Fix for default marker icon in Leaflet + React
 delete L.Icon.Default.prototype._getIconUrl;
@@ -24,6 +25,7 @@ const MapFlyTo = ({ center }) => {
 };
 
 const LocationPicker = ({ lat, lng, onChange }) => {
+  const { t } = useLang();
   const [position, setPosition] = useState(lat && lng ? [lat, lng] : [48.8566, 2.3522]); 
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
@@ -74,7 +76,7 @@ const LocationPicker = ({ lat, lng, onChange }) => {
       <div className="relative">
         <input 
           type="text"
-          placeholder="Search location..."
+          placeholder={t.searchLocationPlaceholder || "Search location..."}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           onKeyDown={(e) => {
@@ -93,7 +95,7 @@ const LocationPicker = ({ lat, lng, onChange }) => {
           disabled={isSearching}
           className="absolute right-1 top-1/2 -translate-y-1/2 bg-[#8B6914] text-white text-[9px] font-bold px-3 py-1 rounded-md hover:bg-[#6a5010] transition-all disabled:opacity-50"
         >
-          {isSearching ? "..." : "Find"}
+          {isSearching ? "..." : (t.findBtn || "Find")}
         </button>
       </div>
 
@@ -103,8 +105,8 @@ const LocationPicker = ({ lat, lng, onChange }) => {
           <MapEvents />
           <MapFlyTo center={position} />
         </MapContainer>
-        <div className="absolute bottom-2 right-2 z-[400] bg-white/90 backdrop-blur-sm px-2 py-1 rounded-lg text-[8px] font-bold text-[#8B6914] border border-[#e8ddd0] shadow-sm">
-          CLICK TO PIN
+        <div className="absolute bottom-2 right-2 z-[400] bg-white/90 backdrop-blur-sm px-2 py-1 rounded-lg text-[8px] font-bold text-[#8B6914] border border-[#e8ddd0] shadow-sm uppercase">
+          {t.clickToPin || "CLICK TO PIN"}
         </div>
       </div>
     </div>
@@ -112,6 +114,7 @@ const LocationPicker = ({ lat, lng, onChange }) => {
 };
 
 const CRUDModal = ({ title, fields, initialData, isOpen, onClose, onSubmit, loading, isViewOnly }) => {
+  const { t } = useLang();
   const [formData, setFormData] = useState({});
   const [previews, setPreviews] = useState({});
 
@@ -243,7 +246,7 @@ const CRUDModal = ({ title, fields, initialData, isOpen, onClose, onSubmit, load
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[#3a2a1a]/70 via-transparent to-transparent"></div>
             <div className="absolute bottom-4 left-6 flex flex-col">
-              <span className="text-[9px] font-black text-white/90 uppercase tracking-[0.2em] mb-1">Visual Preview</span>
+              <span className="text-[9px] font-black text-white/90 uppercase tracking-[0.2em] mb-1">{t.visualPreview || "Visual Preview"}</span>
               <span className="text-white font-black text-xl tracking-tight leading-none">{entityName}</span>
             </div>
           </div>
@@ -254,7 +257,7 @@ const CRUDModal = ({ title, fields, initialData, isOpen, onClose, onSubmit, load
               {entityName?.charAt(0)?.toUpperCase() || "?"}
             </div>
             <div className="flex flex-col">
-              <span className="text-[9px] font-black text-white/70 uppercase tracking-[0.2em] mb-0.5">Details</span>
+              <span className="text-[9px] font-black text-white/70 uppercase tracking-[0.2em] mb-0.5">{t.informationsLabel || "Details"}</span>
               <span className="text-white font-black text-xl tracking-tight leading-none">{entityName}</span>
             </div>
           </div>
@@ -280,7 +283,7 @@ const CRUDModal = ({ title, fields, initialData, isOpen, onClose, onSubmit, load
                       disabled={field.disabled || isViewOnly}
                       className="bg-[#fcfaf7] border border-[#e8ddd0] rounded-xl px-4 py-2 text-xs text-[#3a2a1a] outline-none focus:border-[#8B6914] transition-all font-bold disabled:opacity-80"
                     >
-                      <option value="">Select...</option>
+                      <option value="">{t.selectOption || "Select..."}</option>
                       {field.options.map((opt) => (
                         <option key={opt.value} value={opt.value}>
                           {opt.label}
@@ -318,8 +321,8 @@ const CRUDModal = ({ title, fields, initialData, isOpen, onClose, onSubmit, load
                           </svg>
                         </div>
                         <div className="flex flex-col">
-                          <p className="text-xs font-black text-[#3a2a1a] truncate max-w-[200px]">{formData[field.name]?.name || (initialData ? "Existing Photo" : "Upload photo")}</p>
-                          <p className="text-[9px] text-[#9a8a7a]">{isViewOnly ? "View only mode" : "Click or drag & drop"}</p>
+                          <p className="text-xs font-black text-[#3a2a1a] truncate max-w-[200px]">{formData[field.name]?.name || (initialData ? (t.existingPhoto || "Existing Photo") : (t.uploadPhoto || "Upload photo"))}</p>
+                          <p className="text-[9px] text-[#9a8a7a]">{isViewOnly ? (t.viewOnly || "View only mode") : (t.dragDrop || "Click or drag & drop")}</p>
                         </div>
                       </div>
                     </div>
@@ -342,7 +345,7 @@ const CRUDModal = ({ title, fields, initialData, isOpen, onClose, onSubmit, load
             {hasLocation && (
               <div className="md:col-span-2 flex flex-col gap-2 mt-2">
                 <label className="text-[9px] font-black text-[#9a8a7a] tracking-wider uppercase ml-1 flex justify-between items-center">
-                  <span>{isViewOnly ? "Location Details" : "Map Location"}</span>
+                  <span>{isViewOnly ? (t.locationDetails || "Location Details") : (t.mapLocation || "Map Location")}</span>
                   <span className="text-[9px] font-bold text-[#8B6914]">
                     {formData.latitude?.toFixed(4)}, {formData.longitude?.toFixed(4)}
                   </span>
@@ -362,7 +365,7 @@ const CRUDModal = ({ title, fields, initialData, isOpen, onClose, onSubmit, load
               onClick={onClose}
               className={`rounded-xl border border-[#e8ddd0] text-[#3a2a1a] text-xs font-black transition-all active:scale-[0.98] ${isViewOnly ? 'w-full py-3 bg-[#fcfaf7]' : 'flex-1 py-2.5 hover:bg-[#fcfaf7]'}`}
             >
-              {isViewOnly ? 'Close View' : 'Discard'}
+              {isViewOnly ? (t.closeView || 'Close View') : (t.discardBtn || 'Discard')}
             </button>
             {!isViewOnly && (
               <button
@@ -371,7 +374,7 @@ const CRUDModal = ({ title, fields, initialData, isOpen, onClose, onSubmit, load
                 className="flex-1 px-6 py-2.5 rounded-xl bg-[#8B6914] text-white text-xs font-black hover:bg-[#6a5010] transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-[#8B6914]/20 active:scale-[0.98]"
               >
                 {loading && <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
-                {initialData ? 'Save Changes' : 'Create Contact'}
+                {initialData ? (t.saveChanges || 'Save Changes') : (t.createBtn || 'Create')}
               </button>
             )}
           </div>

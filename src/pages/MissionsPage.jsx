@@ -118,8 +118,8 @@ export default function MissionsPage() {
   const handleDelete = (id) => {
     setConfirmModal({
       isOpen: true,
-      title: "Delete Mission",
-      message: "Are you sure you want to delete this mission?",
+      title: t.deleteMissionTitle || "Delete Mission",
+      message: t.confirmDeleteMission || "Are you sure you want to delete this mission?",
       onConfirm: async () => {
         setConfirmLoading(true);
         try {
@@ -137,17 +137,17 @@ export default function MissionsPage() {
   };
 
   const missionFields = [
-    { name: "title", label: "Title", required: true },
-    { name: "description", label: "Description", type: "textarea", required: true },
-    { name: "address", label: "Address", required: true },
-    { name: "points", label: "Points Reward", type: "number", required: true },
-    { name: "duration", label: "Duration (e.g. 2h)", required: true },
-    { name: "image", label: "Mission Image", type: "file" },
+    { name: "title", label: t.titleLabel || "Title", required: true },
+    { name: "description", label: t.descriptionLabel || "Description", type: "textarea", required: true },
+    { name: "address", label: t.address || "Address", required: true },
+    { name: "points", label: t.points || "Points Reward", type: "number", required: true },
+    { name: "duration", label: t.durationLabel || "Duration", required: true },
+    { name: "image", label: t.missionPhoto || "Mission Photo", type: "file" },
   ];
 
   const columns = [
     {
-      header: "MISSION",
+      header: t.localMissions || "MISSION",
       cell: (m) => (
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-lg bg-[#f5f0e8] flex items-center justify-center text-xl overflow-hidden shrink-0 border border-[#e8ddd0]">
@@ -165,7 +165,7 @@ export default function MissionsPage() {
       )
     },
     {
-      header: "PARTENAIRE",
+      header: t.partnerRole || "PARTNER",
       cell: (m) => (
         <div className="flex items-center gap-2">
           <div className="w-6 h-6 rounded-full bg-[#8B6914] text-white flex items-center justify-center text-[10px] font-bold overflow-hidden shrink-0">
@@ -178,15 +178,15 @@ export default function MissionsPage() {
       )
     },
     {
-      header: "DATE",
+      header: t.dateLabel || "DATE",
       cell: (m) => new Date(m.createdAt).toLocaleDateString()
     },
     {
-      header: "POINTS",
+      header: t.points || "POINTS",
       cell: (m) => <span className="font-bold text-orange-600">+{m.points} pts</span>
     },
     {
-      header: "PARTICIPANTS",
+      header: t.participants || "PARTICIPANTS",
       align: "center",
       cell: (m) => <span className="font-bold">{m.participantsCount || 0}</span>
     },
@@ -195,7 +195,7 @@ export default function MissionsPage() {
       cell: (m) => <StatusBadge status={m.status} />
     },
     {
-      header: "ACTIONS",
+      header: t.actionsLabel || "ACTIONS",
       align: "right",
       cell: (m) => (
         <div className="flex gap-1 justify-end">
@@ -226,10 +226,10 @@ export default function MissionsPage() {
     <div className="px-6 py-4 flex flex-col gap-4">
       {/* Stats */}
       <div className="grid grid-cols-4 gap-3">
-        <StatCard loading={loading} label={t.inProgressLabel} value={{ text: stats?.inProgress?.toLocaleString() || "0", color: "text-[#3a2a1a]" }} />
-        <StatCard loading={loading} label={"To Come"} value={{ text: stats?.toCome?.toLocaleString() || "0", color: "text-[#3a2a1a]" }} />
-        <StatCard loading={loading} label={t.finishedLabel} value={{ text: stats?.finished?.toLocaleString() || "0", color: "text-[#3a2a1a]" }} />
-        <StatCard loading={loading} label={t.pointsAttributed} value={{ text: stats?.pointsAttributed?.toLocaleString() || "0", color: "text-orange-500" }} />
+        <StatCard loading={loading} label={t.inProgressLabel} value={{ text: stats?.inProgress?.toLocaleString() || "0", color: "text-[#3a2a1a]" }} color="bg-orange-500" />
+        <StatCard loading={loading} label={t.toComeLabel || "To Come"} value={{ text: stats?.toCome?.toLocaleString() || "0", color: "text-[#3a2a1a]" }} color="bg-blue-500" />
+        <StatCard loading={loading} label={t.finishedLabel} value={{ text: stats?.finished?.toLocaleString() || "0", color: "text-[#3a2a1a]" }} color="bg-green-500" />
+        <StatCard loading={loading} label={t.pointsAttributed} value={{ text: stats?.pointsAttributed?.toLocaleString() || "0", color: "text-orange-500" }} color="bg-[#8B6914]" />
       </div>
 
       <div className="bg-white rounded-xl border border-[#e8ddd0] overflow-hidden flex flex-col shadow-sm">
@@ -282,7 +282,7 @@ export default function MissionsPage() {
       <CRUDModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title={editingMission ? "Edit Mission" : "Create New Mission"}
+        title={editingMission ? t.editMissionTitle : t.createMissionTitle}
         fields={missionFields}
         initialData={editingMission}
         onSubmit={handleSubmit}
@@ -294,7 +294,7 @@ export default function MissionsPage() {
           <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto custom-scrollbar shadow-2xl animate-in fade-in zoom-in duration-200">
             <div className="p-5 border-b border-[#f0e8d8] flex justify-between items-center sticky top-0 bg-white z-10">
               <h2 className="text-xl font-bold text-[#3a2a1a] flex items-center gap-2">
-                <span>🎯</span> Détails: {selectedMission.title}
+                <span>🎯</span> {t.viewBtn}: {selectedMission.title}
               </h2>
               <button onClick={() => setIsViewModalOpen(false)} className="text-[#9a8a7a] hover:text-[#3a2a1a] transition-colors p-1">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>

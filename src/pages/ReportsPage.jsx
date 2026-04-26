@@ -200,7 +200,7 @@ export default function ReportsPage() {
         };
         return (
           <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full capitalize ${statusColors[r.status] || "bg-gray-100 text-gray-600"}`}>
-            {r.status}
+            {t[r.status] || r.status}
           </span>
         );
       }
@@ -223,7 +223,7 @@ export default function ReportsPage() {
     },
     { header: t.date, cell: (r) => new Date(r.createdAt).toLocaleDateString() },
     {
-      header: "COMMENTAIRES",
+      header: t.commentsLabel || "COMMENTS",
       align: "center",
       cell: (r) => (
         <span className="text-[10px] font-bold bg-[#f5f0e8] text-[#8B6914] px-2 py-1 rounded-lg">
@@ -282,10 +282,10 @@ export default function ReportsPage() {
       {/* Stats */}
       <div className="flex flex-col gap-3">
         <div className="grid grid-cols-4 gap-3">
-          <StatCard loading={loading} label={t.totalActive} value={{ text: stats?.total?.toLocaleString() || "0", color: "text-[#3a2a1a]" }} />
-          <StatCard loading={loading} label={t.resolvedLabel} value={{ text: stats?.resolved?.toLocaleString() || "0", color: "text-[#3a2a1a]" }} />
-          <StatCard loading={loading} label={t.pendingLabel} value={{ text: stats?.pending?.toLocaleString() || "0", color: "text-orange-500" }} />
-          <StatCard loading={loading} label={t.resolutionRate} value={{ text: `${stats?.resolutionRate || 0}%`, color: "text-blue-600" }} />
+          <StatCard loading={loading} label={t.totalActive} value={{ text: stats?.total?.toLocaleString() || "0", color: "text-[#3a2a1a]" }} color="bg-purple-500" />
+          <StatCard loading={loading} label={t.resolvedLabel} value={{ text: stats?.resolved?.toLocaleString() || "0", color: "text-[#3a2a1a]" }} color="bg-green-500" />
+          <StatCard loading={loading} label={t.pendingLabel} value={{ text: stats?.pending?.toLocaleString() || "0", color: "text-orange-500" }} color="bg-orange-500" />
+          <StatCard loading={loading} label={t.resolutionRate} value={{ text: `${stats?.resolutionRate || 0}%`, color: "text-blue-600" }} color="bg-blue-500" />
         </div>
       </div>
 

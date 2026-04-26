@@ -24,7 +24,8 @@ const ItemSkeleton = () => (
 );
 
 const ItemCard = React.memo(({ item, onEdit, onDelete, t }) => (
-  <div className="bg-white rounded-xl border border-[#e8ddd0] p-3 flex flex-col gap-2 hover:shadow-md transition-shadow relative">
+  <div className="bg-white rounded-xl border border-[#e8ddd0] p-3 flex flex-col gap-2 hover:shadow-md transition-shadow relative overflow-hidden">
+    <div className="absolute left-0 top-0 w-1 h-full bg-[#8B6914]"></div>
     <div className="bg-[#fcfaf7] rounded-lg h-24 flex items-center justify-center text-3xl relative overflow-hidden">
       {item.photo?.secure_url ? (
         <img src={item.photo.secure_url} alt={item.title} className="w-full h-full object-cover" />
@@ -221,7 +222,7 @@ export default function PhysicalItemsPage() {
 
   const redemptionColumns = [
     {
-      header: "UTILISATEUR",
+      header: t.user || "USER",
       cell: (req) => (
         <div className="font-bold text-[#3a2a1a]">
           {req.user?.firstName} {req.user?.lastName}
@@ -229,8 +230,8 @@ export default function PhysicalItemsPage() {
       )
     },
     { header: t.article, cell: (req) => req.rewardItem?.title },
-    { header: "POINTS", cell: (req) => <span className="font-bold text-orange-600">{req.pointsAtRedemption} pts</span> },
-    { header: "DATE", cell: (req) => new Date(req.createdAt).toLocaleDateString() },
+    { header: t.points || "POINTS", cell: (req) => <span className="font-bold text-orange-600">{req.pointsAtRedemption} pts</span> },
+    { header: t.dateLabel || "DATE", cell: (req) => new Date(req.createdAt).toLocaleDateString() },
     { header: t.address, cell: (req) => <div className="max-w-[150px] truncate">{req.user?.address || "No address"}</div> },
     {
       header: t.statusLabel || "STATUS",
@@ -239,12 +240,12 @@ export default function PhysicalItemsPage() {
           req.status === 'completed' ? 'bg-green-100 text-green-600' : 
           req.status === 'pending' ? 'bg-orange-100 text-orange-600' : 'bg-gray-100 text-gray-600'
         }`}>
-          {req.status}
+          {t[req.status] || req.status}
         </span>
       )
     },
     {
-      header: "ACTIONS",
+      header: t.actionsLabel || "ACTIONS",
       align: "right",
       cell: (req) => (
         <div className="flex gap-1 justify-end">
@@ -263,23 +264,23 @@ export default function PhysicalItemsPage() {
   ];
 
   const rewardFields = [
-    { name: "title", label: "Title", required: true },
-    { name: "description", label: "Description", type: "textarea", required: true },
-    { name: "points", label: "Points Required", type: "number", required: true },
-    { name: "stock", label: "Stock", type: "number", required: true },
+    { name: "title", label: t.titleLabel || "Title", required: true },
+    { name: "description", label: t.descriptionLabel || "Description", type: "textarea", required: true },
+    { name: "points", label: t.pointsRequired || "Points Required", type: "number", required: true },
+    { name: "stock", label: t.stockLabel || "Stock", type: "number", required: true },
     { 
       name: "type", 
-      label: "Type", 
+      label: t.type || "Type", 
       type: "select", 
       required: true,
       options: [
-        { label: "Product", value: "product" },
-        { label: "Gift Card", value: "giftcard" },
+        { label: t.productType || "Product", value: "product" },
+        { label: t.giftCardType || "Gift Card", value: "giftcard" },
       ]
     },
     { 
       name: "category", 
-      label: "Category", 
+      label: t.categoryLabel || "Category", 
       type: "select", 
       required: true,
       options: [
@@ -288,7 +289,7 @@ export default function PhysicalItemsPage() {
         { label: "Solidarity", value: "solidarity" },
       ]
     },
-    { name: "image", label: "Item Image", type: "file" },
+    { name: "image", label: t.itemImage || "Item Image", type: "file" },
   ];
 
   return (

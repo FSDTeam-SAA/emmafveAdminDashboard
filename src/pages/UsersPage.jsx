@@ -64,14 +64,14 @@ export default function UsersPage() {
   const handleUpdateStatus = (userId, newStatus) => {
     setConfirmModal({
       isOpen: true,
-      title: "Update Status",
-      message: `Are you sure you want to change the user's status to ${newStatus}?`,
+      title: t.updateStatusTitle || "Update Status",
+      message: `${t.confirmUpdateMessageTo || "Are you sure you want to change the user's status to"} ${newStatus}?`,
       onConfirm: async () => {
         setConfirmLoading(true);
         try {
           const res = await api.patch(`/user/update-status/${userId}`, { status: newStatus });
           if (res.data.status === "ok") {
-            toast.success(`User status updated to ${newStatus}`);
+            toast.success(`${t.statusLabel || "Status"} ${newStatus} ${t.updating || "updated"}`);
             fetchData();
           }
         } catch (err) {
@@ -154,13 +154,15 @@ export default function UsersPage() {
       )
     },
     { 
-      header: "ROLE", 
+      header: t.role || "ROLE", 
       accessor: "role", 
       align: "center", 
-      cell: (user) => <span className="uppercase text-[10px] font-bold px-2 py-1 bg-[#f5f0e8] text-[#8B6914] rounded-lg">{user.role || 'user'}</span> 
+      cell: (user) => <span className="uppercase text-[10px] font-bold px-2 py-1 bg-[#f5f0e8] text-[#8B6914] rounded-lg">
+        {user.role === 'admin' ? t.adminRole : user.role === 'partners' ? t.partnerRole : t.userRole}
+      </span> 
     },
     { 
-      header: "ADDRESS", 
+      header: t.address || "ADDRESS", 
       accessor: "address", 
       cell: (user) => <div className="max-w-[150px] truncate" title={user.address}>{user.address || "N/A"}</div> 
     },
@@ -175,7 +177,7 @@ export default function UsersPage() {
               onClick={() => handleUpdateStatus(user._id, "active")}
               className="bg-green-100 text-green-600 text-[10px] font-bold px-3 py-1 rounded hover:bg-green-200 transition-colors"
             >
-              Activate
+              {t.activateNow || "Activate"}
             </button>
           )}
           {user.status === "active" && (
@@ -183,7 +185,7 @@ export default function UsersPage() {
               onClick={() => handleUpdateStatus(user._id, "inactive")}
               className="bg-gray-100 text-gray-600 text-[10px] font-bold px-3 py-1 rounded hover:bg-gray-200 transition-colors"
             >
-              Deactivate
+              {t.deactivateBtn || "Deactivate"}
             </button>
           )}
           {user.status !== "blocked" && user.status !== "banned" && (
@@ -191,7 +193,7 @@ export default function UsersPage() {
               onClick={() => handleUpdateStatus(user._id, "blocked")}
               className="bg-orange-100 text-orange-600 text-[10px] font-bold px-3 py-1 rounded hover:bg-orange-200 transition-colors"
             >
-              Block
+              {t.blocked || "Block"}
             </button>
           )}
         </div>
@@ -200,35 +202,35 @@ export default function UsersPage() {
   ];
 
   const getUserFields = (isEditing) => [
-    { name: "firstName", label: "First Name", required: true, disabled: isEditing },
-    { name: "lastName", label: "Last Name", required: true, disabled: isEditing },
-    { name: "email", label: "Email", type: "email", required: true, disabled: isEditing },
-    ...(!isEditing ? [{ name: "password", label: "Password", type: "password", required: true }] : []),
-    { name: "phone", label: "Phone", required: true, disabled: isEditing },
-    { name: "address", label: "Address", required: true, disabled: isEditing },
-    { name: "company", label: "Company", disabled: isEditing },
+    { name: "firstName", label: t.firstName || "First Name", required: true, disabled: isEditing },
+    { name: "lastName", label: t.lastName || "Last Name", required: true, disabled: isEditing },
+    { name: "email", label: t.emailLabel || "Email", type: "email", required: true, disabled: isEditing },
+    ...(!isEditing ? [{ name: "password", label: t.passwordLabel || "Password", type: "password", required: true }] : []),
+    { name: "phone", label: t.phone || "Phone", required: true, disabled: isEditing },
+    { name: "address", label: t.address || "Address", required: true, disabled: isEditing },
+    { name: "company", label: t.company || "Company", disabled: isEditing },
     { 
       name: "role", 
-      label: "Role", 
+      label: t.role || "Role", 
       type: "select", 
       required: true,
       disabled: isEditing,
       options: [
-        { label: "User", value: "user" },
-        { label: "Partner", value: "partners" },
-        { label: "Admin", value: "admin" },
+        { label: t.userRole || "User", value: "user" },
+        { label: t.partnerRole || "Partner", value: "partners" },
+        { label: t.adminRole || "Admin", value: "admin" },
       ]
     },
     ...(isEditing ? [{
       name: "status",
-      label: "Status",
+      label: t.statusLabel || "Status",
       type: "select",
       required: true,
       options: [
-        { label: "Active", value: "active" },
-        { label: "Inactive", value: "inactive" },
-        { label: "Blocked", value: "blocked" },
-        { label: "Banned", value: "banned" }
+        { label: t.active || "Active", value: "active" },
+        { label: t.inactive || "Inactive", value: "inactive" },
+        { label: t.blocked || "Blocked", value: "blocked" },
+        { label: t.banned || "Banned", value: "banned" }
       ]
     }] : [])
   ];
@@ -237,10 +239,10 @@ export default function UsersPage() {
     <div className="px-6 py-4 flex flex-col gap-4">
       {/* Stats */}
       <div className="grid grid-cols-4 gap-3">
-        <StatCard loading={loading} label={t.totalRegistered} value={{ text: (stats?.total || 0).toLocaleString(), color: "text-[#3a2a1a]" }} />
-        <StatCard loading={loading} label={t.activeLabel} value={{ text: (stats?.active || 0).toLocaleString(), color: "text-[#3a2a1a]" }} />
-        <StatCard loading={loading} label={t.suspendedLabel} value={{ text: (stats?.suspended || 0).toLocaleString(), color: "text-[#3a2a1a]" }} />
-        <StatCard loading={loading} label={t.newThisMonth} value={{ text: (stats?.newThisMonth || 0).toLocaleString(), color: "text-blue-600" }} />
+        <StatCard loading={loading} label={t.totalRegistered} value={{ text: (stats?.total || 0).toLocaleString(), color: "text-[#3a2a1a]" }} color="bg-purple-500" />
+        <StatCard loading={loading} label={t.activeLabel} value={{ text: (stats?.active || 0).toLocaleString(), color: "text-[#3a2a1a]" }} color="bg-green-500" />
+        <StatCard loading={loading} label={t.suspendedLabel} value={{ text: (stats?.suspended || 0).toLocaleString(), color: "text-[#3a2a1a]" }} color="bg-red-500" />
+        <StatCard loading={loading} label={t.newThisMonth} value={{ text: (stats?.newThisMonth || 0).toLocaleString(), color: "text-blue-600" }} color="bg-blue-500" />
       </div>
 
       <div className="bg-white rounded-xl border border-[#e8ddd0] overflow-hidden flex flex-col shadow-sm">
@@ -251,15 +253,15 @@ export default function UsersPage() {
           related={true}
           filters={[
             { name: "role", label: t.allRoles || "All roles", options: [
-                { label: "User", value: "user" },
-                { label: "Partner", value: "partners" },
-                { label: "Admin", value: "admin" }
+                { label: t.userRole || "User", value: "user" },
+                { label: t.partnerRole || "Partner", value: "partners" },
+                { label: t.adminRole || "Admin", value: "admin" }
             ]},
             { name: "status", label: t.allStatuses || "All statuses", options: [
-                { label: "Active", value: "active" },
-                { label: "Inactive", value: "inactive" },
-                { label: "Blocked", value: "blocked" },
-                { label: "Banned", value: "banned" }
+                { label: t.active || "Active", value: "active" },
+                { label: t.inactive || "Inactive", value: "inactive" },
+                { label: t.blocked || "Blocked", value: "blocked" },
+                { label: t.banned || "Banned", value: "banned" }
             ]}
           ]}
           sortOptions={[

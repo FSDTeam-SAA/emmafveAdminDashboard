@@ -2,19 +2,19 @@ import React from "react";
 import { useLang } from "../context/LanguageContext";
 
 const AnalyticsCard = React.memo(({ label, value, sub, color }) => (
-  <div className={`bg-white rounded-xl p-4 border border-[#e8ddd0] flex flex-col justify-between h-[110px] relative overflow-hidden transition-all hover:shadow-md`}>
+  <div className={`bg-white rounded-xl p-3 px-4 border border-[#e8ddd0] flex flex-col justify-between h-[85px] relative overflow-hidden transition-all hover:shadow-md`}>
     <div className={`absolute left-0 top-0 w-1 h-full ${color}`}></div>
     <div>
-      <p className="text-[9px] font-bold text-[#9a8a7a] tracking-widest uppercase mb-1">{label}</p>
-      <p className="text-2xl font-bold text-[#3a2a1a]">{value}</p>
+      <p className="text-[10px] font-black text-[#9a8a7a] tracking-widest uppercase mb-0.5">{label}</p>
+      <p className="text-2xl font-black text-[#3a2a1a] leading-none">{value}</p>
     </div>
     <div className="mt-auto">
       {sub ? (
-        <p className={`text-[10px] font-bold ${sub.startsWith('+') ? 'text-green-600' : 'text-red-600'}`}>
-          {sub.startsWith('+') ? '\u25B2' : '\u25BC'} {sub}
+        <p className={`text-[10px] flex items-center gap-1 ${sub.startsWith('+') ? 'text-green-600' : 'text-red-600'}`}>
+          <span>{sub.startsWith('+') ? '\u25B2' : '\u25BC'}</span> {sub}
         </p>
       ) : (
-        <p className="text-[10px] invisible">&nbsp;</p>
+        <p className="text-[10px] invisible leading-none">&nbsp;</p>
       )}
     </div>
   </div>
@@ -43,10 +43,10 @@ export default function AnalyticsPage() {
   ];
 
   const chartMonths = [
-    { month: "Jan", val: 30, color: "bg-[#e8d5b0]" },
-    { month: "F\u00E9v", val: 45, color: "bg-[#d4b896]" },
-    { month: "Mar", val: 70, color: "bg-[#c8a87a]" },
-    { month: "Avr", val: 85, color: "bg-[#8B6914]" },
+    { month: t.janShort || "Jan", val: 30, color: "bg-[#e8d5b0]" },
+    { month: t.febShort || "Feb", val: 45, color: "bg-[#d4b896]" },
+    { month: t.marShort || "Mar", val: 70, color: "bg-[#c8a87a]" },
+    { month: t.aprShort || "Apr", val: 85, color: "bg-[#8B6914]" },
   ];
 
   return (

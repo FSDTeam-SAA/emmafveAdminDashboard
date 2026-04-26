@@ -9,7 +9,8 @@ import { toast } from "react-toastify";
 import ConfirmModal from "../components/common/ConfirmModal";
 
 const PartnerCard = React.memo(({ partner, isPending, onApprove, onReject, onView, onEdit, t }) => (
-  <div className="bg-[#fcfaf7] border border-[#e8ddd0] rounded-xl p-3 flex items-center justify-between hover:shadow-sm transition-all">
+  <div className="bg-[#fcfaf7] border border-[#e8ddd0] rounded-xl p-3 flex items-center justify-between hover:shadow-sm transition-all relative overflow-hidden">
+    <div className="absolute left-0 top-0 w-1 h-full bg-[#8B6914]"></div>
     <div className="flex items-center gap-3">
       <div className="w-10 h-10 rounded-lg bg-[#8B6914] flex items-center justify-center text-white text-lg font-bold shrink-0">
         {(partner.company || partner.firstName || 'P').charAt(0).toUpperCase()}
@@ -124,8 +125,8 @@ export default function PartnersPage() {
   const handleApprove = (id) => {
     setConfirmModal({
       isOpen: true,
-      title: "Approve Partner",
-      message: "Are you sure you want to approve this partner?",
+      title: t.approvePartnerTitle || "Approve Partner",
+      message: t.confirmApproveMessage || "Are you sure you want to approve this partner?",
       onConfirm: async () => {
         setConfirmLoading(true);
         try {
@@ -148,8 +149,8 @@ export default function PartnersPage() {
   const handleReject = (id) => {
     setConfirmModal({
       isOpen: true,
-      title: "Reject Partner",
-      message: "Are you sure you want to reject this partner?",
+      title: t.rejectPartnerTitle || "Reject Partner",
+      message: t.confirmRejectMessage || "Are you sure you want to reject this partner?",
       onConfirm: async () => {
         setConfirmLoading(true);
         try {
@@ -233,44 +234,44 @@ export default function PartnersPage() {
   };
 
   const partnerFields = [
-    { name: "firstName", label: "First Name", required: true },
-    { name: "lastName", label: "Last Name", required: true },
-    { name: "email", label: "Email", type: "email", required: true },
-    { name: "password", label: "Password", type: "password", required: true },
-    { name: "company", label: "Company Name", required: true },
-    { name: "phone", label: "Phone" },
-    { name: "address", label: "Address" },
+    { name: "firstName", label: t.firstName || "First Name", required: true },
+    { name: "lastName", label: t.lastName || "Last Name", required: true },
+    { name: "email", label: t.emailLabel || "Email", type: "email", required: true },
+    { name: "password", label: t.passwordLabel || "Password", type: "password", required: true },
+    { name: "company", label: t.companyName || "Company Name", required: true },
+    { name: "phone", label: t.phone || "Phone" },
+    { name: "address", label: t.address || "Address" },
   ];
 
   const editFields = [
-    { name: "firstName", label: "First Name", disabled: true },
-    { name: "lastName", label: "Last Name", disabled: true },
-    { name: "company", label: "Company Name", disabled: true },
+    { name: "firstName", label: t.firstName || "First Name", disabled: true },
+    { name: "lastName", label: t.lastName || "Last Name", disabled: true },
+    { name: "company", label: t.companyName || "Company Name", disabled: true },
     {
       name: "status",
-      label: "Status",
+      label: t.statusLabel || "Status",
       type: "select",
       required: true,
       options: [
-        { label: "Active", value: "active" },
-        { label: "Pending", value: "pending" },
-        { label: "Inactive", value: "inactive" },
-        { label: "Blocked", value: "blocked" },
-        { label: "Rejected", value: "rejected" },
-        { label: "Banned", value: "banned" }
+        { label: t.active || "Active", value: "active" },
+        { label: t.pending || "Pending", value: "pending" },
+        { label: t.inactive || "Inactive", value: "inactive" },
+        { label: t.blocked || "Blocked", value: "blocked" },
+        { label: t.rejected || "Rejected", value: "rejected" },
+        { label: t.banned || "Banned", value: "banned" }
       ]
     }
   ];
 
   const viewFields = [
-    { name: "firstName", label: "First Name", disabled: true },
-    { name: "lastName", label: "Last Name", disabled: true },
-    { name: "email", label: "Email", disabled: true },
-    { name: "company", label: "Company Name", disabled: true },
-    { name: "phone", label: "Phone", disabled: true },
-    { name: "address", label: "Address", disabled: true },
-    { name: "status", label: "Status", disabled: true },
-    { name: "createdAt", label: "Joined Date", disabled: true, type: "date" },
+    { name: "firstName", label: t.firstName || "First Name", disabled: true },
+    { name: "lastName", label: t.lastName || "Last Name", disabled: true },
+    { name: "email", label: t.emailLabel || "Email", disabled: true },
+    { name: "company", label: t.companyName || "Company Name", disabled: true },
+    { name: "phone", label: t.phone || "Phone", disabled: true },
+    { name: "address", label: t.address || "Address", disabled: true },
+    { name: "status", label: t.statusLabel || "Status", disabled: true },
+    { name: "createdAt", label: t.joinedDate || "Joined Date", disabled: true, type: "date" },
   ];
 
   return (
@@ -374,7 +375,7 @@ export default function PartnersPage() {
             <DataTable
               columns={[
                 {
-                  header: "PARTENAIRE",
+                  header: t.partnersLabel || "PARTNER",
                   cell: (p) => (
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded bg-[#8B6914] flex items-center justify-center text-white font-bold text-[10px]">
@@ -387,14 +388,14 @@ export default function PartnersPage() {
                     </div>
                   )
                 },
-                { header: "VILLE", accessor: "address" },
+                { header: t.cityLabel || "CITY", accessor: "address" },
                 {
-                  header: "MISSIONS",
+                  header: t.localMissions || "MISSIONS",
                   align: "center",
                   cell: (p) => <span className="font-bold">{p.totalMissions || 0}</span>
                 },
                 {
-                  header: "ACTIONS",
+                  header: t.actionsLabel || "ACTIONS",
                   align: "right",
                   cell: (p) => (
                     <div className="flex gap-1 justify-end">
@@ -430,7 +431,7 @@ export default function PartnersPage() {
       <CRUDModal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
-        title="Add New Partner"
+        title={t.addPartner || "Add Partner"}
         fields={partnerFields}
         onSubmit={handleAddPartner}
         loading={modalLoading}
@@ -442,7 +443,7 @@ export default function PartnersPage() {
           setIsEditModalOpen(false);
           setEditingUser(null);
         }}
-        title="Edit Partner Status"
+        title={t.updateStatusTitle || "Update Status"}
         fields={editFields}
         initialData={editingUser}
         onSubmit={handleEditPartner}
