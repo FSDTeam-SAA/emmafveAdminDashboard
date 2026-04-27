@@ -8,6 +8,7 @@ import FilterBar from "../components/common/FilterBar";
 import { toast } from "react-toastify";
 import ConfirmModal from "../components/common/ConfirmModal";
 import CRUDModal from "../components/common/CRUDModal";
+import { PawPrint, MapPin, FileText, User, X, Plus } from "lucide-react";
 
 export default function ReportsPage() {
   const { t } = useLang();
@@ -99,11 +100,8 @@ export default function ReportsPage() {
     }
   };
 
-  const getEmoji = (type) => {
-    const tp = type?.toLowerCase();
-    if (tp?.includes("dog") || tp?.includes("chien")) return "🐕";
-    if (tp?.includes("cat") || tp?.includes("chat")) return "🐈";
-    return "🐾";
+  const getIcon = (type) => {
+    return <PawPrint className="w-5 h-5 text-[#8B6914]" />;
   };
 
   const handleCreateReport = async (formData) => {
@@ -171,7 +169,7 @@ export default function ReportsPage() {
             {r.images?.[0]?.secure_url ? (
               <img src={r.images[0].secure_url} alt={r.animalName} className="w-full h-full object-cover" />
             ) : (
-              getEmoji(r.species)
+              getIcon(r.species)
             )}
           </div>
           <div className="flex flex-col">
@@ -185,7 +183,7 @@ export default function ReportsPage() {
       header: t.type,
       cell: (r) => (
         <span className="flex items-center gap-1">
-          {getEmoji(r.species)} {r.species}
+          {getIcon(r.species)} {r.species}
         </span>
       )
     },
@@ -303,18 +301,18 @@ export default function ReportsPage() {
               options: [
                 { label: "Lost", value: "lost" },
                 { label: "Found", value: "found" },
-                { label: "Sightings", value: "sighting" },
-                { label: "Resolved", value: "resolved" }
+                { label: "Sighted", value: "sighted" },
+                { label: "Rescued", value: "rescued" }
               ]
             },
             {
               name: "species",
               label: t.allSpecies || "All species",
               options: [
-                { label: "Dog", value: "dog" },
-                { label: "Cat", value: "cat" },
-                { label: "Bird", value: "bird" },
-                { label: "Other", value: "other" }
+                { label: "Dog", value: "Dog" },
+                { label: "Cat", value: "Cat" },
+                { label: "Bird", value: "Bird" },
+                { label: "Other", value: "Other" }
               ]
             }
           ]}
@@ -329,7 +327,7 @@ export default function ReportsPage() {
               onClick={() => setIsAddModalOpen(true)}
               className="bg-[#8B6914] text-white text-[11px] font-bold px-4 py-2 rounded-xl hover:bg-[#6a5010] transition-colors flex items-center gap-2"
             >
-              <span>+</span> {t.createReport || "Create Report"}
+              <Plus className="w-4 h-4" /> {t.createReport || "Create Report"}
             </button>
           }
         />
@@ -355,10 +353,10 @@ export default function ReportsPage() {
           <div className="bg-white rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto custom-scrollbar shadow-2xl animate-in fade-in zoom-in duration-200">
             <div className="p-5 border-b border-[#f0e8d8] flex justify-between items-center sticky top-0 bg-white z-10">
               <h2 className="text-xl font-bold text-[#3a2a1a] flex items-center gap-2">
-                <span>🐾</span> Détails du signalement: {selectedReport.title}
+                <PawPrint className="w-6 h-6 text-[#8B6914]" /> Détails du signalement: {selectedReport.title}
               </h2>
               <button onClick={() => setIsModalOpen(false)} className="text-[#9a8a7a] hover:text-[#3a2a1a] transition-colors p-1">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                <X className="w-6 h-6" />
               </button>
             </div>
 
@@ -369,14 +367,14 @@ export default function ReportsPage() {
                     {selectedReport.images?.[0]?.secure_url ? (
                       <img src={selectedReport.images[0].secure_url} alt="Report" className="w-full h-full object-cover" />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center text-6xl">{getEmoji(selectedReport.species)}</div>
+                      <div className="w-full h-full flex items-center justify-center text-6xl text-[#8B6914] opacity-20"><PawPrint className="w-24 h-24" /></div>
                     )}
                   </div>
                 </div>
 
                 <div className="flex flex-col gap-4">
                   <h3 className="font-bold text-[#3a2a1a] border-b pb-2 flex items-center gap-2">
-                    <span>📝</span> Infos Signalement
+                    <FileText className="w-4 h-4 text-[#8B6914]" /> Infos Signalement
                   </h3>
                   <div className="grid grid-cols-2 gap-y-3 text-sm">
                     <span className="text-[#9a8a7a]">Espèce:</span><span className="font-medium text-[#3a2a1a]">{selectedReport.species}</span>
@@ -391,7 +389,7 @@ export default function ReportsPage() {
 
               <div className="flex flex-col gap-2 bg-[#fcfaf7] p-4 rounded-xl border border-[#e8ddd0]">
                 <h3 className="font-bold text-[#3a2a1a] text-sm flex items-center gap-2">
-                  <span>📍</span> Localisation
+                  <MapPin className="w-4 h-4 text-[#8B6914]" /> Localisation
                 </h3>
                 <p className="text-sm text-[#5a4a3a] leading-relaxed">{selectedReport.location?.address || "Adresse non fournie"}</p>
               </div>
@@ -403,7 +401,7 @@ export default function ReportsPage() {
 
               <div className="flex flex-col gap-4">
                 <h3 className="font-bold text-[#3a2a1a] border-b pb-2 flex items-center gap-2">
-                  <span>👤</span> Signalé par
+                  <User className="w-4 h-4 text-[#8B6914]" /> Signalé par
                 </h3>
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-full bg-[#8B6914] text-white flex items-center justify-center text-lg font-bold overflow-hidden border-2 border-white shadow-sm">

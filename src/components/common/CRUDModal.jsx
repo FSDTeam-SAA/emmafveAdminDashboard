@@ -4,6 +4,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import axios from 'axios';
 import { useLang } from '../../context/LanguageContext';
+import { Search, X, Image as ImageIcon } from 'lucide-react';
 
 // Fix for default marker icon in Leaflet + React
 delete L.Icon.Default.prototype._getIconUrl;
@@ -88,7 +89,7 @@ const LocationPicker = ({ lat, lng, onChange }) => {
           }}
           className="w-full bg-[#fcfaf7] border border-[#e8ddd0] rounded-lg pl-8 pr-20 py-1.5 text-[10px] text-[#3a2a1a] outline-none focus:border-[#8B6914] transition-all font-medium"
         />
-        <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs opacity-40">🔍</span>
+        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-[#9a8a7a]" />
         <button 
           type="button"
           onClick={handleSearch}
@@ -230,9 +231,7 @@ const CRUDModal = ({ title, fields, initialData, isOpen, onClose, onSubmit, load
             onClick={onClose}
             className="text-[#9a8a7a] hover:text-[#3a2a1a] transition-all p-1.5 hover:bg-[#f5f0e8] rounded-full"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <X className="w-5 h-5" />
           </button>
         </div>
 
@@ -316,9 +315,7 @@ const CRUDModal = ({ title, fields, initialData, isOpen, onClose, onSubmit, load
                           />
                         )}
                         <div className={`w-10 h-10 bg-[#f5f0e8] rounded-lg flex items-center justify-center text-[#8B6914] transition-all ${!isViewOnly && 'group-hover:bg-[#8B6914] group-hover:text-white'}`}>
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                          </svg>
+                          <ImageIcon className="w-5 h-5" />
                         </div>
                         <div className="flex flex-col">
                           <p className="text-xs font-black text-[#3a2a1a] truncate max-w-[200px]">{formData[field.name]?.name || (initialData ? (t.existingPhoto || "Existing Photo") : (t.uploadPhoto || "Upload photo"))}</p>

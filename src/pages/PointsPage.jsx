@@ -3,6 +3,7 @@ import { useLang } from "../context/LanguageContext";
 import StatCard from "../components/dashboard/StatCard";
 import api from "../utils/api";
 import { toast } from "react-toastify";
+import { MapPin, Target, Package, Ruler, Lightbulb, Settings, Save } from "lucide-react";
 
 const ScaleItem = React.memo(({ icon, label, points, onChange, t, loading }) => (
   <div className="flex items-center justify-between p-4 border-b border-[#f0e8d8] last:border-0 hover:bg-[#fcfaf7] transition-all rounded-lg group">
@@ -86,9 +87,9 @@ export default function PointsPage() {
   };
 
   const scale = [
-    { key: "pointsPerReport", icon: "📍", label: t.animalReports || "SIGNALEMENT ANIMAUX", points: config?.pointsPerReport || 0 },
-    { key: "pointsPerMission", icon: "🎯", label: t.localMissionsLabel || "MISSIONS LOCALES", points: config?.pointsPerMission || 0 },
-    { key: "pointsPerDonation", icon: "📦", label: t.donationDeposits || "DÉPÔT DE DONS", points: config?.pointsPerDonation || 0 },
+    { key: "pointsPerReport", icon: <MapPin className="w-5 h-5 text-[#8B6914]" />, label: t.animalReports || "SIGNALEMENT ANIMAUX", points: config?.pointsPerReport || 0 },
+    { key: "pointsPerMission", icon: <Target className="w-5 h-5 text-[#8B6914]" />, label: t.localMissionsLabel || "MISSIONS LOCALES", points: config?.pointsPerMission || 0 },
+    { key: "pointsPerDonation", icon: <Package className="w-5 h-5 text-[#8B6914]" />, label: t.donationDeposits || "DÉPÔT DE DONS", points: config?.pointsPerDonation || 0 },
   ];
 
   const rules = [
@@ -158,7 +159,7 @@ export default function PointsPage() {
         <div className="lg:col-span-2 bg-white rounded-2xl border border-[#e8ddd0] flex flex-col overflow-hidden shadow-sm">
           <div className="p-5 border-b border-[#e8ddd0] bg-[#fcfaf7] flex items-center justify-between">
             <h3 className="font-bold text-[#3a2a1a] text-sm flex items-center gap-2 uppercase tracking-tight">
-              <span>📏</span> {t.pointsScale || "POINTS SCALE"}
+              <Ruler className="w-4 h-4 text-[#8B6914]" /> {t.pointsScale || "POINTS SCALE"}
             </h3>
             <div className="bg-[#8B6914]/10 text-[#8B6914] text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-wider">{t.globalConfig || "GLOBAL CONFIGURATION"}</div>
           </div>
@@ -175,10 +176,10 @@ export default function PointsPage() {
           </div>
           <div className="p-6 mt-auto bg-[#fcfaf7] border-t border-[#e8ddd0]">
              <div className="bg-orange-50 border border-orange-100 p-4 rounded-xl flex gap-3 items-start">
-                <span className="text-xl">💡</span>
-                <p className="text-[10px] text-orange-800 font-bold leading-relaxed">
-                   {t.configUpdateMsg || "Changes to the scale will be applied immediately for all future user actions. Existing points will not be affected."}
-                </p>
+              <Lightbulb className="w-5 h-5 text-orange-600 shrink-0" />
+              <p className="text-[10px] text-orange-800 font-bold leading-relaxed">
+                 {t.configUpdateMsg || "Changes to the scale will be applied immediately for all future user actions. Existing points will not be affected."}
+              </p>
              </div>
           </div>
         </div>
@@ -187,7 +188,7 @@ export default function PointsPage() {
           {/* Usage Rules Card */}
           <div className="bg-white rounded-2xl border border-[#e8ddd0] flex flex-col p-6 gap-6 shadow-sm">
             <h3 className="font-bold text-[#3a2a1a] text-sm flex items-center gap-2 uppercase tracking-tight">
-              <span>⚙️</span> {t.usageRules || "USAGE RULES"}
+              <Settings className="w-4 h-4 text-[#8B6914]" /> {t.usageRules || "USAGE RULES"}
             </h3>
             <div className="flex flex-col gap-6">
               {rules.map((rule, i) => (
@@ -232,7 +233,7 @@ export default function PointsPage() {
           {saving ? (
             <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
           ) : (
-            <span>💾</span>
+            <Save className="w-4 h-4" />
           )}
           {t.saveBtn || "Save"}
         </button>

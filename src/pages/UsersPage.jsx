@@ -9,6 +9,7 @@ import FilterBar from "../components/common/FilterBar";
 import StatusBadge from "../components/common/StatusBadge";
 import { toast } from "react-toastify";
 import ConfirmModal from "../components/common/ConfirmModal";
+import { Star, Plus } from "lucide-react";
 
 export default function UsersPage() {
   const { t } = useLang();
@@ -149,7 +150,7 @@ export default function UsersPage() {
       header: t.points,
       cell: (user) => (
         <div className="flex items-center gap-1 font-bold">
-          <span className="text-orange-500">⭐</span> {user.points || user.pointsBalance || 0}
+          <Star className="w-3.5 h-3.5 text-orange-500 fill-orange-500" /> {user.points || user.pointsBalance || 0}
         </div>
       )
     },
@@ -277,7 +278,7 @@ export default function UsersPage() {
                 onClick={() => { setEditingUser(null); setIsModalOpen(true); }}
                 className="bg-[#8B6914] text-white text-[11px] font-bold px-4 py-2 rounded-xl hover:bg-[#6a5010] transition-colors flex items-center gap-2"
               >
-                <span>+</span> {t.addUser || "Add User"}
+                <Plus className="w-4 h-4" /> {t.addUser || "Add User"}
               </button>
             </div>
           }

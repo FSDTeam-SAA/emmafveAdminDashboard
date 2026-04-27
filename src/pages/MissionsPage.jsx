@@ -9,6 +9,7 @@ import FilterBar from "../components/common/FilterBar";
 import StatusBadge from "../components/common/StatusBadge";
 import { toast } from "react-toastify";
 import ConfirmModal from "../components/common/ConfirmModal";
+import { Target, Plus, X } from "lucide-react";
 
 export default function MissionsPage() {
   const { t } = useLang();
@@ -38,7 +39,7 @@ export default function MissionsPage() {
     setLoading(true);
     try {
       const q = { ...queryParams };
-      if (q.status === "all") delete q.status;
+      // Keep status even if "all" because backend defaults to "active"
       const queryString = new URLSearchParams(q).toString();
 
       const [missionsRes, statsRes] = await Promise.all([
@@ -154,7 +155,7 @@ export default function MissionsPage() {
             {m.photo?.secure_url ? (
               <img src={m.photo.secure_url} alt={m.title} className="w-full h-full object-cover" />
             ) : (
-              "🎯"
+              <Target className="w-5 h-5 text-[#8B6914]" />
             )}
           </div>
           <div className="flex flex-col">
@@ -259,7 +260,7 @@ export default function MissionsPage() {
               onClick={handleOpenAdd}
               className="bg-[#8B6914] text-white text-[11px] font-bold px-4 py-2 rounded-xl hover:bg-[#6a5010] transition-colors flex items-center gap-2"
             >
-              <span>+</span> {t.addMission}
+              <Plus className="w-4 h-4" /> {t.addMission}
             </button>
           }
         />
@@ -294,10 +295,10 @@ export default function MissionsPage() {
           <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto custom-scrollbar shadow-2xl animate-in fade-in zoom-in duration-200">
             <div className="p-5 border-b border-[#f0e8d8] flex justify-between items-center sticky top-0 bg-white z-10">
               <h2 className="text-xl font-bold text-[#3a2a1a] flex items-center gap-2">
-                <span>🎯</span> {t.viewBtn}: {selectedMission.title}
+                <Target className="w-5 h-5 text-[#8B6914]" /> {t.viewBtn}: {selectedMission.title}
               </h2>
               <button onClick={() => setIsViewModalOpen(false)} className="text-[#9a8a7a] hover:text-[#3a2a1a] transition-colors p-1">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                <X className="w-6 h-6" />
               </button>
             </div>
 

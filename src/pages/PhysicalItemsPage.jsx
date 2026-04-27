@@ -7,6 +7,7 @@ import Pagination from "../components/common/Pagination";
 import FilterBar from "../components/common/FilterBar";
 import { toast } from "react-toastify";
 import ConfirmModal from "../components/common/ConfirmModal";
+import { Gift, Trash2, Plus, Mail } from "lucide-react";
 
 const ItemSkeleton = () => (
   <div className="bg-white rounded-xl border border-[#e8ddd0] p-3 flex flex-col gap-2 animate-pulse h-[210px]">
@@ -29,7 +30,7 @@ const ItemCard = React.memo(({ item, onEdit, onDelete, t }) => (
       {item.photo?.secure_url ? (
         <img src={item.photo.secure_url} alt={item.title} className="w-full h-full object-cover" />
       ) : (
-        <span className="opacity-20 text-4xl">🎁</span>
+        <Gift className="w-10 h-10 text-[#8B6914] opacity-20" />
       )}
       {item.stock === 0 && (
         <div className="absolute inset-0 bg-white/60 backdrop-blur-[1px] flex items-center justify-center">
@@ -55,7 +56,7 @@ const ItemCard = React.memo(({ item, onEdit, onDelete, t }) => (
         onClick={() => onDelete(item._id)}
         className="px-2 py-1.5 rounded-xl bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
       >
-        <span className="text-xs">🗑️</span>
+        <Trash2 className="w-3.5 h-3.5" />
       </button>
     </div>
   </div>
@@ -322,7 +323,7 @@ export default function PhysicalItemsPage() {
               onClick={handleOpenAdd}
               className="bg-[#8B6914] text-white text-[11px] font-bold px-4 py-2 rounded-xl hover:bg-[#6a5010] transition-colors flex items-center gap-2"
             >
-              <span>+</span> {t.addItem}
+              <Plus className="w-4 h-4" /> {t.addItem}
             </button>
           }
         />
@@ -360,7 +361,7 @@ export default function PhysicalItemsPage() {
       <div className="bg-white rounded-xl border border-[#e8ddd0] overflow-hidden flex flex-col shadow-sm">
         <div className="p-4 border-b border-[#e8ddd0] flex items-center justify-between bg-[#fcfaf7]">
           <h3 className="font-bold text-[#3a2a1a] text-xs flex items-center gap-2">
-            <span>📫</span> {t.exchangeRequests}
+            <Mail className="w-4 h-4 text-[#8B6914]" /> {t.exchangeRequests}
           </h3>
         </div>
 

@@ -7,6 +7,7 @@ import Pagination from "../components/common/Pagination";
 import FilterBar from "../components/common/FilterBar";
 import { toast } from "react-toastify";
 import ConfirmModal from "../components/common/ConfirmModal";
+import { Medal, CheckCircle, ClipboardList, Plus } from "lucide-react";
 
 const PartnerCard = React.memo(({ partner, isPending, onApprove, onReject, onView, onEdit, t }) => (
   <div className="bg-[#fcfaf7] border border-[#e8ddd0] rounded-xl p-3 flex items-center justify-between hover:shadow-sm transition-all relative overflow-hidden">
@@ -300,7 +301,7 @@ export default function PartnersPage() {
         <div className="lg:col-span-1 bg-white rounded-xl border border-[#e8ddd0] p-4 flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <h3 className="font-bold text-[#3a2a1a] text-xs flex items-center gap-2">
-              <span>🏅</span> {t.pendingValidation}
+              <Medal className="w-4 h-4 text-[#8B6914]" /> {t.pendingValidation}
             </h3>
             <span className="bg-orange-100 text-orange-600 text-[10px] font-bold px-2 py-0.5 rounded-full">{pendingPartners.length}</span>
           </div>
@@ -328,7 +329,7 @@ export default function PartnersPage() {
             <div className="p-4 border-b border-[#e8ddd0] bg-[#fcfaf7] flex items-center justify-between">
               <h3 className="font-bold text-[#3a2a1a] text-xs flex items-center gap-2">
                 <span className={queryParams.status === 'active' ? "text-green-500" : "text-blue-500"}>
-                  {queryParams.status === 'active' ? "✅" : "📋"}
+                  {queryParams.status === 'active' ? <CheckCircle className="w-4 h-4" /> : <ClipboardList className="w-4 h-4" />}
                 </span>
                 {queryParams.status === 'all'
                   ? (t.allPartners || "All Partners")
@@ -352,7 +353,7 @@ export default function PartnersPage() {
                     { label: t.inactive, value: "inactive" },
                     { label: t.blocked || "Blocked", value: "blocked" },
                     { label: t.rejected, value: "rejected" },
-                    { label: t.banned, value: "banned" }
+                    { label: t.banned || "Banned", value: "banned" }
                   ]
                 }
               ]}
@@ -367,7 +368,7 @@ export default function PartnersPage() {
                   onClick={() => setIsAddModalOpen(true)}
                   className="bg-[#8B6914] text-white text-[11px] font-bold px-4 py-2 rounded-xl hover:bg-[#6a5010] transition-colors flex items-center gap-2"
                 >
-                  <span>+</span> {t.addPartner}
+                  <Plus className="w-4 h-4" /> {t.addPartner}
                 </button>
               }
             />

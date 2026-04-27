@@ -1,5 +1,6 @@
 import React from "react";
 import { useLang } from "../context/LanguageContext";
+import { BarChart3, Map } from "lucide-react";
 
 const AnalyticsCard = React.memo(({ label, value, sub, color }) => (
   <div className={`bg-white rounded-xl p-3 px-4 border border-[#e8ddd0] flex flex-col justify-between h-[85px] relative overflow-hidden transition-all hover:shadow-md`}>
@@ -64,7 +65,7 @@ export default function AnalyticsPage() {
         {/* Reports Chart Card */}
         <div className="lg:col-span-3 bg-white rounded-xl border border-[#e8ddd0] p-6 flex flex-col gap-6">
           <h3 className="font-bold text-[#3a2a1a] text-xs flex items-center gap-2">
-            <span>📊</span> {t.reportsMonth}
+            <BarChart3 className="w-4 h-4 text-[#8B6914]" /> {t.reportsMonth}
           </h3>
           <div className="flex items-end justify-between h-[180px] px-4 overflow-x-auto no-scrollbar">
             {chartMonths.map((m, i) => (
@@ -79,7 +80,7 @@ export default function AnalyticsPage() {
         {/* Zones Card */}
         <div className="lg:col-span-2 bg-white rounded-xl border border-[#e8ddd0] p-6 flex flex-col gap-6">
           <h3 className="font-bold text-[#3a2a1a] text-xs flex items-center gap-2">
-            <span>🗽</span> {t.activeZones}
+            <Map className="w-4 h-4 text-[#8B6914]" /> {t.activeZones}
           </h3>
           <div className="flex flex-col gap-5">
             {zones.map((z, i) => <ZoneRow key={i} {...z} />)}

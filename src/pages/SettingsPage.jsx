@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useLang } from "../context/LanguageContext";
+import { Users, Smartphone, Lock, Save, Plus } from "lucide-react";
 import api from "../utils/api";
 import ProfileModal from "../components/dashboard/ProfileModal";
 
@@ -37,7 +38,7 @@ export default function SettingsPage() {
         {/* Admin Team Card */}
         <div className="bg-white rounded-xl border border-[#e8ddd0] p-6 flex flex-col gap-5">
            <h3 className="font-bold text-[#3a2a1a] text-sm flex items-center gap-2">
-             <span>👥</span> {t.adminTeam}
+             <Users className="w-4 h-4 text-[#8B6914]" /> {t.adminTeam}
            </h3>
            <div className="flex flex-col gap-4">
               {admins.map((admin, i) => (
@@ -65,7 +66,7 @@ export default function SettingsPage() {
                 </div>
               ))}
               <button className="bg-[#f5f0e8] text-[#8B6914] text-[11px] font-bold py-3 rounded-xl border border-dashed border-[#8B6914] hover:bg-[#e8d5b0] transition-colors">
-                 + {t.inviteAdmin}
+                  <Plus className="w-4 h-4 inline-block mr-1" /> {t.inviteAdmin}
               </button>
            </div>
         </div>
@@ -73,7 +74,7 @@ export default function SettingsPage() {
         {/* Application Config Card */}
         <div className="bg-white rounded-xl border border-[#e8ddd0] p-6 flex flex-col gap-5">
            <h3 className="font-bold text-[#3a2a1a] text-sm flex items-center gap-2">
-             <span>📱</span> {t.application}
+             <Smartphone className="w-4 h-4 text-[#8B6914]" /> {t.application}
            </h3>
            <div className="flex flex-col gap-6">
                <div className="flex items-center justify-between">
@@ -110,7 +111,7 @@ export default function SettingsPage() {
         {/* Recent Logins Card */}
         <div className="bg-white rounded-xl border border-[#e8ddd0] p-6 flex flex-col gap-5">
            <h3 className="font-bold text-[#3a2a1a] text-sm flex items-center gap-2">
-             <span>🔒</span> {t.recentLogins}
+             <Lock className="w-4 h-4 text-[#8B6914]" /> {t.recentLogins}
            </h3>
            <div className="flex flex-col gap-4">
               {logins.map((login, i) => (
@@ -128,7 +129,7 @@ export default function SettingsPage() {
 
       <div className="flex">
           <button className="bg-[#8B6914] text-white text-[12px] font-bold px-6 py-2.5 rounded-xl hover:bg-[#6a5010] transition-colors flex items-center gap-2">
-             <span>💾</span> {t.saveChanges}
+             <Save className="w-4 h-4" /> {t.saveChanges}
           </button>
       </div>
 

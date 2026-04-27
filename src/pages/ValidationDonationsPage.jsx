@@ -4,6 +4,7 @@ import StatCard from "../components/dashboard/StatCard";
 import api from "../utils/api";
 import { socket } from "../context/SocketContect";
 import Pagination from "../components/common/Pagination";
+import { Package, MapPin, Search, Trophy, BarChart3, AlertTriangle, X } from "lucide-react";
 
 import CRUDModal from "../components/common/CRUDModal";
 import { toast } from "react-toastify";
@@ -15,7 +16,7 @@ const PendingDonation = React.memo(({ item, onAction, onEnlarge, t }) => (
           <div className="w-12 h-12 rounded-lg bg-white border border-[#e8ddd0] flex items-center justify-center text-2xl overflow-hidden shrink-0">
             {item.photo?.secure_url ? (
               <img src={item.photo.secure_url} alt="Proof" className="w-full h-full object-cover" />
-            ) : "📦"}
+            ) : <Package className="w-6 h-6 text-[#9a8a7a]" />}
           </div>
           <div>
              <h4 className="text-sm font-bold text-[#3a2a1a]">
@@ -32,7 +33,7 @@ const PendingDonation = React.memo(({ item, onAction, onEnlarge, t }) => (
     
     <div className="bg-[#f5f0e8] rounded-lg p-3 text-[11px] text-[#5a4a3a] flex flex-col gap-1">
        <div><span className="font-bold">{t.declaredQuantity}</span> {item.amount}</div>
-       {item.collectionPoint?.address && <div className="text-[10px] italic">📍 {item.collectionPoint.address}</div>}
+       {item.collectionPoint?.address && <div className="text-[10px] italic flex items-center gap-1"><MapPin className="w-3 h-3" /> {item.collectionPoint.address}</div>}
     </div>
 
     <div className="flex gap-2">
@@ -40,7 +41,7 @@ const PendingDonation = React.memo(({ item, onAction, onEnlarge, t }) => (
          onClick={() => item.photo?.secure_url && onEnlarge(item.photo.secure_url)}
          className="flex-1 bg-white border border-[#e8ddd0] text-[#3a2a1a] text-[10px] font-bold py-2 rounded-xl hover:bg-[#f5f0e8] transition-colors flex items-center justify-center gap-2"
        >
-          <span>🔍</span> {t.enlargePhoto || "Enlarge photo"}
+          <Search className="w-3.5 h-3.5" /> {t.enlargePhoto || "Enlarge photo"}
        </button>
        <button 
          onClick={() => onAction(item._id, 'validate')}
@@ -212,7 +213,7 @@ export default function ValidationDonationsPage() {
          <div className="lg:col-span-2 flex flex-col gap-6">
             <div className="flex items-center justify-between px-2">
                <h3 className="font-bold text-[#3a2a1a] text-sm flex items-center gap-2">
-                 🏆 {t.donsPendingVal}
+                 <Trophy className="w-4 h-4 text-[#8B6914]" /> {t.donsPendingVal}
                </h3>
                <span className="text-[10px] text-[#9a8a7a] font-bold">{meta?.total || 0} {t.pending}</span>
             </div>
@@ -246,7 +247,7 @@ export default function ValidationDonationsPage() {
             {/* Deposits Stats */}
             <div className="bg-white rounded-xl border border-[#e8ddd0] p-5 flex flex-col gap-5">
                <h3 className="font-bold text-[#3a2a1a] text-xs flex items-center gap-2">
-                 📊 {t.depositsThisMonth}
+                 <BarChart3 className="w-4 h-4 text-[#8B6914]" /> {t.depositsThisMonth}
                </h3>
                  <div className="flex flex-col gap-4">
                    {(stats?.depositsByCategory?.length > 0 ? stats.depositsByCategory : [
@@ -272,7 +273,7 @@ export default function ValidationDonationsPage() {
             {/* Refusal Reasons */}
             <div className="bg-red-50 border border-red-100 rounded-xl p-5 flex flex-col gap-4">
                <h3 className="font-bold text-red-800 text-xs flex items-center gap-2">
-                 ⚠️ {t.refusalReasons}
+                 <AlertTriangle className="w-4 h-4 text-red-600" /> {t.refusalReasons}
                </h3>
                 <div className="flex flex-col gap-2">
                    {(stats?.refusalReasons?.length > 0 ? stats.refusalReasons : [
@@ -317,7 +318,7 @@ export default function ValidationDonationsPage() {
             className="absolute top-4 right-4 text-white hover:text-gray-300 transition-colors p-2"
             onClick={() => setImageModal({ isOpen: false, url: null })}
           >
-            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            <X className="w-8 h-8" />
           </button>
         </div>
       )}

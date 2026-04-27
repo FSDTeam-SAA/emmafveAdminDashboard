@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLang } from "../../context/LanguageContext";
 import api from "../../utils/api";
+import { Rocket } from "lucide-react";
 
 export default function CrowdfundingCard() {
   const { t } = useLang();
@@ -31,7 +32,7 @@ export default function CrowdfundingCard() {
   return (
     <div className="bg-white rounded-xl p-4 border border-[#e8ddd0]">
       <h3 className="text-[13px] font-bold text-[#3a2a1a] flex items-center gap-1.5 mb-3">
-        🚀 {t.crowdfunding}
+        <Rocket className="w-4 h-4 text-orange-500" /> {t.crowdfunding}
       </h3>
 
       <p className="text-3xl font-bold text-orange-500 leading-none">

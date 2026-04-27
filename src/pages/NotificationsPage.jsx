@@ -3,6 +3,7 @@ import { useLang } from "../context/LanguageContext";
 import api from "../utils/api";
 
 import ConfirmModal from "../components/common/ConfirmModal";
+import { Bell, Coins, Target, MapPin, Megaphone, Rocket, ClipboardList } from "lucide-react";
 
 const NotifItem = React.memo(({ icon, title, sub, stats, date, isRead, onClick }) => (
   <div 
@@ -10,8 +11,8 @@ const NotifItem = React.memo(({ icon, title, sub, stats, date, isRead, onClick }
     className={`border rounded-xl p-3 flex items-center justify-between transition-all cursor-pointer ${isRead ? 'bg-[#fcfaf7] border-[#e8ddd0] opacity-80' : 'bg-white border-[#8B6914] shadow-sm hover:shadow-md'}`}
   >
     <div className="flex items-center gap-3">
-      <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-lg ${isRead ? 'bg-[#e8ddd0]' : 'bg-[#8B6914] text-white'}`}>
-        {icon || "🔔"}
+      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isRead ? 'bg-[#e8ddd0]' : 'bg-[#8B6914] text-white'}`}>
+        {icon || <Bell className="w-5 h-5" />}
       </div>
       <div>
         <h4 className={`text-sm ${isRead ? 'font-medium text-[#5a4a3a]' : 'font-bold text-[#3a2a1a]'}`}>{title}</h4>
@@ -58,12 +59,12 @@ export default function NotificationsPage() {
     fetchNotifications();
   }, [viewMode]);
 
-  const getEmoji = (type) => {
+  const getIcon = (type) => {
     switch (type) {
-      case "points_earned": return "💰";
-      case "new_mission": return "🎯";
-      case "report_update": return "📍";
-      default: return "🔔";
+      case "points_earned": return <Coins className="w-5 h-5" />;
+      case "new_mission": return <Target className="w-5 h-5" />;
+      case "report_update": return <MapPin className="w-5 h-5" />;
+      default: return <Bell className="w-5 h-5" />;
     }
   };
 
@@ -87,7 +88,7 @@ export default function NotificationsPage() {
         {/* Create Alert Form */}
         <div className="col-span-3 bg-white rounded-xl border border-[#e8ddd0] p-6 flex flex-col gap-5">
            <h3 className="font-bold text-[#3a2a1a] text-xs flex items-center gap-2">
-             <span>📣</span> {t.createAlert}
+             <Megaphone className="w-4 h-4 text-[#8B6914]" /> {t.createAlert}
            </h3>
            <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-1.5">
@@ -112,7 +113,7 @@ export default function NotificationsPage() {
                  />
               </div>
               <button className="bg-[#8B6914] text-white text-[11px] font-bold py-3 rounded-xl hover:bg-[#6a5010] transition-colors flex items-center justify-center gap-2">
-                 <span>🚀</span> {t.sendAlert}
+                  <Rocket className="w-4 h-4" /> {t.sendAlert}
               </button>
            </div>
         </div>
@@ -120,9 +121,9 @@ export default function NotificationsPage() {
         {/* History Card */}
         <div className="col-span-2 bg-white rounded-xl border border-[#e8ddd0] p-4 flex flex-col gap-4">
            <div className="flex items-center justify-between">
-             <h3 className="font-bold text-[#3a2a1a] text-xs flex items-center gap-2">
-               <span>📋</span> {t.notifHistory}
-             </h3>
+              <h3 className="font-bold text-[#3a2a1a] text-xs flex items-center gap-2">
+                <ClipboardList className="w-4 h-4 text-[#8B6914]" /> {t.notifHistory}
+              </h3>
              <div className="flex gap-1 bg-[#fcfaf7] border border-[#e8ddd0] p-1 rounded-lg">
                <button
                  onClick={() => setViewMode("my")}
@@ -143,7 +144,7 @@ export default function NotificationsPage() {
               {history.map((item) => (
                 <NotifItem 
                   key={item._id} 
-                  icon={getEmoji(item.type)}
+                  icon={getIcon(item.type)}
                   title={item.title}
                   sub={item.description}
                   date={item.createdAt}
@@ -168,7 +169,7 @@ export default function NotificationsPage() {
             <div className="flex flex-col gap-4 mt-2 text-left">
               <div className="flex items-center gap-3">
                 <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#8B6914] to-[#c0501a] flex items-center justify-center text-3xl shadow-lg shrink-0 text-white">
-                  {getEmoji(selectedNotif.type)}
+                  {getIcon(selectedNotif.type)}
                 </div>
                 <div className="flex-1">
                   <h3 className="font-bold text-[#3a2a1a] text-lg leading-tight">{selectedNotif.title}</h3>

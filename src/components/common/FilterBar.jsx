@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLang } from '../../context/LanguageContext';
+import { Search } from 'lucide-react';
 
 const FilterBar = ({
   onSearch,
@@ -39,7 +40,7 @@ const FilterBar = ({
             onChange={(e) => setSearchTerm(e.target.value)}
             className="bg-[#fcfaf7] border border-[#e8ddd0] rounded-full pl-10 pr-4 py-2.5 text-xs text-[#3a2a1a] outline-none focus:border-[#8B6914] focus:ring-2 focus:ring-[#8B6914]/10 transition-all w-72 shadow-sm"
           />
-          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm opacity-50">🔍</span>
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-sm opacity-50 w-4 h-4 text-[#9a8a7a]" />
         </div>
 
         {/* Dynamic Filters */}

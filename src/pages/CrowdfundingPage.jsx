@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useLang } from "../context/LanguageContext";
 import api from "../utils/api";
 import DataTable from "../components/common/DataTable";
+import { Scroll } from "lucide-react";
 
 export default function CrowdfundingPage() {
   const { t, lang } = useLang();
@@ -105,7 +106,7 @@ export default function CrowdfundingPage() {
       <div className="bg-white rounded-xl border border-[#e8ddd0] overflow-hidden shadow-sm">
         <div className="p-4 border-b border-[#e8ddd0] bg-[#fcfaf7]">
           <h3 className="font-bold text-[#3a2a1a] text-xs flex items-center gap-2">
-            <span>📜</span> {t.donorsList}
+            <Scroll className="w-4 h-4 text-[#8B6914]" /> {t.donorsList}
           </h3>
         </div>
         

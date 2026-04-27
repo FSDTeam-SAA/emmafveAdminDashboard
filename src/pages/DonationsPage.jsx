@@ -4,6 +4,7 @@ import StatCard from "../components/dashboard/StatCard";
 import api from "../utils/api";
 import Pagination from "../components/common/Pagination";
 import FilterBar from "../components/common/FilterBar";
+import DataTable from "../components/common/DataTable";
 import { toast } from "react-toastify";
 import { FileText, X, Mail, Printer, CreditCard, Package, Wallet, Download } from "lucide-react";
 
@@ -249,7 +250,14 @@ export default function DonationsPage() {
   const [stats, setStats] = useState(null);
   const [meta, setMeta] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [queryParams, setQueryParams] = useState({ page: 1, limit: 10, search: "", status: "" });
+  const [queryParams, setQueryParams] = useState({ 
+    page: 1, 
+    limit: 10, 
+    search: "", 
+    status: "", 
+    sortBy: "date", 
+    sort: "descending" 
+  });
   const [selectedDonation, setSelectedDonation] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isReceiptModalOpen, setIsReceiptModalOpen] = useState(false);
@@ -280,6 +288,8 @@ export default function DonationsPage() {
           page: queryParams.page,
           limit: queryParams.limit,
           search: queryParams.search,
+          sortBy: queryParams.sortBy,
+          sort: queryParams.sort,
           ...(queryParams.status && queryParams.status !== "all" ? { status: queryParams.status } : {})
         }).toString();
 
@@ -400,7 +410,7 @@ export default function DonationsPage() {
         <FilterBar
           onSearch={(val) => setQueryParams(p => ({ ...p, search: val, page: 1 }))}
           onFilterChange={(name, val) => setQueryParams(p => ({ ...p, [name]: val, page: 1 }))}
-          onSortChange={() => { }} // Not used yet
+          onSortChange={(sortBy, sort) => setQueryParams(p => ({ ...p, sortBy, sort, page: 1 }))}
           related={true}
           filters={[
             {
@@ -412,7 +422,12 @@ export default function DonationsPage() {
               ]
             }
           ]}
-          sortOptions={[]}
+          sortOptions={[
+            { label: t.dateDesc || "Date (Newest)", value: "date:descending" },
+            { label: t.dateAsc || "Date (Oldest)", value: "date:ascending" },
+            { label: t.ptsDesc || "Amount (Highest)", value: "amount:descending" },
+            { label: t.ptsAsc || "Amount (Lowest)", value: "amount:ascending" }
+          ]}
           actionButton={
             <button className="bg-[#3a2a1a] text-white text-[11px] font-bold px-4 py-2 rounded-xl hover:bg-[#2a1a0a] transition-colors flex items-center gap-2">
               <Download className="w-4 h-4" /> {t.exportBtn}

@@ -4,6 +4,7 @@ import api from "../utils/api";
 import FilterBar from "../components/common/FilterBar";
 import Pagination from "../components/common/Pagination";
 import { toast } from "react-toastify";
+import { ShoppingBag, RefreshCw, Search } from "lucide-react";
 
 const ProductSkeleton = () => (
   <div className="bg-white rounded-xl border border-[#e8ddd0] p-3 flex flex-col gap-2 animate-pulse h-[290px]">
@@ -28,7 +29,7 @@ const ShopifyProductCard = ({ product, t }) => {
         {mainImage ? (
           <img src={mainImage} alt={product.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
         ) : (
-          <span className="opacity-20 text-4xl">🛍️</span>
+          <ShoppingBag className="w-10 h-10 text-[#8B6914] opacity-20" />
         )}
         <div className="absolute top-1.5 right-1.5">
           <span className="bg-[#3a2a1a]/80 backdrop-blur-sm text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase">
@@ -147,7 +148,7 @@ export default function ShopifyProductsPage() {
               disabled={loading}
               className="bg-[#8B6914] text-white text-[11px] font-bold px-4 py-2 rounded-xl hover:bg-[#6a5010] transition-colors flex items-center gap-2 disabled:opacity-50"
             >
-              <span className={loading ? "animate-spin inline-block" : ""}>&#x1F504;</span> Sync Shopify
+              <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} /> Sync Shopify
             </button>
           }
         />
@@ -162,7 +163,7 @@ export default function ShopifyProductsPage() {
               ))
             ) : (
               <div className="col-span-full py-20 text-center flex flex-col items-center gap-3">
-                <span className="text-4xl opacity-20">🔎</span>
+                <Search className="w-12 h-12 text-[#8B6914] opacity-20" />
                 <p className="text-[#9a8a7a] text-sm italic">{t.noItemsFound}</p>
               </div>
             )}

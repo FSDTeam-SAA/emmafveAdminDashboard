@@ -80,7 +80,7 @@ const CollectionPointsPage = React.memo(() => {
     setLoading(true);
     try {
       const q = { ...queryParams, type: "collection_point" };
-      if (q.status === "all") delete q.status;
+      // Keep status even if "all" because backend defaults to "active"
       const queryString = new URLSearchParams(q).toString();
 
       const res = await fetchWithCache(`/partner-ads/get-all-partner-ads?${queryString}`);

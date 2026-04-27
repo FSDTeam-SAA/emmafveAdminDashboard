@@ -1,4 +1,5 @@
 import React from 'react';
+import { AlertTriangle, X } from 'lucide-react';
 
 const ConfirmModal = ({ isOpen, title, message, onConfirm, onClose, loading }) => {
   if (!isOpen) return null;
@@ -8,16 +9,14 @@ const ConfirmModal = ({ isOpen, title, message, onConfirm, onClose, loading }) =
       <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
         <div className="p-5 border-b border-[#f0e8d8] flex justify-between items-center bg-[#fcfaf7]">
           <h2 className="text-lg font-bold text-[#3a2a1a] flex items-center gap-2">
-            ⚠️ {title || "Confirmation"}
+            <AlertTriangle className="w-5 h-5 text-red-600" /> {title || "Confirmation"}
           </h2>
           <button 
             onClick={onClose}
             className="text-[#9a8a7a] hover:text-[#3a2a1a] transition-colors p-1"
             disabled={loading}
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <X className="w-5 h-5" />
           </button>
         </div>
         

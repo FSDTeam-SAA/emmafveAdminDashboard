@@ -5,6 +5,7 @@ import { Outlet } from "react-router-dom";
 import { socket } from "../context/SocketContect";
 import { toast } from "react-toastify";
 import FCMListener from "../components/common/FCMListener";
+import { Bell } from "lucide-react";
 
 const DashboardLayout = React.memo(() => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -39,7 +40,7 @@ const DashboardLayout = React.memo(() => {
           pauseOnHover: true,
           draggable: true,
           theme: "light",
-          icon: "🔔",
+          icon: <Bell className="w-5 h-5 text-blue-600" />,
         }
       );
     };
