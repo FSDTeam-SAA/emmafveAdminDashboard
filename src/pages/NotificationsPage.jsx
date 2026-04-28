@@ -24,8 +24,8 @@ const NotifItem = React.memo(({ icon, title, sub, stats, date, isRead, onClick }
       {!isRead && <span className="w-2 h-2 bg-red-500 rounded-full"></span>}
       {stats && (
         <>
-          <p className="text-[10px] text-[#9a8a7a] font-bold">{stats.sent} envois \u00B7 Ouverture {stats.open}%</p>
-          <p className="text-[10px] text-[#9a8a7a] font-bold">Clics {stats.clicks}%</p>
+          <p className="text-[10px] text-[#9a8a7a] font-bold">{stats.sent} {t.sentCount || "sent"} \u00B7 {t.opening || "Open"} {stats.open}%</p>
+          <p className="text-[10px] text-[#9a8a7a] font-bold">{t.clicks || "Clicks"} {stats.clicks}%</p>
         </>
       )}
     </div>
@@ -167,10 +167,10 @@ export default function NotificationsPage() {
               <select
                 value={alertTarget}
                 onChange={(e) => setAlertTarget(e.target.value)}
-                className="bg-[#fcfaf7] border border-[#e8ddd0] rounded-xl px-3 py-2 text-xs text-[#3a2a1a] outline-none"
+                className="bg-[#fcfaf7] border border-[#e8ddd0] rounded-xl px-3 py-2 text-xs text-[#3a2a1a] outline-none hover:border-[#8B6914] transition-colors"
               >
-                <option value="all_france">Toute la France</option>
-                <option value="paca">Provence-Alpes-Côte d'Azur</option>
+                <option value="all_france">{t.allFrance || "Toute la France"}</option>
+                <option value="paca">{t.pacaRegion || "Provence-Alpes-Côte d'Azur"}</option>
               </select>
             </div>
             <div className="flex flex-col gap-1.5">
@@ -178,11 +178,11 @@ export default function NotificationsPage() {
               <select
                 value={alertRole}
                 onChange={(e) => setAlertRole(e.target.value)}
-                className="bg-[#fcfaf7] border border-[#e8ddd0] rounded-xl px-3 py-2 text-xs text-[#3a2a1a] outline-none"
+                className="bg-[#fcfaf7] border border-[#e8ddd0] rounded-xl px-3 py-2 text-xs text-[#3a2a1a] outline-none hover:border-[#8B6914] transition-colors"
               >
-                <option value="all">Tous</option>
-                <option value="user">Propriétaires</option>
-                <option value="partner">Partenaires</option>
+                <option value="all">{t.allRoles || "Tous"}</option>
+                <option value="user">{t.userRole || "Propriétaires"}</option>
+                <option value="partner">{t.partnerRole || "Partenaires"}</option>
               </select>
             </div>
             <div className="flex flex-col gap-1.5">
@@ -190,7 +190,7 @@ export default function NotificationsPage() {
               <textarea
                 value={alertMessage}
                 onChange={(e) => setAlertMessage(e.target.value)}
-                placeholder="Saisissez votre message d'alerte..."
+                placeholder={t.enterAlertMessage || "Enter your alert message..."}
                 className="bg-[#fcfaf7] border border-[#e8ddd0] rounded-xl px-3 py-2 text-xs text-[#3a2a1a] outline-none h-32 resize-none"
               />
             </div>

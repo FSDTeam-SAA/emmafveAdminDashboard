@@ -72,8 +72,8 @@ const Sidebar = React.memo(({ isOpen, setIsOpen }) => {
     
     // Listen to various events that should trigger a stats refresh
     socket.on("notification:new", handleRefetch);
-    socket.on("report:new", handleRefetch);
-    socket.on("donation:new", handleRefetch);
+    socket.on("report_new", handleRefetch);
+    socket.on("donation_new", handleRefetch);
     window.addEventListener("refetch-stats", handleRefetch);
 
     // Refresh stats every minute
@@ -82,8 +82,8 @@ const Sidebar = React.memo(({ isOpen, setIsOpen }) => {
     return () => {
       clearInterval(interval);
       socket.off("notification:new", handleRefetch);
-      socket.off("report:new", handleRefetch);
-      socket.off("donation:new", handleRefetch);
+      socket.off("report_new", handleRefetch);
+      socket.off("donation_new", handleRefetch);
       window.removeEventListener("refetch-stats", handleRefetch);
     };
   }, [fetchStats]);

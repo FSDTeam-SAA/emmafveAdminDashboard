@@ -67,13 +67,13 @@ export default function ReportsPage() {
 
     // Live updates for reports
     const handleUpdate = () => fetchData();
-    socket.on("report:new", handleUpdate);
-    socket.on("report:updated", handleUpdate);
+    socket.on("report_new", handleUpdate);
+    socket.on("report_updated", handleUpdate);
     window.addEventListener("refetch-reports", handleUpdate);
 
     return () => {
-      socket.off("report:new", handleUpdate);
-      socket.off("report:updated", handleUpdate);
+      socket.off("report_new", handleUpdate);
+      socket.off("report_updated", handleUpdate);
       window.removeEventListener("refetch-reports", handleUpdate);
     };
   }, [fetchData]);

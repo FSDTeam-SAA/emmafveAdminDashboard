@@ -63,7 +63,7 @@ const Topbar = React.memo(({ onToggleSidebar }) => {
     "/items": { title: t.physicalItems, sub: s ? `${(s.items?.total || 0).toLocaleString()} ${t.itemsInCatalog}` : t.itemsSub },
     "/donations": { title: t.donations, sub: donationsStats ? `${(donationsStats.totalDonations || donationsStats.total || 0).toLocaleString()} ${t.donationsCount} · ${(donationsStats.totalCollected || 0).toLocaleString()}€` : t.donationsSub },
     "/validation-donations": { title: t.validationDonationsTitle || "Donation Validation", sub: s ? `${(s.donationProofs?.pending || 0).toLocaleString()} ${t.pendingCountLabel}` : t.valDonationsSub },
-    "/crowdfunding": { title: t.crowdfunding, sub: s ? `${(s.crowdfunding?.totalCollected || 0).toLocaleString()}€ ${t.collected}` : t.crowdSub },
+    "/crowdfunding": { title: `${t.crowdfunding} (${t.futureLaunch})`, sub: s ? `${(s.crowdfunding?.totalCollected || 0).toLocaleString()}€ ${t.collected}` : t.crowdSub },
     "/analytics": { title: t.analytics, sub: t.analyticsSub },
     "/notifications": { title: t.notifications, sub: s ? `${(s.notifications?.total || 0).toLocaleString()} ${t.sentCount}` : t.notifsSub },
     "/settings": { title: t.settings, sub: t.settingsSub },
@@ -167,6 +167,17 @@ const Topbar = React.memo(({ onToggleSidebar }) => {
     }
   };
 
+  const handleMarkAllAsRead = async () => {
+    if (unreadCount === 0) return;
+    try {
+      await api.patch("/notifications/mark-as-read/all");
+      setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+      setUnreadCount(0);
+    } catch (err) {
+      console.error("Failed to mark all notifications as read", err);
+    }
+  };
+
   const handleProfileUpdate = async () => {
     // Refresh profile data globally after successful update
     try {
@@ -233,18 +244,28 @@ const Topbar = React.memo(({ onToggleSidebar }) => {
             <div className="absolute top-10 right-0 w-80 bg-white border border-[#e8ddd0] rounded-xl shadow-2xl z-50 overflow-hidden flex flex-col">
               <div className="bg-[#f5f0e8] px-4 py-3 border-b border-[#e8ddd0] flex justify-between items-center">
                 <h3 className="font-bold text-[#3a2a1a] text-sm">{t.notifications}</h3>
-                <Link
-                  to="/notifications"
-                  onClick={() => setShowNotifs(false)}
-                  className="text-[10px] font-bold text-[#8B6914] hover:underline"
-                >
-                  {t.viewAll}
-                </Link>
+                <div className="flex gap-3 items-center">
+                  {unreadCount > 0 && (
+                    <button
+                      onClick={handleMarkAllAsRead}
+                      className="text-[10px] font-bold text-[#8B6914] hover:underline cursor-pointer"
+                    >
+                      {t.markAllRead || "Mark all read"}
+                    </button>
+                  )}
+                  <Link
+                    to="/notifications"
+                    onClick={() => setShowNotifs(false)}
+                    className="text-[10px] font-bold text-[#8B6914] hover:underline"
+                  >
+                    {t.viewAll}
+                  </Link>
+                </div>
               </div>
 
               <div className="max-h-80 overflow-y-auto flex flex-col">
-                {notifications.length > 0 ? (
-                  notifications.map((notif) => (
+                {notifications.filter(n => !n.isRead).length > 0 ? (
+                  notifications.filter(n => !n.isRead).map((notif) => (
                     <div
                       key={notif._id}
                       onClick={() => handleMarkAsRead(notif._id, notif.isRead)}

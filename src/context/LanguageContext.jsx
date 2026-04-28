@@ -225,6 +225,7 @@ const translations = {
     dashboardSub: "Dashboard — Hesteka Admin",
     newReport: "New Report",
     viewAll: "View All",
+    markAllRead: "Mark all read",
     noNotifs: "No recent notifications",
     // Profile Modal
     firstName: "First Name",
@@ -407,6 +408,8 @@ const translations = {
     donorsList: "Donors List",
     counterpart: "COUNTERPART",
     confirmed: "Confirmed",
+    collected: "collected",
+    futureLaunch: "Future launch",
     // Analytics Page
     analyticsTitle: "Analytics",
     analyticsSub: "Global performance",
@@ -428,6 +431,11 @@ const translations = {
     userType: "USER TYPE",
     message: "MESSAGE",
     sendAlert: "Send alert",
+    allFrance: "All France",
+    pacaRegion: "PACA Region (South France)",
+    opening: "Open",
+    clicks: "Clicks",
+    enterAlertMessage: "Enter your alert message...",
     notifHistory: "Notification history",
     // Settings Page
     settingsTitle: "Settings",
@@ -684,6 +692,7 @@ const translations = {
     dashboardSub: "Tableau de bord \u2014 Hesteka Admin",
     newReport: "Nouveau signalement",
     viewAll: "Voir tout",
+    markAllRead: "Tout marquer lu",
     noNotifs: "Aucune notification r\u00E9cente",
     firstName: "Pr\u00E9nom",
     lastName: "Nom",
@@ -859,6 +868,8 @@ const translations = {
     donorsList: "Liste des donateurs",
     counterpart: "CONTREPARTIE",
     confirmed: "Confirm\u00E9",
+    collected: "collect\u00E9s",
+    futureLaunch: "Lancement futur",
     // Analytics Page
     analyticsTitle: "Analytics",
     analyticsSub: "Performances globales",
@@ -880,6 +891,11 @@ const translations = {
     userType: "TYPE D'UTILISATEURS",
     message: "MESSAGE",
     sendAlert: "Envoyer l'alerte",
+    allFrance: "Toute la France",
+    pacaRegion: "Provence-Alpes-Côte d'Azur",
+    opening: "Ouverture",
+    clicks: "Clics",
+    enterAlertMessage: "Saisissez votre message d'alerte...",
     notifHistory: "Historique des notifications",
     // Settings Page
     settingsTitle: "Param\u00E8tres",
