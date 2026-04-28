@@ -69,6 +69,7 @@ const Topbar = React.memo(({ onToggleSidebar }) => {
     "/settings": { title: t.settings, sub: t.settingsSub },
     "/contacts": { title: t.contacts, sub: contactsStats ? `${(contactsStats.all || 0).toLocaleString()} ${t.contacts?.toLowerCase()} · ${(contactsStats.active || 0).toLocaleString()} ${t.active?.toLowerCase()}` : "Manage contacts" },
     "/shopify-products": { title: t.shopifyProducts, sub: "Manage Shopify products" },
+    "/faq": { title: t.faqTitle || "FAQ", sub: t.faqSub || "Manage FAQ content" },
   };
 
   const page = PAGE_TITLES[location.pathname] || { title: t.dashboard || "Dashboard", sub: "HESTEKA Admin" };

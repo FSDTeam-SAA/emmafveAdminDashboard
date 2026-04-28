@@ -3,10 +3,17 @@ import { useLang } from "../context/LanguageContext";
 import { Users, Smartphone, Lock, Save, Plus } from "lucide-react";
 import api from "../utils/api";
 import ProfileModal from "../components/dashboard/ProfileModal";
+import { toast } from "react-toastify";
 
 export default function SettingsPage() {
   const { t } = useLang();
   
+  const [settings, setSettings] = useState({
+    supportEmail: "",
+    platformName: "",
+    maintenanceMode: false
+  });
+  const [savingSettings, setSavingSettings] = useState(false);
   const [admins, setAdmins] = useState([]);
   const [selectedAdmin, setSelectedAdmin] = useState(null);
 
@@ -21,9 +28,34 @@ export default function SettingsPage() {
     }
   };
 
+  const fetchSettings = async () => {
+    try {
+      const res = await api.get("/settings");
+      if (res.data.status === "ok") {
+        setSettings(res.data.data);
+      }
+    } catch (err) {
+      console.error("Failed to fetch settings", err);
+    }
+  };
+
   useEffect(() => {
     fetchAdmins();
+    fetchSettings();
   }, []);
+
+  const handleSaveSettings = async () => {
+    setSavingSettings(true);
+    try {
+      await api.patch("/settings", settings);
+      toast.success(`${t.supportEmailLabel} is now ${settings.supportEmail}`);
+    } catch (err) {
+      console.error("Failed to save settings", err);
+      toast.error("Failed to update settings");
+    } finally {
+      setSavingSettings(false);
+    }
+  };
 
   const logins = [
     { type: "Connexion admin \u2014 Emma", time: "Aujourd'hui 10h04", color: "bg-green-500" },
@@ -71,6 +103,44 @@ export default function SettingsPage() {
            </div>
         </div>
 
+        {/* Support Settings Card */}
+        <div className="bg-white rounded-xl border border-[#e8ddd0] p-6 flex flex-col gap-5">
+           <h3 className="font-bold text-[#3a2a1a] text-sm flex items-center gap-2">
+             <Save className="w-4 h-4 text-[#8B6914]" /> {t.supportSettings}
+           </h3>
+           <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-1.5">
+                 <label className="text-[10px] font-bold text-[#9a8a7a] uppercase">{t.platformNameLabel}</label>
+                 <input 
+                    type="text"
+                    value={settings.platformName}
+                    onChange={(e) => setSettings({...settings, platformName: e.target.value})}
+                    placeholder="Hesteka"
+                    className="bg-[#fcfaf7] border border-[#e8ddd0] rounded-xl px-3 py-2 text-xs outline-none focus:border-[#8B6914]"
+                 />
+                 <p className="text-[8px] text-[#9a8a7a] italic">{t.platformNameSub}</p>
+              </div>
+              <div className="flex flex-col gap-1.5">
+                 <label className="text-[10px] font-bold text-[#9a8a7a] uppercase">{t.supportEmailLabel}</label>
+                 <input 
+                    type="email"
+                    value={settings.supportEmail}
+                    onChange={(e) => setSettings({...settings, supportEmail: e.target.value})}
+                    placeholder="support@hesteka.com"
+                    className="bg-[#fcfaf7] border border-[#e8ddd0] rounded-xl px-3 py-2 text-xs outline-none focus:border-[#8B6914]"
+                 />
+                 <p className="text-[8px] text-[#9a8a7a] italic">{t.supportEmailSub}</p>
+              </div>
+              <button 
+                onClick={handleSaveSettings}
+                disabled={savingSettings}
+                className="mt-2 bg-[#8B6914] text-white text-[11px] font-bold py-2.5 rounded-xl hover:bg-[#6a5010] transition-colors disabled:opacity-50"
+              >
+                {savingSettings ? t.saving : t.saveChanges}
+              </button>
+           </div>
+        </div>
+
         {/* Application Config Card */}
         <div className="bg-white rounded-xl border border-[#e8ddd0] p-6 flex flex-col gap-5">
            <h3 className="font-bold text-[#3a2a1a] text-sm flex items-center gap-2">
@@ -91,8 +161,15 @@ export default function SettingsPage() {
                     <p className="text-xs font-bold text-[#3a2a1a]">{t.maintenanceMode}</p>
                     <p className="text-[9px] text-[#9a8a7a]">{t.disableAccess}</p>
                  </div>
-                 <div className="w-10 h-5 bg-gray-200 rounded-full p-1 cursor-pointer">
-                    <div className="w-3 h-3 bg-white rounded-full transition-transform" />
+                 <div 
+                   onClick={() => {
+                     const newMode = !settings.maintenanceMode;
+                     setSettings({...settings, maintenanceMode: newMode});
+                     api.patch("/settings", { maintenanceMode: newMode });
+                   }}
+                   className={`w-10 h-5 rounded-full p-1 cursor-pointer transition-colors ${settings.maintenanceMode ? 'bg-red-500' : 'bg-gray-200'}`}
+                 >
+                    <div className={`w-3 h-3 bg-white rounded-full transition-transform ${settings.maintenanceMode ? 'translate-x-5' : ''}`} />
                  </div>
               </div>
               <div className="flex items-center justify-between">
@@ -107,30 +184,6 @@ export default function SettingsPage() {
               </div>
            </div>
         </div>
-
-        {/* Recent Logins Card */}
-        <div className="bg-white rounded-xl border border-[#e8ddd0] p-6 flex flex-col gap-5">
-           <h3 className="font-bold text-[#3a2a1a] text-sm flex items-center gap-2">
-             <Lock className="w-4 h-4 text-[#8B6914]" /> {t.recentLogins}
-           </h3>
-           <div className="flex flex-col gap-4">
-              {logins.map((login, i) => (
-                <div key={i} className="flex gap-3">
-                   <div className={`w-1.5 h-1.5 rounded-full mt-1 ${login.color}`}></div>
-                   <div>
-                      <p className="text-xs font-bold text-[#3a2a1a]">{login.type}</p>
-                      <p className="text-[10px] text-[#9a8a7a]">{login.time}</p>
-                   </div>
-                </div>
-              ))}
-           </div>
-        </div>
-      </div>
-
-      <div className="flex">
-          <button className="bg-[#8B6914] text-white text-[12px] font-bold px-6 py-2.5 rounded-xl hover:bg-[#6a5010] transition-colors flex items-center gap-2">
-             <Save className="w-4 h-4" /> {t.saveChanges}
-          </button>
       </div>
 
       <ProfileModal

@@ -19,6 +19,7 @@ import {
   Rocket,
   BarChart,
   Bell,
+  HelpCircle,
   Settings,
   LogOut,
   X
@@ -122,6 +123,7 @@ const Sidebar = React.memo(({ isOpen, setIsOpen }) => {
       items: [
         { icon: BarChart, key: "analytics", path: "/analytics", badge: null },
         { icon: Bell, key: "notifications", path: "/notifications", badge: null },
+        { icon: HelpCircle, key: "faq", path: "/faq", badge: null },
         { icon: Settings, key: "settings", path: "/settings", badge: null },
       ],
     },
