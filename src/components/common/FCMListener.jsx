@@ -33,6 +33,9 @@ const FCMListener = () => {
     const setupListener = async () => {
       try {
         await onMessageListener();
+        // Dispatch events for UI to refetch
+        window.dispatchEvent(new Event("refetch-notifications"));
+        window.dispatchEvent(new Event("refetch-stats"));
         // Silently re-subscribe for the next message
         setupListener();
       } catch (_) {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useLang } from "../../context/LanguageContext";
 import { useApiCache } from "../../context/ApiCacheContext";
@@ -16,16 +16,17 @@ const Topbar = React.memo(({ onToggleSidebar }) => {
   // Live stats for dynamic subtitles — declared first so PAGE_TITLES can use it
   const [liveStats, setLiveStats] = useState(null);
 
+  const fetchStats = useCallback(() => {
+    fetchWithCache("/admin/stats", { expireIn: 30000 })
+      .then(res => { if (res.data.status === "ok") setLiveStats(res.data.data); })
+      .catch(() => { });
+  }, [fetchWithCache]);
+
   useEffect(() => {
-    const fetchStats = () => {
-      fetchWithCache("/admin/stats", { expireIn: 30000 })
-        .then(res => { if (res.data.status === "ok") setLiveStats(res.data.data); })
-        .catch(() => { });
-    };
     fetchStats();
     const interval = setInterval(fetchStats, 60000);
     return () => clearInterval(interval);
-  }, [fetchWithCache]);
+  }, [fetchStats]);
 
   // Per-route supplemental stats (for pages not covered by /admin/stats)
   const [contactsStats, setContactsStats] = useState(null);
@@ -53,7 +54,7 @@ const Topbar = React.memo(({ onToggleSidebar }) => {
   const s = liveStats;
   const PAGE_TITLES = {
     "/dashboard": { title: t.overview, sub: s ? `${(s.users?.total || 0).toLocaleString()} ${t.users?.toLowerCase()} · ${(s.reports?.total || 0).toLocaleString()} ${t.reports?.toLowerCase()}` : t.dashboardSub },
-    "/reports": { title: t.reports, sub: s ? `${(s.reports?.total || 0).toLocaleString()} ${t.totalCount} · ${(s.reports?.pending || 0).toLocaleString()} ${t.pendingCountLabel}` : t.reportsSub },
+    "/reports": { title: t.reports, sub: s ? `${(s.reports?.total || 0).toLocaleString()} ${t.totalCount} · ${(s.reports?.breakdown?.lost || 0).toLocaleString()} ${t.lost?.toLowerCase() || "lost"}` : t.reportsSub },
     "/users": { title: t.users, sub: s ? `${(s.users?.total || 0).toLocaleString()} ${t.registeredCount} · ${(s.users?.active || 0).toLocaleString()} ${t.active?.toLowerCase()}` : t.usersSub },
     "/partners": { title: t.partners, sub: s ? `${(s.partners?.total || 0).toLocaleString()} ${t.totalCount} · ${(s.partners?.pending || 0).toLocaleString()} ${t.pendingCountLabel}` : t.partnersSub },
     "/missions": { title: t.localMissions, sub: s ? `${(s.missions?.total || 0).toLocaleString()} ${t.missions?.toLowerCase()} · ${(s.missions?.inProgress || 0).toLocaleString()} ${t.inProgressCount}` : t.missionsSub },
@@ -101,34 +102,45 @@ const Topbar = React.memo(({ onToggleSidebar }) => {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [loadingProfile, setLoadingProfile] = useState(false);
 
+  const fetchNotifs = useCallback(async () => {
+    try {
+      const res = await api.get("/notifications/get-my-notifications?limit=10");
+      if (res.data.status === "ok") {
+        setNotifications(res.data.data);
+        setUnreadCount(res.data.meta.unreadCount || 0);
+      }
+    } catch (err) {
+      console.error("Failed to fetch personal notifications", err);
+    }
+  }, []);
+
   // Fetch initial notifications
   useEffect(() => {
-    const fetchNotifs = async () => {
-      try {
-        const res = await api.get("/notifications/get-my-notifications?limit=10");
-        if (res.data.status === "ok") {
-          setNotifications(res.data.data);
-          setUnreadCount(res.data.meta.unreadCount || 0);
-        }
-      } catch (err) {
-        console.error("Failed to fetch personal notifications", err);
-      }
-    };
     fetchNotifs();
-  }, []);
+  }, [fetchNotifs]);
 
   // Listen to live socket events for Topbar dropdown
   useEffect(() => {
-    const handleNewNotif = (notif) => {
-      setNotifications((prev) => [notif, ...prev]);
-      setUnreadCount((prev) => prev + 1);
+    const handleNewNotif = () => {
+      fetchNotifs();
+      fetchStats();
+    };
+
+    const handleRefetch = () => {
+      fetchNotifs();
+      fetchStats();
     };
 
     socket.on("notification:new", handleNewNotif);
+    window.addEventListener("refetch-notifications", handleRefetch);
+    window.addEventListener("refetch-stats", handleRefetch);
+    
     return () => {
       socket.off("notification:new", handleNewNotif);
+      window.removeEventListener("refetch-notifications", handleRefetch);
+      window.removeEventListener("refetch-stats", handleRefetch);
     };
-  }, []);
+  }, [fetchNotifs, fetchStats]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -172,7 +184,7 @@ const Topbar = React.memo(({ onToggleSidebar }) => {
   return (
     <header className="sticky top-0 z-[9997] bg-white border-b border-[#e8ddd0] px-4 md:px-6 h-[73px] flex items-center justify-between shrink-0">
       <div className="flex items-center gap-3">
-        <button 
+        <button
           onClick={onToggleSidebar}
           className="md:hidden text-[#3a2a1a] p-1.5 -ml-1 hover:bg-[#f5f0e8] rounded-lg transition-colors"
           aria-label="Toggle Sidebar"

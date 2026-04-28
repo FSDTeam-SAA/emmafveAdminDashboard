@@ -2,6 +2,7 @@ import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useLang } from "../../context/LanguageContext";
 import api from "../../utils/api";
+import { socket } from "../../context/SocketContect";
 import {
   LayoutDashboard,
   Flag,
@@ -52,30 +53,47 @@ const Sidebar = React.memo(({ isOpen, setIsOpen }) => {
     window.location.href = "/login";
   };
 
-  React.useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const res = await api.get("/admin/stats");
-        if (res.data.status === "ok") {
-          setStats(res.data.data);
-        }
-      } catch (err) {
-        console.error("Sidebar stats fetch failed", err);
+  const fetchStats = React.useCallback(async () => {
+    try {
+      const res = await api.get("/admin/stats");
+      if (res.data.status === "ok") {
+        setStats(res.data.data);
       }
-    };
+    } catch (err) {
+      console.error("Sidebar stats fetch failed", err);
+    }
+  }, []);
+
+  React.useEffect(() => {
     fetchStats();
+
+    // Refresh stats on real-time events
+    const handleRefetch = () => fetchStats();
+    
+    // Listen to various events that should trigger a stats refresh
+    socket.on("notification:new", handleRefetch);
+    socket.on("report:new", handleRefetch);
+    socket.on("donation:new", handleRefetch);
+    window.addEventListener("refetch-stats", handleRefetch);
 
     // Refresh stats every minute
     const interval = setInterval(fetchStats, 60000);
-    return () => clearInterval(interval);
-  }, []);
+    
+    return () => {
+      clearInterval(interval);
+      socket.off("notification:new", handleRefetch);
+      socket.off("report:new", handleRefetch);
+      socket.off("donation:new", handleRefetch);
+      window.removeEventListener("refetch-stats", handleRefetch);
+    };
+  }, [fetchStats]);
 
   const navSections = (t, stats) => [
     {
       label: t.principal,
       items: [
         { icon: LayoutDashboard, key: "overview", path: "/dashboard", badge: null },
-        { icon: Flag, key: "reports", path: "/reports", badge: stats?.reports?.pending > 0 ? stats.reports.pending : null, badgeColor: "bg-red-600" },
+        { icon: Flag, key: "reports", path: "/reports", badge: stats?.reports?.breakdown?.lost > 0 ? stats.reports.breakdown.lost : null, badgeColor: "bg-red-600" },
         { icon: Users, key: "users", path: "/users", badge: null },
         { icon: Handshake, key: "partners", path: "/partners", badge: stats?.partners?.pending > 0 ? stats.partners.pending : null, badgeColor: "bg-orange-500" },
         { icon: Phone, key: "contacts", path: "/contacts", badge: null },
@@ -170,7 +188,7 @@ const Sidebar = React.memo(({ isOpen, setIsOpen }) => {
                 <span
                   className={`${item.badgeColor} text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full`}
                 >
-                  {item.badge}
+                  {item.badge > 99 ? "99+" : item.badge}
                 </span>
               )}
             </Link>

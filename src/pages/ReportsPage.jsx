@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useLang } from "../context/LanguageContext";
 import StatCard from "../components/dashboard/StatCard";
 import api from "../utils/api";
+import { socket } from "../context/SocketContect";
 import DataTable from "../components/common/DataTable";
 import Pagination from "../components/common/Pagination";
 import FilterBar from "../components/common/FilterBar";
@@ -63,6 +64,18 @@ export default function ReportsPage() {
 
   useEffect(() => {
     fetchData();
+
+    // Live updates for reports
+    const handleUpdate = () => fetchData();
+    socket.on("report:new", handleUpdate);
+    socket.on("report:updated", handleUpdate);
+    window.addEventListener("refetch-reports", handleUpdate);
+
+    return () => {
+      socket.off("report:new", handleUpdate);
+      socket.off("report:updated", handleUpdate);
+      window.removeEventListener("refetch-reports", handleUpdate);
+    };
   }, [fetchData]);
 
   const handleApprovePoints = (reportId) => {
@@ -288,7 +301,7 @@ export default function ReportsPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <StatCard loading={loading} label={t.totalActive} value={{ text: stats?.total?.toLocaleString() || "0", color: "text-[#3a2a1a]" }} color="bg-purple-500" />
           <StatCard loading={loading} label={t.resolvedLabel} value={{ text: stats?.resolved?.toLocaleString() || "0", color: "text-[#3a2a1a]" }} color="bg-green-500" />
-          <StatCard loading={loading} label={t.pendingLabel} value={{ text: stats?.pending?.toLocaleString() || "0", color: "text-orange-500" }} color="bg-orange-500" />
+          <StatCard loading={loading} label={t.lost || "LOST"} value={{ text: (stats?.lost || 0).toLocaleString(), color: "text-orange-500" }} color="bg-orange-500" />
           <StatCard loading={loading} label={t.resolutionRate} value={{ text: `${stats?.resolutionRate || 0}%`, color: "text-blue-600" }} color="bg-blue-500" />
         </div>
       </div>
