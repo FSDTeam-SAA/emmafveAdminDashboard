@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useLang } from "../context/LanguageContext";
 import { toast } from "react-toastify";
@@ -143,7 +144,7 @@ export default function AdminLoginPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword((p) => !p)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-white/80 hover:text-white transition-colors"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-[#9a8a7a] hover:text-[#3a2a1a] transition-colors"
                 >
                   {showPassword ? (
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -163,6 +164,7 @@ export default function AdminLoginPage() {
             <div className="text-left -mt-1">
               <button
                 type="button"
+                onClick={() => navigate("/forgot-password")}
                 className="text-[11px] text-[#c0501a] hover:underline font-medium"
               >
                 {t.forgotPassword}
@@ -189,15 +191,18 @@ export default function AdminLoginPage() {
               type="submit"
               id="admin-login-btn"
               disabled={loading}
-              className="mt-2 w-full bg-white border-2 border-[#c0501a] text-[#c0501a] font-bold py-3 rounded-full text-sm hover:bg-[#c0501a] hover:text-white transition-all shadow-sm active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="mt-2 w-full bg-[#c0501a] text-white font-bold py-3 rounded-full text-sm hover:bg-[#a04015] transition-all shadow-md active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center relative"
             >
               {loading ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-[#c0501a]/30 border-t-[#c0501a] rounded-full animate-spin" />
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                   {t.signingIn}
-                </>
+                </div>
               ) : (
-                t.signInBtn
+                <>
+                  <span>{t.signInBtn || "Sign In"}</span>
+                  <ArrowRight className="w-4 h-4 absolute right-5" />
+                </>
               )}
             </button>
           </form>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useLang } from "../context/LanguageContext";
 import StatCard from "../components/dashboard/StatCard";
 import api from "../utils/api";
@@ -280,40 +280,51 @@ export default function DonationsPage() {
     }
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const query = new URLSearchParams({
-          page: queryParams.page,
-          limit: queryParams.limit,
-          search: queryParams.search,
-          sortBy: queryParams.sortBy,
-          sort: queryParams.sort,
-          ...(queryParams.status && queryParams.status !== "all" ? { status: queryParams.status } : {})
-        }).toString();
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const query = new URLSearchParams({
+        page: queryParams.page,
+        limit: queryParams.limit,
+        search: queryParams.search,
+        sortBy: queryParams.sortBy,
+        sort: queryParams.sort,
+        ...(queryParams.status && queryParams.status !== "all" ? { status: queryParams.status } : {})
+      }).toString();
 
-        const [donationsRes, statsRes] = await Promise.all([
-          api.get(`/donations/get-all-donation?${query}`),
-          api.get("/donations/stats"),
-        ]);
+      const [donationsRes, statsRes] = await Promise.all([
+        api.get(`/donations/get-all-donation?${query}`),
+        api.get("/donations/stats"),
+      ]);
 
-        if (donationsRes.data.status === "ok" || donationsRes.data.success) {
-          setDonations(donationsRes.data.data || []);
-          setMeta(donationsRes.data.meta);
-        }
-
-        if (statsRes.data.status === "ok" || statsRes.data.success) {
-          setStats(statsRes.data.data);
-        }
-      } catch (err) {
-        console.error("Failed to fetch donations", err);
-      } finally {
-        setLoading(false);
+      if (donationsRes.data.status === "ok" || donationsRes.data.success) {
+        setDonations(donationsRes.data.data || []);
+        setMeta(donationsRes.data.meta);
       }
-    };
-    fetchData();
+
+      if (statsRes.data.status === "ok" || statsRes.data.success) {
+        setStats(statsRes.data.data);
+      }
+    } catch (err) {
+      console.error("Failed to fetch donations", err);
+    } finally {
+      setLoading(false);
+    }
   }, [queryParams]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  useEffect(() => {
+    socket.connect();
+    socket.on("donation_new", () => {
+      fetchData();
+    });
+    return () => {
+      socket.off("donation_new");
+    };
+  }, [fetchData]);
 
   const statCards = [
     { label: t.totalCollected, value: { text: `${stats?.totalCollected || 0}€`, color: "text-green-600" }, color: "bg-green-500" },

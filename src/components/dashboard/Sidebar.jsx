@@ -75,7 +75,7 @@ const Sidebar = React.memo(({ isOpen, setIsOpen }) => {
       label: t.principal,
       items: [
         { icon: LayoutDashboard, key: "overview", path: "/dashboard", badge: null },
-        { icon: Flag, key: "reports", path: "/reports", badge: stats?.reports?.total > 0 ? stats.reports.total : null, badgeColor: "bg-red-600" },
+        { icon: Flag, key: "reports", path: "/reports", badge: stats?.reports?.pending > 0 ? stats.reports.pending : null, badgeColor: "bg-red-600" },
         { icon: Users, key: "users", path: "/users", badge: null },
         { icon: Handshake, key: "partners", path: "/partners", badge: stats?.partners?.pending > 0 ? stats.partners.pending : null, badgeColor: "bg-orange-500" },
         { icon: Phone, key: "contacts", path: "/contacts", badge: null },

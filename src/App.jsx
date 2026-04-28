@@ -12,6 +12,8 @@ import { Suspense, lazy } from "react";
 
 // Lazy Loaded Pages
 const AdminLoginPage = lazy(() => import("./pages/AdminLoginPage"));
+const ForgotPasswordPage = lazy(() => import("./pages/ForgotPasswordPage"));
+const ResetPasswordPage = lazy(() => import("./pages/ResetPasswordPage"));
 const DashboardPage = lazy(() => import("./pages/DashboardPage"));
 const ReportsPage = lazy(() => import("./pages/ReportsPage"));
 const UsersPage = lazy(() => import("./pages/UsersPage"));
@@ -68,6 +70,26 @@ const App = () => {
                 <Navigate to="/dashboard" replace />
               ) : (
                 <AdminLoginPage />
+              )
+            }
+          />
+          <Route
+            path="/forgot-password"
+            element={
+              isAdmin() ? (
+                <Navigate to="/dashboard" replace />
+              ) : (
+                <ForgotPasswordPage />
+              )
+            }
+          />
+          <Route
+            path="/reset-password/:token"
+            element={
+              isAdmin() ? (
+                <Navigate to="/dashboard" replace />
+              ) : (
+                <ResetPasswordPage />
               )
             }
           />

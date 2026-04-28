@@ -106,8 +106,12 @@ export default function ValidationDonationsPage() {
     socket.on("donation_validation_updated", () => {
       fetchData();
     });
+    socket.on("donation_proof_new", () => {
+      fetchData();
+    });
     return () => {
       socket.off("donation_validation_updated");
+      socket.off("donation_proof_new");
     };
   }, [fetchData]);
 

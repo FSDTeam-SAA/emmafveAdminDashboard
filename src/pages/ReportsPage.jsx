@@ -8,7 +8,7 @@ import FilterBar from "../components/common/FilterBar";
 import { toast } from "react-toastify";
 import ConfirmModal from "../components/common/ConfirmModal";
 import CRUDModal from "../components/common/CRUDModal";
-import { PawPrint, MapPin, FileText, User, X, Plus } from "lucide-react";
+import { PawPrint, MapPin, FileText, User, X, Plus, Dog, Cat, Bird, HelpCircle } from "lucide-react";
 
 export default function ReportsPage() {
   const { t } = useLang();
@@ -101,7 +101,13 @@ export default function ReportsPage() {
   };
 
   const getIcon = (type) => {
-    return <PawPrint className="w-5 h-5 text-[#8B6914]" />;
+    switch (type?.toLowerCase()) {
+      case "dog": return <Dog className="w-5 h-5 text-[#8B6914]" />;
+      case "cat": return <Cat className="w-5 h-5 text-[#8B6914]" />;
+      case "bird": return <Bird className="w-5 h-5 text-[#8B6914]" />;
+      case "other": return <HelpCircle className="w-5 h-5 text-[#8B6914]" />;
+      default: return <PawPrint className="w-5 h-5 text-[#8B6914]" />;
+    }
   };
 
   const handleCreateReport = async (formData) => {
