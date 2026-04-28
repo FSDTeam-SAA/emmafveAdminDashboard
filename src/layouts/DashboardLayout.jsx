@@ -70,7 +70,16 @@ const DashboardLayout = React.memo(() => {
       <div className="flex-1 flex flex-col min-h-screen transition-all duration-300 md:ml-52">
         <Topbar onToggleSidebar={() => setIsSidebarOpen(true)} />
         <main className="flex-1 overflow-y-auto">
-          <Outlet />
+          <React.Suspense fallback={
+            <div className="flex h-full w-full items-center justify-center">
+              <div className="flex flex-col items-center gap-4">
+                 <div className="w-10 h-10 border-4 border-[#8B6914] border-t-transparent rounded-full animate-spin"></div>
+                 <p className="text-[#8B6914] font-semibold tracking-widest uppercase text-xs animate-pulse">Loading Page...</p>
+              </div>
+            </div>
+          }>
+            <Outlet />
+          </React.Suspense>
         </main>
       </div>
     </div>

@@ -2,23 +2,23 @@ import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useLang } from "../../context/LanguageContext";
 import api from "../../utils/api";
-import { 
-  LayoutDashboard, 
-  Flag, 
-  Users, 
-  Handshake, 
-  Phone, 
-  Map, 
-  MapPin, 
-  ShoppingBag, 
-  FileText, 
-  Coins, 
-  Package, 
-  Gift, 
-  Rocket, 
-  BarChart, 
-  Bell, 
-  Settings, 
+import {
+  LayoutDashboard,
+  Flag,
+  Users,
+  Handshake,
+  Phone,
+  Map,
+  MapPin,
+  ShoppingBag,
+  FileText,
+  Coins,
+  Package,
+  Gift,
+  Rocket,
+  BarChart,
+  Bell,
+  Settings,
   LogOut,
   X
 } from "lucide-react";
@@ -116,14 +116,15 @@ const Sidebar = React.memo(({ isOpen, setIsOpen }) => {
       {/* Logo */}
       <div className="bg-[#2a1a0a] px-3 h-[73px] flex items-center justify-between shrink-0">
         <div className="flex items-center gap-2">
-          <span className="text-white font-bold text-base tracking-widest">HESTEKA</span>
+          {/*  <span className="text-white font-bold text-base tracking-widest">HESTEKA</span> */}
+          <img src="/hestekalogo.png" alt="HESTEKA Logo" className="h-12 w-auto object-contain" />
           <span className="bg-red-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
             {t.admin}
           </span>
         </div>
-        
+
         {/* Close Button for Mobile */}
-        <button 
+        <button
           onClick={() => setIsOpen(false)}
           className="md:hidden text-[#c8b898] hover:text-white p-1 transition-colors"
           aria-label="Close Sidebar"

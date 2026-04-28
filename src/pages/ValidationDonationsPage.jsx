@@ -305,21 +305,22 @@ export default function ValidationDonationsPage() {
 
       {imageModal.isOpen && imageModal.url && (
         <div 
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 cursor-pointer"
+          className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 cursor-pointer"
           onClick={() => setImageModal({ isOpen: false, url: null })}
         >
-          <img 
-            src={imageModal.url} 
-            alt="Enlarged proof" 
-            className="max-w-full max-h-[90vh] object-contain rounded-xl shadow-2xl cursor-default"
-            onClick={(e) => e.stopPropagation()}
-          />
-          <button 
-            className="absolute top-4 right-4 text-white hover:text-gray-300 transition-colors p-2"
-            onClick={() => setImageModal({ isOpen: false, url: null })}
-          >
-            <X className="w-8 h-8" />
-          </button>
+          <div className="relative max-w-full max-h-[90vh] inline-flex" onClick={(e) => e.stopPropagation()}>
+            <img 
+              src={imageModal.url} 
+              alt="Enlarged proof" 
+              className="max-w-full max-h-[90vh] object-contain rounded-xl shadow-2xl cursor-default"
+            />
+            <button 
+              className="absolute top-3 right-3 bg-black/50 text-white rounded-full p-1 hover:bg-black/80 hover:scale-110 transition-all"
+              onClick={() => setImageModal({ isOpen: false, url: null })}
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
       )}
     </div>

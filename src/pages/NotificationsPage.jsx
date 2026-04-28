@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useLang } from "../context/LanguageContext";
 import api from "../utils/api";
 
 import ConfirmModal from "../components/common/ConfirmModal";
-import { Bell, Coins, Target, MapPin, Megaphone, Rocket, ClipboardList } from "lucide-react";
+import { Bell, Coins, Target, MapPin, Megaphone, Rocket, ClipboardList, Gift, Users, FileText, CreditCard, ArrowUp } from "lucide-react";
 
 const NotifItem = React.memo(({ icon, title, sub, stats, date, isRead, onClick }) => (
   <div 
@@ -39,16 +39,63 @@ export default function NotificationsPage() {
   const [selectedNotif, setSelectedNotif] = useState(null);
   const [viewMode, setViewMode] = useState("my");
 
+  const [alertTarget, setAlertTarget] = useState("all_france");
+  const [alertRole, setAlertRole] = useState("all");
+  const [alertMessage, setAlertMessage] = useState("");
+  const [sendingAlert, setSendingAlert] = useState(false);
+
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const observer = useRef();
+  
+  const listRef = useRef(null);
+  const [showBackToTop, setShowBackToTop] = useState(false);
+
+  const handleScroll = () => {
+    if (listRef.current) {
+      setShowBackToTop(listRef.current.scrollTop > 200);
+    }
+  };
+
+  const scrollToTop = () => {
+    if (listRef.current) {
+      listRef.current.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
+
+  const lastNotifElementRef = useCallback(node => {
+    if (loading) return;
+    if (observer.current) observer.current.disconnect();
+    observer.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && hasMore) {
+        setPage(prevPage => prevPage + 1);
+      }
+    });
+    if (node) observer.current.observe(node);
+  }, [loading, hasMore]);
+
+  useEffect(() => {
+    setHistory([]);
+    setPage(1);
+    setHasMore(true);
+  }, [viewMode]);
+
   useEffect(() => {
     const fetchNotifications = async () => {
       setLoading(true);
       try {
         const endpoint = viewMode === "all" 
-          ? "/notifications/get-all-admin-notifications" 
-          : "/notifications/get-my-notifications";
+          ? `/notifications/get-all-admin-notifications?page=${page}&limit=20` 
+          : `/notifications/get-my-notifications?page=${page}&limit=20`;
         const res = await api.get(endpoint);
         if (res.data.status === "ok") {
-          setHistory(res.data.data);
+          const newNotifs = res.data.data;
+          setHistory(prev => {
+            const existingIds = new Set(prev.map(n => n._id));
+            const filteredNew = newNotifs.filter(n => !existingIds.has(n._id));
+            return page === 1 ? newNotifs : [...prev, ...filteredNew];
+          });
+          setHasMore(newNotifs.length === 20);
         }
       } catch (err) {
         console.error("Failed to fetch notifications", err);
@@ -57,13 +104,17 @@ export default function NotificationsPage() {
       }
     };
     fetchNotifications();
-  }, [viewMode]);
+  }, [viewMode, page]);
 
   const getIcon = (type) => {
     switch (type) {
       case "points_earned": return <Coins className="w-5 h-5" />;
       case "new_mission": return <Target className="w-5 h-5" />;
       case "report_update": return <MapPin className="w-5 h-5" />;
+      case "new_report": return <FileText className="w-5 h-5" />;
+      case "new_payment": return <CreditCard className="w-5 h-5" />;
+      case "new_donation": return <Gift className="w-5 h-5" />;
+      case "new_partner": return <Users className="w-5 h-5" />;
       default: return <Bell className="w-5 h-5" />;
     }
   };
@@ -82,45 +133,80 @@ export default function NotificationsPage() {
     }
   };
 
+  const handleSendAlert = async () => {
+    if (!alertMessage.trim()) return;
+    setSendingAlert(true);
+    try {
+      const res = await api.post("/notifications/send-admin-alert", {
+        geoTarget: alertTarget,
+        userType: alertRole,
+        message: alertMessage
+      });
+      if (res.data.status === "ok") {
+        setAlertMessage("");
+        setViewMode("all"); // Refresh to show the new alert in history
+      }
+    } catch (err) {
+      console.error("Failed to send alert", err);
+    } finally {
+      setSendingAlert(false);
+    }
+  };
+
   return (
     <div className="px-6 py-4 flex flex-col gap-4">
-      <div className="grid grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
         {/* Create Alert Form */}
-        <div className="col-span-3 bg-white rounded-xl border border-[#e8ddd0] p-6 flex flex-col gap-5">
+        <div className="lg:col-span-3 bg-white rounded-xl border border-[#e8ddd0] p-6 flex flex-col gap-5">
            <h3 className="font-bold text-[#3a2a1a] text-xs flex items-center gap-2">
-             <Megaphone className="w-4 h-4 text-[#8B6914]" /> {t.createAlert}
+             <Megaphone className="w-4 h-4 text-[#8B6914]" /> {t.createAlert || "Create an alert"}
            </h3>
            <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-1.5">
-                 <label className="text-[9px] font-bold text-[#9a8a7a] uppercase">{t.geoTarget}</label>
-                 <select className="bg-[#fcfaf7] border border-[#e8ddd0] rounded-xl px-3 py-2 text-xs text-[#3a2a1a] outline-none">
-                    <option>Toute la France</option>
-                    <option>Provence-Alpes-C\u00F4te d'Azur</option>
+                 <label className="text-[9px] font-bold text-[#9a8a7a] uppercase">{t.geoTarget || "GEOGRAPHIC TARGETING"}</label>
+                 <select 
+                   value={alertTarget}
+                   onChange={(e) => setAlertTarget(e.target.value)}
+                   className="bg-[#fcfaf7] border border-[#e8ddd0] rounded-xl px-3 py-2 text-xs text-[#3a2a1a] outline-none"
+                 >
+                    <option value="all_france">Toute la France</option>
+                    <option value="paca">Provence-Alpes-Côte d'Azur</option>
                  </select>
               </div>
               <div className="flex flex-col gap-1.5">
-                 <label className="text-[9px] font-bold text-[#9a8a7a] uppercase">{t.userType}</label>
-                 <select className="bg-[#fcfaf7] border border-[#e8ddd0] rounded-xl px-3 py-2 text-xs text-[#3a2a1a] outline-none">
-                    <option>Tous</option>
-                    <option>Propri\u00E9taires</option>
+                 <label className="text-[9px] font-bold text-[#9a8a7a] uppercase">{t.userType || "USER TYPE"}</label>
+                 <select 
+                   value={alertRole}
+                   onChange={(e) => setAlertRole(e.target.value)}
+                   className="bg-[#fcfaf7] border border-[#e8ddd0] rounded-xl px-3 py-2 text-xs text-[#3a2a1a] outline-none"
+                 >
+                    <option value="all">Tous</option>
+                    <option value="user">Propriétaires</option>
+                    <option value="partner">Partenaires</option>
                  </select>
               </div>
               <div className="flex flex-col gap-1.5">
-                 <label className="text-[9px] font-bold text-[#9a8a7a] uppercase">{t.message}</label>
+                 <label className="text-[9px] font-bold text-[#9a8a7a] uppercase">{t.message || "MESSAGE"}</label>
                  <textarea 
+                    value={alertMessage}
+                    onChange={(e) => setAlertMessage(e.target.value)}
                     placeholder="Saisissez votre message d'alerte..."
                     className="bg-[#fcfaf7] border border-[#e8ddd0] rounded-xl px-3 py-2 text-xs text-[#3a2a1a] outline-none h-32 resize-none"
                  />
               </div>
-              <button className="bg-[#8B6914] text-white text-[11px] font-bold py-3 rounded-xl hover:bg-[#6a5010] transition-colors flex items-center justify-center gap-2">
-                  <Rocket className="w-4 h-4" /> {t.sendAlert}
+              <button 
+                onClick={handleSendAlert}
+                disabled={sendingAlert || !alertMessage.trim()}
+                className="bg-[#8B6914] text-white text-[11px] font-bold py-3 rounded-xl hover:bg-[#6a5010] transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                  <Rocket className="w-4 h-4" /> {sendingAlert ? "Sending..." : (t.sendAlert || "Send alert")}
               </button>
            </div>
         </div>
 
         {/* History Card */}
-        <div className="col-span-2 bg-white rounded-xl border border-[#e8ddd0] p-4 flex flex-col gap-4">
-           <div className="flex items-center justify-between">
+        <div className="lg:col-span-2 bg-white rounded-xl border border-[#e8ddd0] p-4 flex flex-col gap-4 relative h-[calc(100vh-110px)]">
+           <div className="flex items-center justify-between shrink-0">
               <h3 className="font-bold text-[#3a2a1a] text-xs flex items-center gap-2">
                 <ClipboardList className="w-4 h-4 text-[#8B6914]" /> {t.notifHistory}
               </h3>
@@ -140,26 +226,56 @@ export default function NotificationsPage() {
              </div>
            </div>
            
-           <div className="flex flex-col gap-3">
-              {history.map((item) => (
-                <NotifItem 
-                  key={item._id} 
-                  icon={getIcon(item.type)}
-                  title={item.title}
-                  sub={item.description}
-                  date={item.createdAt}
-                  isRead={item.isRead}
-                  onClick={() => handleNotifClick(item)}
-                />
-              ))}
+           <div 
+             className="flex flex-col gap-3 overflow-y-auto pr-1 pb-4 flex-1 scrollbar-thin scrollbar-thumb-[#8B6914]/20 scrollbar-track-transparent"
+             ref={listRef}
+             onScroll={handleScroll}
+           >
+              {history.map((item, index) => {
+                if (history.length === index + 1) {
+                  return (
+                    <div ref={lastNotifElementRef} key={item._id}>
+                      <NotifItem 
+                        icon={getIcon(item.type)}
+                        title={item.title}
+                        sub={item.description}
+                        date={item.createdAt}
+                        isRead={item.isRead}
+                        onClick={() => handleNotifClick(item)}
+                      />
+                    </div>
+                  );
+                } else {
+                  return (
+                    <NotifItem 
+                      key={item._id} 
+                      icon={getIcon(item.type)}
+                      title={item.title}
+                      sub={item.description}
+                      date={item.createdAt}
+                      isRead={item.isRead}
+                      onClick={() => handleNotifClick(item)}
+                    />
+                  );
+                }
+              })}
               {history.length === 0 && !loading && (
                 <p className="text-[10px] text-[#9a8a7a] text-center py-8 italic">{t.noNotifHistory}</p>
               )}
            </div>
+
+           {/* Back to top button */}
+           {showBackToTop && (
+             <button 
+               onClick={scrollToTop}
+               className="absolute bottom-6 right-6 bg-[#8B6914] text-white p-2.5 rounded-full shadow-lg hover:bg-[#6a5010] transition-all z-10 hover:scale-105"
+               title="Back to top"
+             >
+               <ArrowUp className="w-4 h-4" />
+             </button>
+           )}
         </div>
       </div>
-
-      {/* Details Modal */}
       {selectedNotif && (
         <ConfirmModal
           isOpen={!!selectedNotif}
